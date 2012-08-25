@@ -1,0 +1,7 @@
+syntax: glob
+*~
+img/*.luaimg
+sonic-hud.7z
+sonic/common/boss-tables.lua
+sonic/common/hud-codes.lua
+sonic/common/hud-images.lua
