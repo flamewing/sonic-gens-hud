@@ -1,6 +1,17 @@
 This set of script files is a Lua HUD for TASing Sega Genesis Sonic games. The
 HUD also supports several hacks.
 
+
+Index
+--------------------------------------------------------------------------------
+1) Introduction
+2) Building
+3) Using
+4) Changelog
+
+1) Introduction
+--------------------------------------------------------------------------------
+
 This HUD displays a load of useful information for TASing such games. It has the
 following features:
 
@@ -81,9 +92,22 @@ Compatibility list:
  *	Sonic & Knuckles
  *	Sonic the Hedgehog 3 locked on to Sonic & Knuckles
  *	E-122-Psi's Sonic 3 and Amy Rose v1.3 
- 
-Changelog:
-----------
+
+2) Building
+--------------------------------------------------------------------------------
+You need have a Unix environment with bash, plus Lua, GD tools (specifically,
+png2gd) and 7z in order to build the HUD. If you have none of this, you can't
+build it at the moment.
+
+After installing all required tools, edit 'make.sh' so that the environment
+variables it sets have the correct locations.
+
+3) Using
+--------------------------------------------------------------------------------
+
+
+4) Changelog
+--------------------------------------------------------------------------------
 
 Aug 25 2012:
  *	Sonic 3 & Amy Rose support;
