@@ -104,7 +104,11 @@ variables it sets have the correct locations.
 
 3) Using
 --------------------------------------------------------------------------------
+Find the location where your Gens rerecording executable is. At the same level,
+create a directory called "lua". Extract all the contents of the distributed
+package into this directory.
 
+Open a supported ROM, then start sonic-hud.lua.
 
 4) Changelog
 --------------------------------------------------------------------------------
