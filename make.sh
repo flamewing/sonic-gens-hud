@@ -18,8 +18,10 @@ check_run find_bosses.lua boss-tables.lua "Finding boss code points..."
 echo "Generating luaimg files and header file..."
 ./imagedump.sh
 
-echo "Creating archive sonic-hud.7z..."
-rm -f sonic-hud.7z
-7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on sonic-hud.7z *.txt sonic-hud.lua headers/*.lua img/*.luaimg sonic/*.lua sonic/common/*.lua &> /dev/null
+BUILD="builds/sonic-hud-$(date +"%F").7z"
+mkdir -p builds
+rm -f "$BUILD"
+echo "Creating archive '$BUILD'..."
+7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "$BUILD" *.txt sonic-hud.lua headers/*.lua img/*.luaimg sonic/*.lua sonic/common/*.lua &> /dev/null
 echo "All done."
 

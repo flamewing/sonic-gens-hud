@@ -113,12 +113,16 @@ Open a supported ROM, then start sonic-hud.lua.
 4) Changelog
 --------------------------------------------------------------------------------
 
-Aug 25 2012:
+Sep 5/2012
+ * Added horizontal scroll delay support for S2, S3, S&K, and their supported hacks.
+ * Fixed bugs 'Sonic 3 & Amy' hack.
+
+Aug 25/2012:
  *	Sonic 3 & Amy Rose support;
  *	Updated Charmy in Sonic 1 support to v1.1;
  *	Perfect rings counter in S2;
 
-Apr 15 2012:
+Apr 15/2012:
  *	Updated support to Amy in Sonic 2 hack to version 1.5.
 
 Oct 11/2010:
@@ -134,7 +138,7 @@ Sep 27/2010:
  *	Revamped the ROM detection and feature set code.
  *	Added several hacks to the compatibility list.
 
-Jan 22 2012:
+Jan 22/2012:
  *	Updated support to Amy in Sonic 2 hack to version 1.5.
 
 

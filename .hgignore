@@ -6,3 +6,4 @@ sonic/common/boss-tables.lua
 sonic/common/hud-codes.lua
 sonic/common/hud-images.lua
 build.sh
+builds/*
