@@ -605,31 +605,33 @@ function Character:init(id, p1, port)
 		--	apply for either character in a Sonic + Tails game (in S2, S3, S3&K), it never
 		--	happens in-game except in 2p mode, for which this script is inadequate anyway.
 		table.insert(self.status_huds, 1,
-			Create_HUD(self, self.stars_active   , self.stars_timer    , ui_icons.invincibility))
+			Create_HUD(self, self.stars_active       , self.stars_timer        , ui_icons.invincibility))
 		table.insert(self.status_huds, 2,
-			Create_HUD(self, self.shoes_active   , self.shoes_timer    , ui_icons.superspeed   ))
+			Create_HUD(self, self.shoes_active       , self.shoes_timer        , ui_icons.superspeed   ))
 	 	--	Player-independent status icons. They are included in player 1 for
 	 	--	convenience purposes only.
 		table.insert(self.status_huds, 3,
-			Create_HUD(game, game.super_active   , game.super_timer    , ui_icons.superchange  ))
+			Create_HUD(game, game.super_active       , game.super_timer        , ui_icons.superchange  ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.warp_active    , game.warp_timer     , ui_icons.clock        ))
+			Create_HUD(game, game.warp_active        , game.warp_timer         , ui_icons.clock        ))
+		table.insert(self.status_huds,
+			Create_HUD(game, game.scroll_delay_active, game.scroll_delay_timer , ui_icons.camera_lock  ))
 	elseif self.charid == charids.tails then
 		--	Status icons specific to player 2 Tails.
 		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active , game.cputime_timer  , ui_icons.cpu_2p       ))
+			Create_HUD(game, game.cputime_active     , game.cputime_timer      , ui_icons.cpu_2p       ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active , game.despawn_timer  , ui_icons.tails_despawn))
+			Create_HUD(game, game.despawn_active     , game.despawn_timer      , ui_icons.tails_despawn))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active , game.respawn_timer  , ui_icons.tails_normal ))
+			Create_HUD(game, game.respawn_active     , game.respawn_timer      , ui_icons.tails_normal ))
 	elseif self.charid == charids.cream then
 		--	Status icons specific to player 2 Cream.
 		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active , game.cputime_timer  , ui_icons.cpu_2p       ))
+			Create_HUD(game, game.cputime_active     , game.cputime_timer      , ui_icons.cpu_2p       ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active , game.despawn_timer  , ui_icons.cream_despawn))
+			Create_HUD(game, game.despawn_active     , game.despawn_timer      , ui_icons.cream_despawn))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active , game.respawn_timer  , ui_icons.cream_normal ))
+			Create_HUD(game, game.respawn_active     , game.respawn_timer      , ui_icons.cream_normal ))
 	end
 end
 

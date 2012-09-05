@@ -261,7 +261,7 @@ end
 --	We remap the value read from memory in S3Amy to the internal IDs
 --	defined in the enums file.
 local function s3kamy_char()
-	local char = memory.readword(0xffff72)
+	local char = memory.readword(0xffff08)
 	return (char >= 2 and char) or (char + charids.amy_tails)
 end
 

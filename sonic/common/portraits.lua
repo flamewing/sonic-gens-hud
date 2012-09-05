@@ -122,9 +122,10 @@ if rom:is_sonic3() or rom:is_sonick() then
 	                                 [ 54]=ui_icons.knuckles_hyper_54}
 	portraits.knuckles.super.face = portraits.knuckles.hyper.face	--	Same portrait set
 	--	Just in case:
-	portraits.amy_rose.super.face = {[ 48]=ui_icons.sonic_super_30,    [ 56]=ui_icons.sonic_super_38,    [ 64]=ui_icons.sonic_super_40,
-	                                 [ 72]=ui_icons.sonic_super_48,    [ 80]=ui_icons.sonic_super_50,    [ 88]=ui_icons.sonic_super_58,
-	                                 [ 96]=ui_icons.sonic_super_60,    [104]=ui_icons.sonic_super_68,    [112]=ui_icons.sonic_super_70}
+	portraits.amy_rose.super.face = {[ 00]=ui_icons.amy_super_30,      [ 06]=ui_icons.amy_super_70,      [ 12]=ui_icons.amy_super_30,
+	                                 [ 18]=ui_icons.amy_super_38,      [ 24]=ui_icons.amy_super_40,      [ 30]=ui_icons.amy_super_48,
+	                                 [ 36]=ui_icons.amy_super_48,      [ 42]=ui_icons.amy_super_48,      [ 48]=ui_icons.amy_super_48,
+	                                 [ 54]=ui_icons.amy_super_48,      [ 60]=ui_icons.amy_super_40,      [ 66]=ui_icons.amy_super_38}
 	portraits.amy_rose.hyper.face = portraits.amy_rose.super.face
 else
 	--	Defining for all others just in case, using the same set as for S2.

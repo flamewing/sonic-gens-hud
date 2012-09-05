@@ -100,6 +100,10 @@ if rom:is_sonic1() or rom:is_sonic_cd() then
 	function game:hyper_form()
 		return false
 	end
+	
+	function game:scroll_delay()
+		return 0
+	end
 elseif rom:is_sonic2() then
     --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
 	function game:super_status()
@@ -109,6 +113,10 @@ elseif rom:is_sonic2() then
     --	Super Sonic/Knuckles = 1, all others 0
 	function game:hyper_form()
 		return false
+	end
+
+	function game:scroll_delay()
+		return memory.readbyte(0xffeed2)
 	end
 else
     --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
@@ -120,10 +128,22 @@ else
 	function game:hyper_form()
 		return memory.readbytesigned(0xfffe19) == -1
 	end
+
+	function game:scroll_delay()
+		return memory.readbyte(0xffee24)
+	end
 end
 
 function game:super_active()
 	return self:super_status() == -1
+end
+
+function game:scroll_delay_timer()
+	return string.format("%5d", self.scroll_delay())
+end
+
+function game:scroll_delay_active()
+	return memory.readword(0xffee24) ~= 0
 end
 
 function game:cputime_time_left()
