@@ -17,7 +17,7 @@
 
 if	base_path == nil then
 	base_path = (string.gsub(debug.getinfo(1).source, "sonic%-hud", "?", 1)):sub(2)
-	package.path = package.path .. ";" .. base_path
+	package.path = base_path .. ";" .. package.path
 end
 
 -------------------------------------------------------------------------------
