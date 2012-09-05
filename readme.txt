@@ -104,18 +104,23 @@ variables it sets have the correct locations.
 
 3) Using
 --------------------------------------------------------------------------------
-Find the location where your Gens rerecording executable is. At the same level,
-create a directory called "lua". Extract all the contents of the distributed
-package into this directory.
+Extract all the contents of the distributed package somewhere you like. Open a
+supported ROM in Gens, then start 'sonic-hud.lua'.
 
-Open a supported ROM, then start sonic-hud.lua.
+Alternatively, all of the '*.lua' files in the 'sonic' subdirectory (but not on
+the 'sonic/common' subdirectory) can be opened in Gens and they will work on
+their own.
 
 4) Changelog
 --------------------------------------------------------------------------------
 
 Sep 5/2012
- * Added horizontal scroll delay support for S2, S3, S&K, and their supported hacks.
- * Fixed bugs 'Sonic 3 & Amy' hack.
+ *	Added horizontal scroll delay support for S2, S3, S&K, and their supported
+	hacks.
+ *	Fixed bugs 'Sonic 3 & Amy' hack.
+ *	Script now works from wherever it has been decompressed to.
+ *	Added S&K and S3&K visual cheat script.
+ *	Added Sonic 1 movie resyncher.
 
 Aug 25/2012:
  *	Sonic 3 & Amy Rose support;

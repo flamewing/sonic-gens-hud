@@ -15,6 +15,11 @@
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------------------
 
+if	base_path == nil then
+	base_path = (string.gsub(debug.getinfo(1).source, "sonic[\\\\/][%w%-]+%.lua", "?.lua", 1)):sub(2)
+	package.path = package.path .. ";" .. base_path
+end
+
 -------------------------------------------------------------------------------
 --	Disable Hyper Sonic's Hyper Launch flash.
 --	Original by Upthorn, but caused desynchs.

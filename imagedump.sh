@@ -31,8 +31,10 @@ echo "--------------------------------------------------------------------------
 --	All images are PNGs predumped to GD format.
 -------------------------------------------------------------------------------
 
+local img_path = (string.gsub(debug.getinfo(1).source, \"sonic/common/hud%-images%.lua\", \"img\")):sub(2)
+
 local function open_image(fname)
-	local prefix = \"./lua/img\"
+	local prefix = img_path
 	local file = io.open(string.format(\"%s/%s\", prefix, fname), \"rb\") or
 		error(string.format(\"Error: Image '%s' could not be found.\", string.format(\"%s/%s\", prefix, fname)), 0)
 	local retvar = file:read(\"*a\")
