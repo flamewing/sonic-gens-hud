@@ -396,6 +396,10 @@ function give_super(hyper)
 	go_super()
 end
 
+function give_wheel_glitch()
+	memory.writebyte(p1_off + 0x3c, 0xff)
+end
+
 local x_offset = 269
 local width    = 41
 -- Reads mem values, emulates a couple of frames, displays everything
@@ -406,15 +410,15 @@ function create_menu()
 		give_rings(10)
 	elseif do_icon_button(ui_icons.shield_flame    , 0,  78, 16, 14) then
 		give_shield(fire_shield)
-	elseif do_icon_button(ui_icons.shield_lightning, 0,  93, 16, 14) then
+	elseif do_icon_button(ui_icons.shield_lightning,17,  78, 16, 14) then
 		give_shield(lightning_shield)
-	elseif do_icon_button(ui_icons.shield_bubble   , 0, 108, 16, 14) then
+	elseif do_icon_button(ui_icons.shield_bubble   ,34,  78, 16, 14) then
 		give_shield(bubble_shield)
-	elseif do_icon_button(ui_icons.superspeed      , 0, 123, 16, 14) then
+	elseif do_icon_button(ui_icons.superspeed      , 0,  93, 16, 14) then
 		give_shoes()
-	elseif do_icon_button(ui_icons.invincibility   , 0, 138, 16, 14) then
+	elseif do_icon_button(ui_icons.invincibility   ,17,  93, 16, 14) then
 		give_invincibility()
-	elseif do_icon_button(ui_icons.emeralds_chaos  , 0, 153, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif do_icon_button(ui_icons.emeralds_chaos  , 0, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local ncnt = (memory.readbyte(chaosem_off) + 1) % 8
 		memory.writebyte(chaosem_off, ncnt)
 		if plain_s3 then
@@ -441,7 +445,7 @@ function create_menu()
 				memory.writebyte(0xffffb2 + emerald, val)
 			end
 		end
-	elseif not plain_s3 and do_icon_button(ui_icons.emeralds_super  , 0, 168, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif not plain_s3 and do_icon_button(ui_icons.emeralds_super  ,17, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local scnt = (memory.readbyte(superem_off) + 1) % 8
 		memory.writebyte(superem_off, scnt)
 		local ncnt = memory.readbyte(chaosem_off)
@@ -458,7 +462,7 @@ function create_menu()
 			end
 			memory.writebyte(0xffffb2 + emerald, val)
 		end
-	elseif do_icon_button(ui_icons.superchange  , 0, (plain_s3 and 168) or 183, 16, 14) then
+	elseif do_icon_button(ui_icons.superchange  , 0, 123, 16, 14) then
 		give_super(false)
 	-- elseif do_button("Go Normal"    , x_offset, 190, width, 9) then
 	-- 	give_rings(-1000)
@@ -472,8 +476,10 @@ function create_menu()
 	-- 	go_super(false)
 	-- elseif do_button("Go Hyper"     , x_offset, 210, width, 9) then
 	-- 	go_super(true)
-	elseif not plain_s3 and do_icon_button(ui_icons.superchange  , 17, 183, 16, 14) then
+	elseif not plain_s3 and do_icon_button(ui_icons.hyperchange  , 17, 123, 16, 14) then
 		give_super(true)
+	elseif do_icon_button(ui_icons.wheel_glitch  , 0, 138, 16, 14) then
+		give_wheel_glitch()
 	end
 
 	local item = draw_queue[1]
