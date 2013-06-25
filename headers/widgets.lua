@@ -22,6 +22,7 @@
 
 require("headers/lua-oo")
 require("headers/input-handler")
+require("headers/ui-icons")
 
 -------------------------------------------------------------------------------
 --	Generic abstract base interface: store position only.
@@ -70,9 +71,9 @@ function Icon_widget.Create(x, y, image, obj)
 	local type = type(image)
 	self.image = image
 	if type == "function" then
-		self.draw = function (self) gui.drawimage(self.x, self.y, self.image(obj)) end
+		self.draw = function (self) gui.drawimage(self.x, self.y, ui_icons[self.image(obj)]) end
 	elseif type == "string" then
-		self.draw = function (self) gui.drawimage(self.x, self.y, self.image) end
+		self.draw = function (self) gui.drawimage(self.x, self.y, ui_icons[self.image]) end
 	end
 	return self
 end

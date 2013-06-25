@@ -370,7 +370,7 @@ if rom:is_sonic_cd() then
 	end
 
 	function Character:spindash_icon()
-		return (self:is_rolling() and self.curr_set.spindash) or ui_icons.sonic_peelout
+		return (self:is_rolling() and self.curr_set.spindash) or "sonic-peelout"
 	end
 else
 	-- Standard spindash.
@@ -432,7 +432,7 @@ function Character:get_face()
 			self.curr_set  = self.portraits.normal
 			self.curr_face = self.curr_set.face
 		elseif super == 1 then           --	Transforming
-			self.curr_face = ui_icons.superchange
+			self.curr_face = "superchange"
 		elseif super == -1 then          --	Super form
 			local currframe = gens.framecount()
 			if gens.lagged() then    --	TESTING!!!
@@ -495,13 +495,13 @@ function Character:init(id, p1, port)
 	end
 	if p1 then
 		self.offset       = p1_off
-		self.drown_icon   = ui_icons.bubbles
+		self.drown_icon   = "bubbles"
 	else
 		self.offset       = p2_off
 		if self.charid == charids.tails then
-			self.drown_icon   = ui_icons.bubbles_tails
+			self.drown_icon   = "bubbles-tails"
 		elseif self.charid == charids.cream then
-			self.drown_icon   = ui_icons.bubbles_cream
+			self.drown_icon   = "bubbles-cream"
 		end
 	end
 
@@ -579,24 +579,24 @@ function Character:init(id, p1, port)
 
 	if self.charid == charids.sonic then
 	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.doing_instashield  , self.instashield_time      , ui_icons.sonic_instashield))
+			Create_HUD(self, self.doing_instashield  , self.instashield_time      , "sonic-instashield"))
 	end
 
 	if self.flies then
-		local ficon = ui_icons.blank
+		local ficon = "blank"
 		if self.charid == charids.tails then
-			ficon = ui_icons.tails_flight
+			ficon = "tails-flight"
 			if rom:is_sonic3() or rom:is_sonick() then
 			 	table.insert(self.status_huds, 1,
-					Create_HUD(self, self.flight_no_pickup_active, self.flight_no_pickup_timer, ui_icons.tails_flight_no_pickup))
+					Create_HUD(self, self.flight_no_pickup_active, self.flight_no_pickup_timer, "tails-flight-no-pickup"))
 			end
 		elseif self.charid == charids.cream then
-		 	ficon = ui_icons.cream_flight
+		 	ficon = "cream-flight"
 		end
 	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.flight_active  , self.flight_timer      , ficon                 ))
+			Create_HUD(self, self.flight_active  , self.flight_timer      , ficon         ))
 	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.flight_boosting, self.flight_boost_timer, ui_icons.flight_boost ))
+			Create_HUD(self, self.flight_boosting, self.flight_boost_timer, "flight-boost"))
 	end
 
 	if self.is_p1 then
@@ -605,33 +605,33 @@ function Character:init(id, p1, port)
 		--	apply for either character in a Sonic + Tails game (in S2, S3, S3&K), it never
 		--	happens in-game except in 2p mode, for which this script is inadequate anyway.
 		table.insert(self.status_huds, 1,
-			Create_HUD(self, self.stars_active       , self.stars_timer        , ui_icons.invincibility))
+			Create_HUD(self, self.stars_active       , self.stars_timer        , "invincibility"))
 		table.insert(self.status_huds, 2,
-			Create_HUD(self, self.shoes_active       , self.shoes_timer        , ui_icons.superspeed   ))
+			Create_HUD(self, self.shoes_active       , self.shoes_timer        , "superspeed"   ))
 	 	--	Player-independent status icons. They are included in player 1 for
 	 	--	convenience purposes only.
 		table.insert(self.status_huds, 3,
-			Create_HUD(game, game.super_active       , game.super_timer        , ui_icons.superchange  ))
+			Create_HUD(game, game.super_active       , game.super_timer        , "superchange"  ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.warp_active        , game.warp_timer         , ui_icons.clock        ))
+			Create_HUD(game, game.warp_active        , game.warp_timer         , "clock"        ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.scroll_delay_active, game.scroll_delay_timer , ui_icons.camera_lock  ))
+			Create_HUD(game, game.scroll_delay_active, game.scroll_delay_timer , "camera-lock"  ))
 	elseif self.charid == charids.tails then
 		--	Status icons specific to player 2 Tails.
 		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active     , game.cputime_timer      , ui_icons.cpu_2p       ))
+			Create_HUD(game, game.cputime_active     , game.cputime_timer      , "cpu-2p"       ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active     , game.despawn_timer      , ui_icons.tails_despawn))
+			Create_HUD(game, game.despawn_active     , game.despawn_timer      , "tails-despawn"))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active     , game.respawn_timer      , ui_icons.tails_normal ))
+			Create_HUD(game, game.respawn_active     , game.respawn_timer      , "tails-normal" ))
 	elseif self.charid == charids.cream then
 		--	Status icons specific to player 2 Cream.
 		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active     , game.cputime_timer      , ui_icons.cpu_2p       ))
+			Create_HUD(game, game.cputime_active     , game.cputime_timer      , "cpu-2p"       ))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active     , game.despawn_timer      , ui_icons.cream_despawn))
+			Create_HUD(game, game.despawn_active     , game.despawn_timer      , "cream-despawn"))
 		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active     , game.respawn_timer      , ui_icons.cream_normal ))
+			Create_HUD(game, game.respawn_active     , game.respawn_timer      , "cream-normal" ))
 	end
 end
 

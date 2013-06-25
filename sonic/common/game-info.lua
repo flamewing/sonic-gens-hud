@@ -325,11 +325,11 @@ if rom:is_sonic_cd() then
 	function game:get_timewarp_icon()
 		local val = memory.readbytesigned(0xfff784)
 		if val == -1 then
-			return ui_icons.warp_past
+			return "warp-past"
 		elseif val == 1 then
-			return ui_icons.warp_future
+			return "warp-future"
 		end
-		return ui_icons.blank
+		return "blank"
 	end
 
 	function game:warp_time_left()

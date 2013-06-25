@@ -21,7 +21,7 @@ if	base_path == nil then
 end
 
 require("sonic/common/rom-check")
-require("sonic/common/hud-images")
+require("headers/ui-icons")
 
 if not gens.emulating() then
 	error("ROM must be loaded first.")
@@ -166,7 +166,7 @@ function do_icon_button(gdimage, x, y, width, height, fill_color, outline_color,
 		end
 	end
 	
-    table.insert(draw_queue, function() gui.drawimage(x, y, gdimage) end)
+    table.insert(draw_queue, function() gui.drawimage(x, y, ui_icons[gdimage]) end)
 	if outline_color ~= nil then
 	    if skip_corners then
 		    table.insert(draw_queue, function() gui.line(x + 1, y, x + width - 2, y, outline_color) end)
@@ -406,19 +406,19 @@ local width    = 41
 function create_menu()
 	update_input()
 
-	if do_icon_button    (ui_icons.ring            , 0,  63, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	if do_icon_button    ("ring"            , 0,  63, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		give_rings(10)
-	elseif do_icon_button(ui_icons.shield_flame    , 0,  78, 16, 14) then
+	elseif do_icon_button("shield-flame"    , 0,  78, 16, 14) then
 		give_shield(fire_shield)
-	elseif do_icon_button(ui_icons.shield_lightning,17,  78, 16, 14) then
+	elseif do_icon_button("shield-lightning",17,  78, 16, 14) then
 		give_shield(lightning_shield)
-	elseif do_icon_button(ui_icons.shield_bubble   ,34,  78, 16, 14) then
+	elseif do_icon_button("shield-bubble"   ,34,  78, 16, 14) then
 		give_shield(bubble_shield)
-	elseif do_icon_button(ui_icons.superspeed      , 0,  93, 16, 14) then
+	elseif do_icon_button("superspeed"      , 0,  93, 16, 14) then
 		give_shoes()
-	elseif do_icon_button(ui_icons.invincibility   ,17,  93, 16, 14) then
+	elseif do_icon_button("invincibility"   ,17,  93, 16, 14) then
 		give_invincibility()
-	elseif do_icon_button(ui_icons.emeralds_chaos  , 0, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif do_icon_button("emeralds-chaos"  , 0, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local ncnt = (memory.readbyte(chaosem_off) + 1) % 8
 		memory.writebyte(chaosem_off, ncnt)
 		if plain_s3 then
@@ -445,7 +445,7 @@ function create_menu()
 				memory.writebyte(0xffffb2 + emerald, val)
 			end
 		end
-	elseif not plain_s3 and do_icon_button(ui_icons.emeralds_super  ,17, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif not plain_s3 and do_icon_button("emeralds-super"  ,17, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local scnt = (memory.readbyte(superem_off) + 1) % 8
 		memory.writebyte(superem_off, scnt)
 		local ncnt = memory.readbyte(chaosem_off)
@@ -462,7 +462,7 @@ function create_menu()
 			end
 			memory.writebyte(0xffffb2 + emerald, val)
 		end
-	elseif do_icon_button(ui_icons.superchange  , 0, 123, 16, 14) then
+	elseif do_icon_button("superchange"  , 0, 123, 16, 14) then
 		give_super(false)
 	-- elseif do_button("Go Normal"    , x_offset, 190, width, 9) then
 	-- 	give_rings(-1000)
@@ -476,9 +476,9 @@ function create_menu()
 	-- 	go_super(false)
 	-- elseif do_button("Go Hyper"     , x_offset, 210, width, 9) then
 	-- 	go_super(true)
-	elseif not plain_s3 and do_icon_button(ui_icons.hyperchange  , 17, 123, 16, 14) then
+	elseif not plain_s3 and do_icon_button("hyperchange"  , 17, 123, 16, 14) then
 		give_super(true)
-	elseif do_icon_button(ui_icons.wheel_glitch  , 0, 138, 16, 14) then
+	elseif do_icon_button("wheel-glitch"  , 0, 138, 16, 14) then
 		give_wheel_glitch()
 	end
 

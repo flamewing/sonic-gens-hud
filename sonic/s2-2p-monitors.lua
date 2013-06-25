@@ -29,30 +29,29 @@ end
 require("sonic/common/rom-check")
 require("headers/register")
 require("headers/widgets")
-require("sonic/common/hud-images")
 require("sonic/common/game-info")
 
 if rom:is_sonic2() then
 	local monitor_icon = Icon_widget.Create(72 + 4 * 44, 0, function(self)
 			local frames = AND(memory.readword(0xfffe04),7)
 			if frames == 0 then
-				return ui_icons.sonic_normal
+				return "sonic-normal"
 			elseif frames == 1 then
-				return ui_icons.tails_normal
+				return "tails-normal"
 			elseif frames == 2 then
-				return ui_icons.eggman
+				return "eggman"
 			elseif frames == 3 then
-				return ui_icons.ring
+				return "ring"
 			elseif frames == 4 then
-				return ui_icons.superspeed
+				return "superspeed"
 			elseif frames == 5 then
-				return ui_icons.shield_normal
+				return "shield-normal"
 			elseif frames == 6 then
-				return ui_icons.invincibility
+				return "invincibility"
 			elseif frames == 7 then
-				return ui_icons.teleport
+				return "teleport"
 			else
-				return ui_icons.blank
+				return "blank"
 			end
 		end, nil)
 	callbacks.gens.registerafter:add(function()

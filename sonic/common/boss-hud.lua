@@ -23,7 +23,6 @@ require("sonic/common/rom-check")
 require("headers/lua-oo")
 require("headers/register")
 require("headers/widgets")
-require("sonic/common/hud-images")
 
 -------------------------------------------------------------------------------
 --	This is the HUD of a single boss.
@@ -103,7 +102,7 @@ function Boss_hud.create(x, y, active, offset, icon_fun, hit_counter, flash_time
 	--hud:add(Text_widget.Create(0, 0, function (self) return string.format("0x%06x", self.offset) end, self), 22, 12)
 
 	--	Position
-	hud:add(Icon_widget.Create(0, 0, ui_icons.location      ),  2, 18)
+	hud:add(Icon_widget.Create(0, 0, "location"             ),  2, 18)
 	hud:add(Text_widget.Create(0, 0, self.get_position, self), 17, 19)
 
 	self:add(hud, 0, 0)
@@ -124,14 +123,14 @@ local function make_boss_icons(hit, normal)
 		return hurt and hit or normal
 	end
 end
-local eggmanicons = make_boss_icons(ui_icons.eggman_flashing, ui_icons.eggman)
-local mecha_icons = make_boss_icons(ui_icons.mechasonic_blue_flashing, ui_icons.mechasonic_blue)
+local eggmanicons = make_boss_icons("eggman-flashing"         , "eggman")
+local mecha_icons = make_boss_icons("mechasonic-blue-flashing", "mechasonic_blue")
 
 local select_icons = function(val) return eggmanicons end
 if rom:is_sonic2() then
 	select_icons = function(val) return ((val == 0xaf) and mecha_icons) or eggmanicons end
 elseif rom:is_sonick() or rom:is_sonic3k() then
-	local knux_icons  = make_boss_icons(ui_icons.knuckles_wounded, ui_icons.knuckles_normal)
+	local knux_icons  = make_boss_icons("knuckles-wounded"    , "knuckles_normal")
 	select_icons = function(val)
 			if val == 1 then
 				return mecha_icons

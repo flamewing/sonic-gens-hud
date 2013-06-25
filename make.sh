@@ -15,7 +15,7 @@ function check_run()
 
 check_run find_huds.lua hud-codes.lua "Finding HUD code points..."
 check_run find_bosses.lua boss-tables.lua "Finding boss code points..."
-echo "Generating luaimg files and header file..."
+echo "Generating luaimg files..."
 ./imagedump.sh
 
 BUILD="builds/sonic-hud-$(date +"%F").7z"

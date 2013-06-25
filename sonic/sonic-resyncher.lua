@@ -23,9 +23,8 @@ end
 enable_predictor = true
 
 require("sonic/common/rom-check")
-require("sonic/common/game-info")
 require("headers/widgets")
-require("sonic/common/hud-images")
+require("sonic/common/game-info")
 require("sonic/common/jump-predictor")
 
 if not gens.emulating() then
@@ -41,7 +40,6 @@ local function Create_HUD(click_fun, obj, text_fun, icon, x, y)
 	local hud  = Clickable_widget.Create(0, 0, 68, 16, click_fun, obj)
 	hud:add_status_icon(1, 1, icon, nil, text_fun, nil)
 	cont:add(hud, 0, 0)
-
 	return cont
 end
 
@@ -176,8 +174,8 @@ local function paste_level(self)
 	gui.drawtext(120, 100, "Done.")
 end
 
-local copy_icon  = Create_HUD(save_level , nil, "Save level" , ui_icons.level_copy , 0,  0)
-local paste_icon = Create_HUD(paste_level, nil, "Paste level", ui_icons.level_paste, 0, 18)
+local copy_icon  = Create_HUD(save_level , nil, "Save level" , "level-copy" , 0,  0)
+local paste_icon = Create_HUD(paste_level, nil, "Paste level", "level-paste", 0, 18)
 
 gui.register(function ()
 	update_input()

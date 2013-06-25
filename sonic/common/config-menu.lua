@@ -22,7 +22,6 @@
 
 require("headers/lua-oo")
 require("headers/widgets")
-require("sonic/common/hud-images")
 
 Config_menu = {
 	showing_menu = nil,
@@ -33,9 +32,9 @@ local function make_emerald_toggle(callback, udata, icon, text, h, active)
 	local btn = Clickable_widget.Create(0, 0, 1 + 16 + 1 + 4 * #text + 1, h, callback, udata, {0, 0, 0, 0}, {0, 0, 0, 0})
 	local emerald = Icon_widget.Create(0, 0, function(self)
 			if self.hot then
-				return (icon() and ui_icons.emeralds_slot_hot_on) or ui_icons.emeralds_slot_hot_off
+				return (icon() and "emeralds-slot-hot-on") or "emeralds-slot-hot-off"
 			else
-				return (icon() and ui_icons.emeralds_chaos) or ui_icons.emeralds_slot_empty
+				return (icon() and "emeralds-chaos") or "emeralds-slot-empty"
 			end
 		end, btn)
 	btn:add(emerald, 1, 1)
@@ -89,7 +88,7 @@ function Config_menu.Create(x, y, w, h, draw_fun, active)
 	self.draw_fun = draw_fun
 	
 	self:add(make_button(function(self) self.showing_menu = false end, self, "Close" , 30, 8), math.floor((w - 30)/2), h - 10)
-	self:add(Icon_widget.Create(0, 0, ui_icons.warning, nil), math.floor((w + 30 + 1)/2) + 10, h - 10)
+	self:add(Icon_widget.Create(0, 0, "warning", nil), math.floor((w + 30 + 1)/2) + 10, h - 10)
 	self:add(Text_widget.Create(0, 0, "May cause desynchs", nil), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)
 	h = h - 10
 
@@ -160,7 +159,7 @@ function Config_menu.Create(x, y, w, h, draw_fun, active)
 		function()
 			return disable_original_huds
 		end, "Disable Original HUDs", 15, disable_original_huds), 2, 7)
-	fra1:add(Icon_widget.Create(0, 0, ui_icons.warning, nil), math.floor(w/2)-15, 10)
+	fra1:add(Icon_widget.Create(0, 0, "warning", nil), math.floor(w/2)-15, 10)
 	if rom:is_sonic3() or rom:is_sonick() then
 		--	Super/hyper music diabler.
 		fra1:add(make_emerald_toggle(
