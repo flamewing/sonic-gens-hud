@@ -36,8 +36,8 @@ elseif not movie.playing() and not movie.recording() then
 end
 
 local function Create_HUD(click_fun, obj, text_fun, icon, x, y)
-	local cont = Container_widget.Create(x, y, true)
-	local hud  = Clickable_widget.Create(0, 0, 68, 16, click_fun, obj)
+	local cont = Container_widget:new(x, y, true)
+	local hud  = Clickable_widget:new(0, 0, 68, 16, click_fun, obj)
 	hud:add_status_icon(1, 1, icon, nil, text_fun, nil)
 	cont:add(hud, 0, 0)
 	return cont

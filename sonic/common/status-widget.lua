@@ -24,8 +24,8 @@ require("headers/lua-oo")
 require("headers/widgets")
 require("sonic/common/char-info")
 
-Status_widget = {
-}
+Status_widget = class({
+}, Container_widget)
 
 function Status_widget:move(x, y)
 	local dx = x - self.x
@@ -89,9 +89,8 @@ function Status_widget:draw()
 	return self.active
 end
 
-function Status_widget.Create(x, y, active)
-	local self = Container_widget.Create(x, y, active)
-	self = ShallowCopy(Status_widget, self)
+function Status_widget:construct(x, y, active)
+	Container_widget.construct(self, x, y, active)
 	self:add_toggle(make_toggle(4 * 44 - 2, true, Container_widget.toggled, self, active), 0, 0)
 	self.cleanfun = function()
 			while #self.children > 0 do

@@ -31,7 +31,7 @@ savestate.registersave
 gui.register
 ]]
 
-callback_data = {
+callback_data = class{
 	callbacks = nil,
 	nonrecursive = nil,
 	in_call = false,
@@ -67,8 +67,7 @@ function callback_data:add(fun)
 end
 
 --	Create widget and set position.
-function callback_data.Create(registerfunc, nonrec, redraw)
-	local self = ShallowCopy(callback_data)
+function callback_data:construct(registerfunc, nonrec, redraw)
 	self.callbacks = {}
 	self.nonrecursive = nonrec or false
 	self.in_call = false
@@ -79,17 +78,17 @@ end
 
 callbacks = {
 	gens = {
-		registerbefore = callback_data.Create(gens.registerbefore   , true, false),
-		registerafter  = callback_data.Create(gens.registerafter    , true, false),
-		registerexit   = callback_data.Create(gens.registerexit     , true, false),
-		registerstart  = callback_data.Create(gens.registerstart    , true, false),
+		registerbefore = callback_data:new(gens.registerbefore   , true, false),
+		registerafter  = callback_data:new(gens.registerafter    , true, false),
+		registerexit   = callback_data:new(gens.registerexit     , true, false),
+		registerstart  = callback_data:new(gens.registerstart    , true, false),
 	},
 	savestate = {
-		registerload   = callback_data.Create(savestate.registerload, true, false),
-		registersave   = callback_data.Create(savestate.registersave, true, false),
+		registerload   = callback_data:new(savestate.registerload, true, false),
+		registersave   = callback_data:new(savestate.registersave, true, false),
 	},
 	gui = {
-		register       = callback_data.Create(gui.register          , true, true ),
+		register       = callback_data:new(gui.register          , true, true ),
 	},
 }
 

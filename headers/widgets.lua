@@ -28,7 +28,7 @@ require("headers/ui-icons")
 --	Generic abstract base interface: store position only.
 --	Should not be used on its own.
 -------------------------------------------------------------------------------
-widget = {
+widget = class{
 	x = nil,
 	y = nil
 }
@@ -36,8 +36,8 @@ widget = {
 --	Note: calling this from any but derived widgets with an 'add' member will
 --	result in an error.
 function widget:add_status_icon(dx, dy, image, objim, text, objt, border, fill)
-	local icon  = Icon_widget.Create(0, 0, image, objim)
-	local watch = Text_widget.Create(0, 0, text, objt, border, fill)
+	local icon  = Icon_widget:new(0, 0, image, objim)
+	local watch = Text_widget:new(0, 0, text, objt, border, fill)
 	self:add(icon , self.x + dx     , self.y + dy     )
 	self:add(watch, self.x + dx + 20, self.y + dy +  4)
 end
@@ -49,25 +49,24 @@ function widget:move(x, y)
 end
 
 --	Create widget and set position.
-function widget.Create(x, y)
-	local self = ShallowCopy(widget)
-	self:move(x, y)
+function widget:construct(x, y)
+	self.x = x
+	self.y = y
 	return self
 end
 
 -------------------------------------------------------------------------------
 --	A widget which displays an image.
 -------------------------------------------------------------------------------
-Icon_widget = {
+Icon_widget = class({
 	image = nil,
 	draw = nil
-}
+}, widget)
 
 --	'image' can be a gdimage or a drawing function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
-function Icon_widget.Create(x, y, image, obj)
-	local self = widget.Create(x, y)
-	self = ShallowCopy(Icon_widget, self)
+function Icon_widget:construct(x, y, image, obj)
+	widget.construct(self, x, y)
 	local type = type(image)
 	self.image = image
 	if type == "function" then
@@ -81,18 +80,17 @@ end
 -------------------------------------------------------------------------------
 --	A widget which displays text.
 -------------------------------------------------------------------------------
-Text_widget = {
+Text_widget = class({
 	text = nil,
 	border = nil,
 	fill = nil,
 	draw = nil
-}
+}, widget)
 
 --	'image' can be a raw string or a function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
-function Text_widget.Create(x, y, text, obj, border, fill)
-	local self = widget.Create(x, y)
-	self = ShallowCopy(Text_widget, self)
+function Text_widget:construct(x, y, text, obj, border, fill)
+	widget.construct(self, x, y)
 	self.text = text
 	self.border = border or {0, 0, 0, 0}
 	self.fill = fill or {255, 255, 255, 255}
@@ -108,13 +106,13 @@ end
 -------------------------------------------------------------------------------
 --	A container widget which draws a rectangular box.
 -------------------------------------------------------------------------------
-Frame_widget = {
+Frame_widget = class({
 	w = nil,
 	h = nil,
 	border = nil,
 	fill = nil,
 	children = nil
-}
+}, widget)
 
 --	Children are added relative.
 function Frame_widget:add(child, dx, dy)
@@ -142,9 +140,8 @@ function Frame_widget:draw()
 	return true
 end
 
-function Frame_widget.Create(x, y, w, h, border, fill)
-	local self = widget.Create(x, y)
-	self = ShallowCopy(Frame_widget, self)
+function Frame_widget:construct(x, y, w, h, border, fill)
+	widget.construct(self, x, y)
 	self.w = w
 	self.h = h
 	self.border = border or {0, 0, 127, 255}
@@ -156,11 +153,11 @@ end
 -------------------------------------------------------------------------------
 --	A clickable version of a frame widget.
 -------------------------------------------------------------------------------
-Clickable_widget = {
+Clickable_widget = class({
 	hot = nil,
 	on_click = nil,
 	udata = nil
-}
+}, Frame_widget)
 
 --	Check if mouse is on the widget's area.
 function Clickable_widget:is_hot()
@@ -189,9 +186,8 @@ function Clickable_widget:draw()
 	return true
 end
 
-function Clickable_widget.Create(x, y, w, h, callback, udata, border, fill)
-	local self = Frame_widget.Create(x, y, w, h, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
-	self = ShallowCopy(Clickable_widget, self)
+function Clickable_widget:construct(x, y, w, h, callback, udata, border, fill)
+	Frame_widget.construct(self, x, y, w, h, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
 	self.hot = false
 	self.on_click = callback
 	self.udata = udata
@@ -199,8 +195,8 @@ function Clickable_widget.Create(x, y, w, h, callback, udata, border, fill)
 end
 
 function make_button(callback, udata, text, w, h, border, fill)
-	local btn = Clickable_widget.Create(0, 0, w, h, callback, udata, border, fill)
-	btn:add(Text_widget.Create(0, 0, text), 1 + math.floor((w + 1 - 4 * #text)/2), 1)
+	local btn = Clickable_widget:new(0, 0, w, h, callback, udata, border, fill)
+	btn:add(Text_widget:new(0, 0, text), 1 + math.floor((w + 1 - 4 * #text)/2), 1)
 	return btn
 end
 
@@ -208,10 +204,10 @@ end
 --	Clickable widget with 'on' and 'off' states. This widget has a separate
 --	list of children that are drawn if the widget is 'off'.
 -------------------------------------------------------------------------------
-Toggle_widget = {
+Toggle_widget = class({
 	active = nil,
 	off_children = nil
-}
+}, Clickable_widget)
 
 function Toggle_widget:add(child, dx, dy, active)
 	child:move(self.x + dx, self.y + dy)
@@ -253,10 +249,8 @@ end
 
 --	'callback' is a function to be called when the container is 'toggled'.
 --	'udata' is an object which is passed to 'callback'.
-function Toggle_widget.Create(x, y, w, h, callback, udata, active, border, fill)
-	local self = Clickable_widget.Create(x, y, w, h, callback, udata,
-	             border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
-	self = ShallowCopy(Toggle_widget, self)
+function Toggle_widget:construct(x, y, w, h, callback, udata, active, border, fill)
+	Clickable_widget.construct(self, x, y, w, h, callback, udata, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
 	self.active = active
 	self.off_children = {}
 	return self
@@ -265,18 +259,18 @@ end
 function make_toggle(dim, horiz, callback, udata, active)
 	local w = (horiz and dim) or 3
 	local h = (horiz and 3) or dim
-	return Toggle_widget.Create(0, 0, w, h, callback, udata, active)
+	return Toggle_widget:new(0, 0, w, h, callback, udata, active)
 end
 
 -------------------------------------------------------------------------------
 --	Container widget with a separate toggle widget. The toggle widget is used
 --	to toggle the display of the container's children on or off.
 -------------------------------------------------------------------------------
-Container_widget = {
+Container_widget = class({
 	active = nil,
 	toggle = nil,
 	children = nil
-}
+}, widget)
 
 function Container_widget:toggled()
 	self.active = not self.active
@@ -324,21 +318,21 @@ function Container_widget:draw()
 	return self.active
 end
 
-function Container_widget.Create(x, y, active)
-	local self = widget.Create(x, y)
-	self = ShallowCopy(Container_widget, self)
+function Container_widget:construct(x, y, active)
+	widget.construct(self, x, y)
 	self.active = (active == nil and false) or active
 	self.children = {}
+	self.toggle = nil
 	return self
 end
 
 -------------------------------------------------------------------------------
 --	Container which only shows if certain definable conditions hold.
 -------------------------------------------------------------------------------
-Conditional_widget = {
+Conditional_widget = class({
 	is_active = nil,
 	obj = nil
-}
+}, Container_widget)
 
 function Conditional_widget:add_toggle(child, dx, dy)
 end
@@ -365,9 +359,8 @@ end
 
 --	'is_active' is a function that defines the conditions under which the
 --	widget appears. 'obj' is an object which is passed to 'is_active'.
-function Conditional_widget.Create(x, y, active, is_active, obj)
-	local self = Container_widget.Create(x, y, active)
-	self = ShallowCopy(Conditional_widget, self)
+function Conditional_widget:construct(x, y, active, is_active, obj)
+	Container_widget.construct(self, x, y, active)
 	self.is_active = is_active
 	self.obj = obj
 	return self

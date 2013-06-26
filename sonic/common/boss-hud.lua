@@ -27,12 +27,12 @@ require("headers/widgets")
 -------------------------------------------------------------------------------
 --	This is the HUD of a single boss.
 -------------------------------------------------------------------------------
-Boss_hud = {
+Boss_hud = class({
 	offset = nil,
 	icon_fun = nil,
 	hit_counter = nil,
 	flash_timer = nil,
-}
+}, Container_widget)
 
 if rom:is_sonic3() or rom:is_sonick() then
 	function Boss_hud:get_position()
@@ -83,27 +83,26 @@ function Boss_hud:draw()
 	return self.active
 end
 
-function Boss_hud.create(x, y, active, offset, icon_fun, hit_counter, flash_timer)
-	local self = Container_widget.Create(x, y, active)
-	self = ShallowCopy(Boss_hud, self)
+function Boss_hud:construct(x, y, active, offset, icon_fun, hit_counter, flash_timer)
+	Container_widget.construct(self, x, y, active)
 	self.offset = offset
 	self.icon_fun = icon_fun
 	self.hit_counter = hit_counter
 	self.flash_timer = flash_timer
 
-	local hud = Frame_widget.Create(0, 0, 65, 29)
-	hud:add(Icon_widget.Create(0, 0, self.face_icon, self), 2, 2)
+	local hud = Frame_widget:new(0, 0, 65, 29)
+	hud:add(Icon_widget:new(0, 0, self.face_icon, self), 2, 2)
 
 	--	Hit counter
-	hud:add(Text_widget.Create(0, 0, self.hit_counter_string, self), 22, 5)
-	hud:add(Text_widget.Create(0, 0, self.flash_timer_string, self), 53, 5)
+	hud:add(Text_widget:new(0, 0, self.hit_counter_string, self), 22, 5)
+	hud:add(Text_widget:new(0, 0, self.flash_timer_string, self), 53, 5)
 	-- These are for debugging purposes:
-	--hud:add(Text_widget.Create(0, 0, function (self) return string.format("0x%02x", memory.readbyte(self.offset)) end, self), 22, 12)
-	--hud:add(Text_widget.Create(0, 0, function (self) return string.format("0x%06x", self.offset) end, self), 22, 12)
+	--hud:add(Text_widget:new(0, 0, function (self) return string.format("0x%02x", memory.readbyte(self.offset)) end, self), 22, 12)
+	--hud:add(Text_widget:new(0, 0, function (self) return string.format("0x%06x", self.offset) end, self), 22, 12)
 
 	--	Position
-	hud:add(Icon_widget.Create(0, 0, "location"             ),  2, 18)
-	hud:add(Text_widget.Create(0, 0, self.get_position, self), 17, 19)
+	hud:add(Icon_widget:new(0, 0, "location"             ),  2, 18)
+	hud:add(Text_widget:new(0, 0, self.get_position, self), 17, 19)
 
 	self:add(hud, 0, 0)
 	return self
@@ -113,10 +112,10 @@ end
 --	This is a self-organizing widget that watches for, and creates, the boss
 --	HUDs for each active boss.
 -------------------------------------------------------------------------------
-Boss_widget = {
+Boss_widget = class({
 	boss_addr = nil,
 	cleanfun = nil,
-}
+}, Container_widget)
 
 local function make_boss_icons(hit, normal)
 	return function(hurt)
@@ -142,9 +141,8 @@ elseif rom:is_sonick() or rom:is_sonic3k() then
 		end
 end
 
-function Boss_widget.create(x, y, active)
-	local self = Container_widget.Create(x, y, active)
-	self = ShallowCopy(Boss_widget, self)
+function Boss_widget:construct(x, y, active)
+	Container_widget.construct(self, x, y, active)
 	self:add_toggle(make_toggle(65, true, Container_widget.toggled, self, active), 134, 220)
 
 	-- Code locations of boss main loop.
@@ -166,7 +164,7 @@ function Boss_widget:scan_bosses()
 			local code = memory.readlong(offset)
 			for ad,fun in pairs(self.boss_addr) do
 				if code == ad then
-					self:add(Boss_hud.create(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+					self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 					break
 				end
 			end
@@ -180,7 +178,7 @@ function Boss_widget:scan_bosses()
 			if id ~= 0 then
 				for ad,fun in pairs(self.boss_addr) do
 					if id == fun[1] then
-						self:add(Boss_hud.create(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+						self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 						break
 					end
 				end
@@ -202,7 +200,7 @@ function Boss_widget:register()
 						return
 					end
 				end
-				self:add(Boss_hud.create(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+				self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 			end)
 	end
 	self:scan_bosses()

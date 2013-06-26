@@ -27,9 +27,9 @@ require("sonic/common/game-info")
 require("sonic/common/char-info")
 
 --	Character HUD object.
-Character_hud = {
+Character_hud = class({
 	character = nil,
-}
+}, Container_widget)
 
 local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.normal_shield]    = "shield-normal",
@@ -37,43 +37,42 @@ local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.lightning_shield] = "shield-lightning",
                       [shieldids.bubble_shield]    = "shield-bubble"}
 
-function Character_hud.create(char, x, y, active)
-	local self = Container_widget.Create(x, y, active)
-	self = ShallowCopy(Character_hud, self)
+function Character_hud:construct(char, x, y, active)
+	Container_widget.construct(self, x, y, active)
 	self.character = char
 
 	local pad = (char.is_p1 and 15) or 1
-	local char_hud = Frame_widget.Create(8, 0, 115 + pad, 35)
+	local char_hud = Frame_widget:new(8, 0, 115 + pad, 35)
 
 	self:add_toggle(make_toggle(35, false, Container_widget.toggled, self, active), (char.is_p1 and 0) or 118 + pad, 0)
-	char_hud:add(Icon_widget.Create(0, 0, char.get_face, char), 2, 2)
+	char_hud:add(Icon_widget:new(0, 0, char.get_face, char), 2, 2)
 	if char.is_p1 then
-		Text_widget.Create(x, y, text, obj, border, fill)
-		char_hud:add(Text_widget.Create(0, 0, game.get_lives, game), 20, 2)
-		char_hud:add(Text_widget.Create(0, 0, game.get_continues, game), 20, 9)
-		char_hud:add(Icon_widget.Create(0, 0,
+		Text_widget:new(x, y, text, obj, border, fill)
+		char_hud:add(Text_widget:new(0, 0, game.get_lives, game), 20, 2)
+		char_hud:add(Text_widget:new(0, 0, game.get_continues, game), 20, 9)
+		char_hud:add(Icon_widget:new(0, 0,
 				function(char)
 					return shield_icons[char:shield()]
 				end,
 				char ), 2, 20)
 	else
 		pad = 0
-		char_hud:add(Icon_widget.Create   (0, 0,
+		char_hud:add(Icon_widget:new   (0, 0,
 				function(char)
 					return (game:cputime_time_left() == 0 and "cpu-2p") or "tails-player"
 				end,
 				char ), 2, 20)
 	end
 	--	Position
-	char_hud:add(Icon_widget.Create(0, 0, "location"             ), 21 + pad, 2)
-	char_hud:add(Text_widget.Create(0, 0, char.get_position, char), 36 + pad, 2)
+	char_hud:add(Icon_widget:new(0, 0, "location"             ), 21 + pad, 2)
+	char_hud:add(Text_widget:new(0, 0, char.get_position, char), 36 + pad, 2)
 
 	--	Speed
-	char_hud:add(Icon_widget.Create(0, 0, "speed"                ), 21 + pad, 13)
-	char_hud:add(Text_widget.Create(0, 0, char.get_speed   , char), 36 + pad, 10)
+	char_hud:add(Icon_widget:new(0, 0, "speed"                ), 21 + pad, 13)
+	char_hud:add(Text_widget:new(0, 0, char.get_speed   , char), 36 + pad, 10)
 
 	--	Jump prediction
-	char_hud:add(Text_widget.Create(0, 0,
+	char_hud:add(Text_widget:new(0, 0,
 			function(char)
 				if want_prediction() then
 					return char.jump_speed
@@ -84,13 +83,13 @@ function Character_hud.create(char, x, y, active)
 			char), 36 + pad, 17)
 
 	--	Angle
-	char_hud:add(Icon_widget.Create(0, 0, "angle"             ), 21 + pad, 24)
-	char_hud:add(Text_widget.Create(0, 0, char.get_slope, char), 36 + pad, 26)
+	char_hud:add(Icon_widget:new(0, 0, "angle"             ), 21 + pad, 24)
+	char_hud:add(Text_widget:new(0, 0, char.get_slope, char), 36 + pad, 26)
 	
 	--	Move lock
-	local cond = Conditional_widget.Create(0, 0, true, Character.move_lock_active, char)
-	cond:add(Icon_widget.Create(0, 0, "move-lock"              ),  0, 0)
-	cond:add(Text_widget.Create(0, 0, char.move_lock_text, char), 15, 2)
+	local cond = Conditional_widget:new(0, 0, true, Character.move_lock_active, char)
+	cond:add(Icon_widget:new(0, 0, "move-lock"              ),  0, 0)
+	cond:add(Text_widget:new(0, 0, char.move_lock_text, char), 15, 2)
 	char_hud:add(cond, 77 + pad, 24)
 
 	self:add(char_hud, 3, 0)

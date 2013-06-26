@@ -63,15 +63,15 @@ require("sonic/kill-original")
 -------------------------------------------------------------------------------
 --	HUD components: status icons, character HUDs, boss HUDs.
 -------------------------------------------------------------------------------
-local status_huds = Status_widget.Create(72, 0, stat_hud)
+local status_huds = Status_widget:new(72, 0, stat_hud)
 local char_huds = nil
-local boss_hud = Boss_widget.create(0, 0, boss_hud_active)
+local boss_hud = Boss_widget:new(0, 0, boss_hud_active)
 
 -------------------------------------------------------------------------------
 --	Main game HUD
 -------------------------------------------------------------------------------
 local function create_main_hud(ly, w, h)
-	local main_hud = Frame_widget.Create(0, 0, w, h)
+	local main_hud = Frame_widget:new(0, 0, w, h)
 	main_hud:add_status_icon(1,          2, "score"         , nil, game.get_score         , game)
 	main_hud:add_status_icon(1,     ly + 2, "clock"         , nil, game.get_time          , game)
 	main_hud:add_status_icon(1, 2 * ly + 2, "ring"          , nil, game.get_rings         , game)
@@ -79,12 +79,12 @@ local function create_main_hud(ly, w, h)
 	if rom:is_sonic3k() then
 		main_hud:add_status_icon(36, 3 * ly + 2, "emeralds-super", nil, game.get_super_emeralds, game)
 	elseif rom:is_sonic_cd() then
-		main_hud:add(Icon_widget.Create(0, 0, game.get_timewarp_icon, game), 36, 3 * ly + 2)
+		main_hud:add(Icon_widget:new(0, 0, game.get_timewarp_icon, game), 36, 3 * ly + 2)
 	end
 	return main_hud
 end
 
-local main_hud = Container_widget.Create(0, 0, game_hud)
+local main_hud = Container_widget:new(0, 0, game_hud)
 main_hud:add(create_main_hud(14, 65, 58), 3, 0)
 main_hud:add_toggle(make_toggle(58, false, Container_widget.toggled, main_hud, game_hud), 0, 0)
 
@@ -101,7 +101,7 @@ draw_hud = function ()
 		set_chardata(selchar)
 		char_huds = {}
 		for i, char in pairs(characters) do
-			table.insert(char_huds, Character_hud.create(char, (i == 2 and 197) or 0, 188, active_char_huds[i]))
+			table.insert(char_huds, Character_hud:new(char, (i == 2 and 197) or 0, 188, active_char_huds[i]))
 		end
 	end
 
@@ -198,8 +198,8 @@ end
 -------------------------------------------------------------------------------
 --	Configuration menu.
 -------------------------------------------------------------------------------
-local menubtn = Container_widget.Create(273, 0, menu_active)
-local menu = Config_menu.Create(40, 30, 240, 143, function ()
+local menubtn = Container_widget:new(273, 0, menu_active)
+local menu = Config_menu:new(40, 30, 240, 143, function ()
 		apply_options()
 		if not disable_lua_hud and not game:disable_hud() then
 			do_huds()

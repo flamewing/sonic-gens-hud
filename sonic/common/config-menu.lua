@@ -23,14 +23,14 @@
 require("headers/lua-oo")
 require("headers/widgets")
 
-Config_menu = {
+Config_menu = class({
 	showing_menu = nil,
 	draw_fun = nil,
-}
+}, Frame_widget)
 
 local function make_emerald_toggle(callback, udata, icon, text, h, active)
-	local btn = Clickable_widget.Create(0, 0, 1 + 16 + 1 + 4 * #text + 1, h, callback, udata, {0, 0, 0, 0}, {0, 0, 0, 0})
-	local emerald = Icon_widget.Create(0, 0, function(self)
+	local btn = Clickable_widget:new(0, 0, 1 + 16 + 1 + 4 * #text + 1, h, callback, udata, {0, 0, 0, 0}, {0, 0, 0, 0})
+	local emerald = Icon_widget:new(0, 0, function(self)
 			if self.hot then
 				return (icon() and "emeralds-slot-hot-on") or "emeralds-slot-hot-off"
 			else
@@ -38,22 +38,22 @@ local function make_emerald_toggle(callback, udata, icon, text, h, active)
 			end
 		end, btn)
 	btn:add(emerald, 1, 1)
-	btn:add(Text_widget.Create(0, 0, text), 1 + 16 + 1, math.floor((h - 1 - 5)/2))
+	btn:add(Text_widget:new(0, 0, text), 1 + 16 + 1, math.floor((h - 1 - 5)/2))
 	return btn
 end
 
 local function make_frame(text, x, y, w, h)
-	local fra = Frame_widget.Create(x, y + 3, w, h - 2, nil, {0, 0, 0, 0})
-	local box = Frame_widget.Create(0, 0, 4 + 4 * #text, 8, {0, 0, 255, 255}, {0, 0, 127, 255})
-	box:add(Text_widget.Create(0, 0, text), 3, 1)
+	local fra = Frame_widget:new(x, y + 3, w, h - 2, nil, {0, 0, 0, 0})
+	local box = Frame_widget:new(0, 0, 4 + 4 * #text, 8, {0, 0, 255, 255}, {0, 0, 127, 255})
+	box:add(Text_widget:new(0, 0, text), 3, 1)
 	fra:add(box, 2, -3)
 	return fra
 end
 
 local function make_warning(text, x, y, w, h)
-	local fra = Frame_widget.Create(x, y + 3, w, h - 2, nil, {0, 0, 0, 0})
-	local box = Frame_widget.Create(0, 0, 4 + 4 * #text, 8, {0, 0, 255, 255}, {0, 0, 127, 255})
-	box:add(Text_widget.Create(0, 0, text), 3, 1)
+	local fra = Frame_widget:new(x, y + 3, w, h - 2, nil, {0, 0, 0, 0})
+	local box = Frame_widget:new(0, 0, 4 + 4 * #text, 8, {0, 0, 255, 255}, {0, 0, 127, 255})
+	box:add(Text_widget:new(0, 0, text), 3, 1)
 	fra:add(box, 2, -3)
 	return fra
 end
@@ -80,16 +80,14 @@ function Config_menu:menu_loop()
 	self.showing_menu = false
 end
 
-function Config_menu.Create(x, y, w, h, draw_fun, active)
-	local self = Frame_widget.Create(x, y, w, h, nil, {0, 0, 0, 225})
-	self = ShallowCopy(Config_menu, self)
-
+function Config_menu:construct(x, y, w, h, draw_fun, active)
+	Frame_widget.construct(self, x, y, w, h, nil, {0, 0, 0, 225})
 	self.showing_menu = false
 	self.draw_fun = draw_fun
 	
 	self:add(make_button(function(self) self.showing_menu = false end, self, "Close" , 30, 8), math.floor((w - 30)/2), h - 10)
-	self:add(Icon_widget.Create(0, 0, "warning", nil), math.floor((w + 30 + 1)/2) + 10, h - 10)
-	self:add(Text_widget.Create(0, 0, "May cause desynchs", nil), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)
+	self:add(Icon_widget:new(0, 0, "warning", nil), math.floor((w + 30 + 1)/2) + 10, h - 10)
+	self:add(Text_widget:new(0, 0, "May cause desynchs", nil), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)
 	h = h - 10
 
 	local fra0 = make_frame("HUD Options", 0, 0, math.floor(w/2)-3, h - 5)
@@ -102,7 +100,7 @@ function Config_menu.Create(x, y, w, h, draw_fun, active)
 			return not disable_lua_hud
 		end, "Enable Lua HUD", 15, not disable_lua_hud), 2, 7)
 	--	Conditional display for HUD options.
-	local cond = Conditional_widget.Create(0, 0, not disable_lua_hud, function()
+	local cond = Conditional_widget:new(0, 0, not disable_lua_hud, function()
 			return not disable_lua_hud
 		end, nil)
 	--	Jump predictor toggle.
@@ -159,7 +157,7 @@ function Config_menu.Create(x, y, w, h, draw_fun, active)
 		function()
 			return disable_original_huds
 		end, "Disable Original HUDs", 15, disable_original_huds), 2, 7)
-	fra1:add(Icon_widget.Create(0, 0, "warning", nil), math.floor(w/2)-15, 10)
+	fra1:add(Icon_widget:new(0, 0, "warning", nil), math.floor(w/2)-15, 10)
 	if rom:is_sonic3() or rom:is_sonick() then
 		--	Super/hyper music diabler.
 		fra1:add(make_emerald_toggle(
@@ -192,7 +190,7 @@ function Config_menu.Create(x, y, w, h, draw_fun, active)
 			return skip_boring_stuff
 		end, "Skip Boring Stuff", 15, skip_boring_stuff), 2, 7)
 	--	Conditional display for skipping stuff.
-	local cond = Conditional_widget.Create(0, 0, skip_boring_stuff, function()
+	local cond = Conditional_widget:new(0, 0, skip_boring_stuff, function()
 			return skip_boring_stuff
 		end, nil)
 	--	Toggle for skipping score tallies.

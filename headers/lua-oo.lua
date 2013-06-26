@@ -13,15 +13,48 @@
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------------------
 
---	From http://code.google.com/p/mangos-luascript/source/browse/trunk/src/bindings/luascript/lua-scripts/LuaScript/Mango/Mango.Utils.lua?spec=svn61&r=61
-function ShallowCopy(fromTable, toTable)
-	toTable = toTable or {} -- new table if not given
-	local inx = nil
-	local val = nil
-	repeat
-		inx, val = next(fromTable, inx)
-		if val then toTable[inx] = val end
-	until (inx == nil)
-	return toTable
+--	Based on code from http://lua-users.org/wiki/InheritanceTutorial
+function class(prototype, baseClass)
+	local new_class = prototype or {}
+	local class_mt = {__index = new_class}
+
+	function new_class:new(...)
+		local newinst = {}
+		setmetatable(newinst, class_mt)
+		if newinst.construct then
+			newinst:construct(unpack(arg))
+		end
+		return newinst
+	end
+
+	if baseClass ~= nil then
+		setmetatable(new_class, {__index = baseClass})
+	end
+
+	-- Return the class object of the instance
+	function new_class:class()
+		return new_class
+	end
+
+	-- Return the super class object of the instance
+	function new_class:superClass()
+		return baseClass
+	end
+
+	-- Return true if the caller is an instance of theClass
+	function new_class:isa(theClass)
+		local b_isa = false
+		local cur_class = new_class
+
+		while (cur_class ~= nil) and (b_isa == false) do
+			if cur_class == theClass then
+				b_isa = true
+			else
+				cur_class = cur_class:superClass()
+			end
+		end
+		return b_isa
+	end
+	return new_class
 end
 

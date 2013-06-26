@@ -25,7 +25,7 @@ require("headers/lua-oo")
 require("sonic/common/rom-check")
 require("sonic/common/game-info")
 
-Character = {
+Character = class{
 	is_p1          = nil,
 	offset         = nil,
 	charid         = nil,
@@ -507,6 +507,7 @@ function Character:init(id, p1, port)
 
 	self.portraits   = port
 	self.curr_set    = port.normal
+	self.curr_face   = nil
 	self.super_frame = 0
 	self.jump_speed  = ""
 	local dso = nil
@@ -561,8 +562,8 @@ function Character:init(id, p1, port)
 	--	This manufactures a HUD icon monitor given the adequate functions.
 	--	'Icon' can be either a function or a gdimage.
 	local function Create_HUD(this, active_fun, timer_fun, icon)
-		local cond = Conditional_widget.Create(0, 0, false, active_fun, this)
-		local hud  = Frame_widget.Create(0, 0, 42, 17)
+		local cond = Conditional_widget:new(0, 0, false, active_fun, this)
+		local hud  = Frame_widget:new(0, 0, 42, 17)
 		hud:add_status_icon(2, 2, icon, this, timer_fun, this)
 		cond:add(hud, 0, 0)
 
@@ -635,8 +636,7 @@ function Character:init(id, p1, port)
 	end
 end
 
-function Character.create(id, p1, port)
-	local self = ShallowCopy(Character)
+function Character:construct(id, p1, port)
 	self:init(id, p1, port)
 	return self
 end
@@ -652,39 +652,39 @@ function set_chardata(selchar)
 	game.curr_char   = selchar
 	if selchar == charids.sonic_tails then          --	Sonic + Tails
 		characters = {
-			Character.create(charids.sonic, true , portraits.sonic),
-			Character.create(charids.tails, false, portraits.tails)
+			Character:new(charids.sonic, true , portraits.sonic),
+			Character:new(charids.tails, false, portraits.tails)
 		}
 	elseif selchar == charids.sonic then            --	Sonic solo
 		characters = {
-			Character.create(charids.sonic, true , portraits.sonic)
+			Character:new(charids.sonic, true , portraits.sonic)
 		}
 	elseif selchar == charids.tails then            --	Tails
 		characters = {
-			Character.create(charids.tails, true , portraits.tails)
+			Character:new(charids.tails, true , portraits.tails)
 		}
 	elseif selchar == charids.knuckles then         --	Knuckles
 		characters = {
-			Character.create(charids.knuckles, true , portraits.knuckles)
+			Character:new(charids.knuckles, true , portraits.knuckles)
 		}
 	elseif selchar == charids.amy_tails then        --	Amy + Tails
 		characters = {
-			Character.create(charids.amy_rose, true , portraits.amy_rose),
-			Character.create(charids.tails, false, portraits.tails)
+			Character:new(charids.amy_rose, true , portraits.amy_rose),
+			Character:new(charids.tails, false, portraits.tails)
 		}
 	elseif selchar == charids.amy_rose then			--	Amy
 		characters = {
-			Character.create(charids.amy_rose, true , portraits.amy_rose)
+			Character:new(charids.amy_rose, true , portraits.amy_rose)
 		}
 	--[[
 	elseif selchar == charids.cream then			--	Cream
 		characters = {
-			Character.create(charids.cream   , true , portraits.cream   )
+			Character:new(charids.cream   , true , portraits.cream   )
 		}
 	--]]
 	elseif selchar == charids.charmy then			--	Cream
 		characters = {
-			Character.create(charids.charmy  , true , portraits.charmy  )
+			Character:new(charids.charmy  , true , portraits.charmy  )
 		}
 	end
 end

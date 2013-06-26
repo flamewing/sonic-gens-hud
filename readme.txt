@@ -114,10 +114,14 @@ their own.
 4) Changelog
 --------------------------------------------------------------------------------
 
-Jun 25/2013
+Jun 26/2013:
+ *	Fixed two of Hyper Sonic's icons.
+ *	Better object-oriented base model.
+
+Jun 25/2013:
  *	Icons are dynamically loaded as needed, instead of all at once at startup.
 
-Sep 5/2012
+Sep 5/2012:
  *	Added horizontal scroll delay support for S2, S3, S&K, and their supported
 	hacks.
  *	Fixed bugs 'Sonic 3 & Amy' hack.

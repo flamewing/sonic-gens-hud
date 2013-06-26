@@ -27,14 +27,13 @@ require("headers/lua-oo")
 -------------------------------------------------------------------------------
 --	Set of portraits for a character.
 -------------------------------------------------------------------------------
-Portrait_set =  {
+Portrait_set = class{
 	face     = nil,
 	spindash = nil,
 	wounded  = nil
 }
 
-function Portrait_set.Create(face, spin, wound)
-	local self = ShallowCopy(Portrait_set)
+function Portrait_set:construct(face, spin, wound)
 	self.face     = face
 	self.spindash = spin
 	self.wounded  = wound
@@ -44,14 +43,13 @@ end
 -------------------------------------------------------------------------------
 --	Set of all portraits for a character, accounting for transformations.
 -------------------------------------------------------------------------------
-Char_portraits = {
+Char_portraits = class{
 	normal = nil,
 	super  = nil,
 	hyper  = nil
 }
 
-function Char_portraits.Create(face1, spin1, wound1, face2, spin2, wound2, face3, spin3, wound3)
-	local self = ShallowCopy(Char_portraits)
+function Char_portraits:construct(face1, spin1, wound1, face2, spin2, wound2, face3, spin3, wound3)
 	if face2 == nil then
 		face2 = face1
 	end
@@ -70,9 +68,9 @@ function Char_portraits.Create(face1, spin1, wound1, face2, spin2, wound2, face3
 	if wound3 == nil then
 		wound3 = wound2
 	end
-	self.normal = Portrait_set.Create(face1, spin1, wound1)
-	self.super  = Portrait_set.Create(face2, spin2, wound2)
-	self.hyper  = Portrait_set.Create(face3, spin3, wound3)
+	self.normal = Portrait_set:new(face1, spin1, wound1)
+	self.super  = Portrait_set:new(face2, spin2, wound2)
+	self.hyper  = Portrait_set:new(face3, spin3, wound3)
 	return self
 end
 
@@ -80,27 +78,27 @@ end
 --	All set of portraits for all characters.
 -------------------------------------------------------------------------------
 portraits = {
-	sonic    = Char_portraits.Create("sonic-normal",
-	                                 "sonic-spindash",
-	                                 "sonic-wounded",
-	                                 "sonic-normal",
-	                                 "sonic-super-spindash",
-	                                 "sonic-super-wounded"),
-	tails    = Char_portraits.Create("tails-normal",
-	                                 "tails-spindash",
-	                                 "tails-wounded"),
-	knuckles = Char_portraits.Create("knuckles-normal",
-	                                 "knuckles-spindash",
-	                                 "knuckles-wounded"),
-	amy_rose = Char_portraits.Create("amy-normal",
-	                                 "amy-spindash",
-	                                 "amy-wounded"),
-	cream    = Char_portraits.Create("cream-normal",
-	                                 "cream-spindash",
-	                                 "cream-wounded"),
-	charmy   = Char_portraits.Create("charmy-normal",
-	                                 "charmy-spindash",
-	                                 "charmy-wounded"),
+	sonic    = Char_portraits:new("sonic-normal",
+	                              "sonic-spindash",
+	                              "sonic-wounded",
+	                              "sonic-normal",
+	                              "sonic-super-spindash",
+	                              "sonic-super-wounded"),
+	tails    = Char_portraits:new("tails-normal",
+	                              "tails-spindash",
+	                              "tails-wounded"),
+	knuckles = Char_portraits:new("knuckles-normal",
+	                              "knuckles-spindash",
+	                              "knuckles-wounded"),
+	amy_rose = Char_portraits:new("amy-normal",
+	                              "amy-spindash",
+	                              "amy-wounded"),
+	cream    = Char_portraits:new("cream-normal",
+	                              "cream-spindash",
+	                              "cream-wounded"),
+	charmy   = Char_portraits:new("charmy-normal",
+	                              "charmy-spindash",
+	                              "charmy-wounded"),
 
 	sel_char  = nil,
 	curr_set  = nil
