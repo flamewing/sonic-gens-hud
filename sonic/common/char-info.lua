@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,34 +13,34 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Character data, wrapped up in an object.
 --	Written by: Marzo Junior
 --	Based on game disassemblies and Gens' RAM search.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("headers/lua-oo")
 require("sonic/common/rom-check")
 require("sonic/common/game-info")
 
 Character = class{
-	is_p1          = nil,
-	offset         = nil,
-	charid         = nil,
-	flies          = nil,
-	portraits      = nil,      --	Character portait sets
-	curr_set       = nil,      --	Current portrait set
-	curr_face      = nil,      --	Currently selected face
-	swap_delay     = nil,      --	Delay for portrait swap
-	super_pal      = nil,      --	Current portrait palette
-	super_swap     = nil,      --	Counter for portrait swap
-	super_frame    = nil,      --	Frame in which portrait will be swapped
-	jump_speed     = nil,      --	String value for jump prediction
-	drowning_timer = nil,
-	drown_icon     = nil,
-	status_huds    = nil,
+	is_p1          = false,
+	offset         = 0,
+	charid         = charids.sonic,
+	flies          = false,
+	portraits      = {},       --	Character portait sets
+	curr_set       = {},       --	Current portrait set
+	curr_face      = false,    --	Currently selected face
+	swap_delay     = 0,        --	Delay for portrait swap
+	super_pal      = 0,        --	Current portrait palette
+	super_swap     = 0,        --	Counter for portrait swap
+	super_frame    = 0,        --	Frame in which portrait will be swapped
+	jump_speed     = "",       --	String value for jump prediction
+	drowning_timer = function (self) return "" end,
+	drown_icon     = "blank",
+	status_huds    = {},
 }
 
 function Character:get_slope()
@@ -438,7 +438,7 @@ function Character:get_face()
 			if gens.lagged() then    --	TESTING!!!
 				self.super_frame = self.super_frame + 1
 			end
-			if currframe == self.super_frame or self.curr_face == nil then      --	Time to get a new portrait
+			if currframe == self.super_frame or not self.curr_face then      --	Time to get a new portrait
 				local newpal = memory.readbyte(self.super_pal)
 				if self.charid == charids.tails then	         --	Tails is different
 					self.curr_set = self.portraits.hyper
@@ -507,7 +507,7 @@ function Character:init(id, p1, port)
 
 	self.portraits   = port
 	self.curr_set    = port.normal
-	self.curr_face   = nil
+	self.curr_face   = false
 	self.super_frame = 0
 	self.jump_speed  = ""
 	local dso = nil
@@ -642,9 +642,9 @@ function Character:construct(id, p1, port)
 end
 
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Initializer for the character objects.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 characters = nil
 
 --	Set character data

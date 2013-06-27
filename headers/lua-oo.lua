@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This program is free software: you can redistribute it and/or modify
 --	it under the terms of the GNU Lesser General Public License as 
 --	published by the Free Software Foundation, either version 3 of the 
@@ -11,7 +11,7 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 --	Based on code from http://lua-users.org/wiki/InheritanceTutorial
 function class(prototype)
@@ -63,5 +63,11 @@ function class(prototype)
 		return b_isa
 	end
 	return new_class
+end
+
+--	Static assertion function for debugging purposes.
+function assert_function(fun)
+	local ty = type(fun)
+	assert(ty == "function", debug.traceback(string.format("Error: Function expected for variable 'fun', got '" .. ty .. "'.")))
 end
 

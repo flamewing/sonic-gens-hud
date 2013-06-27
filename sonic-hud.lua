@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,16 +13,16 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 if	base_path == nil then
 	base_path = (string.gsub(debug.getinfo(1).source, "sonic%-hud", "?", 1)):sub(2)
 	package.path = base_path .. ";" .. package.path
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Script configuration options.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 gens.persistglobalvariables({
 	-- Enabled HUDs
 	game_hud = true,
@@ -41,9 +41,9 @@ gens.persistglobalvariables({
 	disable_s3k_super_music = false,
 })
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Include all of the script subfiles.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 require("sonic/common/rom-check")
 require("headers/register")
 require("headers/widgets")
@@ -60,16 +60,16 @@ require("sonic/kill-hyperflash")
 require("sonic/kill-super-music")
 require("sonic/kill-original")
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	HUD components: status icons, character HUDs, boss HUDs.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local status_huds = Status_widget:new(72, 0, stat_hud)
 local char_huds = nil
 local boss_hud = Boss_widget:new(0, 0, boss_hud_active)
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Main game HUD
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local function create_main_hud(ly, w, h)
 	local main_hud = Frame_widget:new(0, 0, w, h)
 	main_hud:add_status_icon(1,          2, "score"         , nil, game.get_score         , game)
@@ -88,9 +88,9 @@ local main_hud = Container_widget:new(0, 0, game_hud)
 main_hud:add(create_main_hud(14, 65, 58), 3, 0)
 main_hud:add_toggle(make_toggle(58, false, Container_widget.toggled, main_hud, game_hud), 0, 0)
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Main workhorse function
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local flash_nomovie = false
 
 --	Reads mem values, emulates a couple of frames, displays everything
@@ -156,9 +156,9 @@ local function toggle_lua_hud(enable)
 	end
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Starting options.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local function apply_options()
 	if char_huds then
 		for n = 1,#char_huds do
@@ -195,9 +195,9 @@ local function reset_config()
 	disable_s3k_super_music = false
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Configuration menu.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local menubtn = Container_widget:new(273, 0, menu_active)
 local menu = Config_menu:new(40, 30, 240, 143, function ()
 		apply_options()
@@ -213,9 +213,9 @@ callbacks.gui.register:add(function()
 		menu_active = menubtn:draw()
 	end)
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Apply the options and do initial draw.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 apply_options()
 update_input()
 if not disable_lua_hud and not game:disable_hud() then

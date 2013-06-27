@@ -21,13 +21,13 @@ following features:
  *	Character HUDs for both players, showing position (down to subpixel level),
  	speed and slope angle. For player 1, the current shield, the number of lives
  	and of continues are also shown; for player 2, there is an indicator of
- 	whether Tails is being controlled by the CPU or by a (presumably human) 
- 	player. Both players also feature a jump predictor whenever you are not in 
- 	read-only playback of a movie; the jump predictor shows what will be your 
- 	speed if you hold the 'C' button for the next two frames (so for optimal 
- 	benefit, you should avoid using that button); for S2 and SCD, this speed
- 	is calculated as it will be without holding the forward direction, due to
- 	the air speed cap in those games.
+ 	whether Tails is being controlled by the CPU or by a (presumably human)
+ 	player. Both players also feature a jump predictor whenever you are not in
+ 	read-only playback of a movie; the jump predictor shows what will be your
+ 	speed if you hold the 'C' button for the next two frames (so for optimal
+ 	benefit, you should avoid using that button); for S2 and SCD, this speed is
+ 	calculated as it will be without holding the forward direction, due to the
+ 	air speed cap in those games.
  *	Boss HUDs, showing number of hits, a timer showing remaining invulnerability
  	time (in frames) and position (pixel level). S2 Boom and SCD do not feature
  	boss HUDs, but all other games in the compatibility list do.
@@ -71,7 +71,7 @@ The boss post-hit invulnerability timers are also watched and displayed, but
 they are displayed in the boss' respective HUDs.
 
 Also, slope horizontal move lock timers for both players are also watched and
-displayed in the respective character HUD. 
+displayed in the respective character HUD.
 
 Compatibility list:
 
@@ -91,7 +91,7 @@ Compatibility list:
  *	Sonic the Hedgehog 3
  *	Sonic & Knuckles
  *	Sonic the Hedgehog 3 locked on to Sonic & Knuckles
- *	E-122-Psi's Sonic 3 and Amy Rose v1.3 
+ *	E-122-Psi's Sonic 3 and Amy Rose v1.3
 
 2) Building
 --------------------------------------------------------------------------------
@@ -114,6 +114,15 @@ their own.
 4) Changelog
 --------------------------------------------------------------------------------
 
+Jun 27/2013:
+ *	Reformatted comments and readme to fill 80 columns.
+ *	Added code to verify that functions are being supplied for callbacks.
+ *	Added code to verify that widgets are being supplied to add to all container
+ 	widgets.
+ *	Non-nil values passed to class prototypes, so they actually have the fields.
+ *	ROM checker no longer caches the return value of s1tails_check -- it is only
+ 	ever called once per ROM anyway.
+
 Jun 26/2013:
  *	Fixed two of Hyper Sonic's icons.
  *	Better object-oriented base model.
@@ -125,7 +134,7 @@ Jun 25/2013:
 
 Sep 5/2012:
  *	Added horizontal scroll delay support for S2, S3, S&K, and their supported
-	hacks.
+ 	hacks.
  *	Fixed bugs 'Sonic 3 & Amy' hack.
  *	Script now works from wherever it has been decompressed to.
  *	Added S&K and S3&K visual cheat script.

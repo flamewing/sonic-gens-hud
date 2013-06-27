@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,19 +13,19 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	A self-organizing togglable container widget.
 --	Written by: Marzo Junior
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("headers/lua-oo")
 require("headers/widgets")
 
 Config_menu = class{
-	showing_menu = nil,
-	draw_fun = nil,
+	showing_menu = false,
+	draw_fun     = function () end,
 }:extends(Frame_widget)
 
 local function make_emerald_toggle(callback, udata, icon, text, h, active)

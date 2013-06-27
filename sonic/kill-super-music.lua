@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,18 +13,18 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 if	base_path == nil then
 	base_path = (string.gsub(debug.getinfo(1).source, "sonic[\\\\/][%w%-]+%.lua", "?.lua", 1)):sub(2)
 	package.path = base_path .. ";" .. package.path
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Hack that disables super/hyper music.
 --	Written by: Marzo Junior
 --	Original by Upthorn
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("sonic/common/rom-check")
 

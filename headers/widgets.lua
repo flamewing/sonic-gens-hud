@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,38 +13,30 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	User interface widgets for Lua in Gens.
 --	Written by: Marzo Junior
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("headers/lua-oo")
 require("headers/input-handler")
 require("headers/ui-icons")
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Generic abstract base interface: store position only.
 --	Should not be used on its own.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 widget = class{
-	x = nil,
-	y = nil
+	x = 0,
+	y = 0
 }
 
---[[
 --	Static assertion function for debugging purposes.
-function widget.assert(instance)
-	if instance.isa ~= nil then
-		if instance:isa(widget) == true then
-			return true
-		end
-	end
-	error(debug.traceback(string.format("Error: The variable 'child' must descend from the class 'widget'.")), 0)
-	return false
+function assert_widget(instance)
+	assert(instance.isa ~= nil and instance:isa(widget), debug.traceback(string.format("Error: The variable 'child' must descend from the class 'widget'.")))
 end
-]]
 
 function widget:add(child, dx, dy)
 	error(debug.traceback(string.format("Error: Pure virtual function 'widget:add' called.")), 0)
@@ -72,12 +64,12 @@ function widget:construct(x, y)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	A widget which displays an image.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Icon_widget = class{
-	image = nil,
-	draw = nil
+	image = "blank",
+	draw  = function (self) end
 }:extends(widget)
 
 --	'image' can be a gdimage or a drawing function. The latter requires an
@@ -94,14 +86,14 @@ function Icon_widget:construct(x, y, image, obj)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	A widget which displays text.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Text_widget = class{
-	text = nil,
-	border = nil,
-	fill = nil,
-	draw = nil
+	text   = "",
+	border = {0, 0, 0, 0},
+	fill   = {255, 255, 255, 255},
+	draw   = function (self) end
 }:extends(widget)
 
 --	'image' can be a raw string or a function. The latter requires an
@@ -120,20 +112,20 @@ function Text_widget:construct(x, y, text, obj, border, fill)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	A container widget which draws a rectangular box.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Frame_widget = class{
-	w = nil,
-	h = nil,
-	border = nil,
-	fill = nil,
-	children = nil
+	w        = 0,
+	h        = 0,
+	border   = {0, 0, 127, 255},
+	fill     = {0, 0, 0, 192},
+	children = {}
 }:extends(widget)
 
 --	Children are added relative.
 function Frame_widget:add(child, dx, dy)
-	--widget.assert(child)
+	assert_widget(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert(self.children, child)
 end
@@ -168,13 +160,13 @@ function Frame_widget:construct(x, y, w, h, border, fill)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	A clickable version of a frame widget.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Clickable_widget = class{
-	hot = nil,
-	on_click = nil,
-	udata = nil
+	hot      = false,
+	on_click = function (self) end,
+	udata    = {}
 }:extends(Frame_widget)
 
 --	Check if mouse is on the widget's area.
@@ -205,6 +197,7 @@ function Clickable_widget:draw()
 end
 
 function Clickable_widget:construct(x, y, w, h, callback, udata, border, fill)
+	assert_function(callback)
 	Frame_widget.construct(self, x, y, w, h, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
 	self.hot = false
 	self.on_click = callback
@@ -218,17 +211,17 @@ function make_button(callback, udata, text, w, h, border, fill)
 	return btn
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Clickable widget with 'on' and 'off' states. This widget has a separate
 --	list of children that are drawn if the widget is 'off'.
--------------------------------------------------------------------------------
-Toggle_widget = class{
-	active = nil,
-	off_children = nil
+--------------------------------------------------------------------------------
+Toggle_widget    = class{
+	active       = false,
+	off_children = {}
 }:extends(Clickable_widget)
 
 function Toggle_widget:add(child, dx, dy, active)
-	--widget.assert(child)
+	assert_widget(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert((active == true and self.children) or self.off_children, child)
 end
@@ -281,14 +274,14 @@ function make_toggle(dim, horiz, callback, udata, active)
 	return Toggle_widget:new(0, 0, w, h, callback, udata, active)
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Container widget with a separate toggle widget. The toggle widget is used
 --	to toggle the display of the container's children on or off.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Container_widget = class{
-	active = nil,
-	toggle = nil,
-	children = nil
+	active       = false,
+	toggle       = false,
+	children     = {}
 }:extends(widget)
 
 function Container_widget:toggled()
@@ -303,13 +296,13 @@ function Container_widget:set_state(flag)
 end
 
 function Container_widget:add(child, dx, dy)
-	--widget.assert(child)
+	assert_widget(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert(self.children, child)
 end
 
 function Container_widget:add_toggle(child, dx, dy)
-	--widget.assert(child)
+	assert_widget(child)
 	child:move(self.x + dx, self.y + dy)
 	self.toggle = child
 end
@@ -347,16 +340,16 @@ function Container_widget:construct(x, y, active)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Container which only shows if certain definable conditions hold.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Conditional_widget = class{
-	is_active = nil,
-	obj = nil
+	is_active = function (self) return false end,
+	obj       = {}
 }:extends(Container_widget)
 
 function Conditional_widget:add_toggle(child, dx, dy)
-	--widget.assert(child)
+	assert_widget(child)
 end
 
 function Conditional_widget:move(x, y)

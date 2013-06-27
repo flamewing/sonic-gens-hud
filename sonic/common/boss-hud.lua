@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,25 +13,25 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Boss HUD widget and object.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("sonic/common/rom-check")
 require("headers/lua-oo")
 require("headers/register")
 require("headers/widgets")
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This is the HUD of a single boss.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Boss_hud = class{
-	offset = nil,
-	icon_fun = nil,
-	hit_counter = nil,
-	flash_timer = nil,
+	offset      = 0,
+	icon_fun    = function (flag) return "blank" end,
+	hit_counter = function (self) return 0 end,
+	flash_timer = function (self) return 0 end,
 }:extends(Container_widget)
 
 if rom:is_sonic3() or rom:is_sonick() then
@@ -108,13 +108,13 @@ function Boss_hud:construct(x, y, active, offset, icon_fun, hit_counter, flash_t
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This is a self-organizing widget that watches for, and creates, the boss
 --	HUDs for each active boss.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Boss_widget = class{
-	boss_addr = nil,
-	cleanfun = nil,
+	boss_addr = {},
+	cleanfun  = function() end,
 }:extends(Container_widget)
 
 local function make_boss_icons(hit, normal)

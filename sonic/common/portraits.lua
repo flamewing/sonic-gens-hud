@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
 --	
 --	This program is free software: you can redistribute it and/or modify
@@ -13,24 +13,24 @@
 --	
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Portrait tables.
 --	Written by: Marzo Junior
 --	Based on game disassemblies and Gens' RAM search.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 require("sonic/common/rom-check")
 require("headers/lua-oo")
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Set of portraits for a character.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Portrait_set = class{
-	face     = nil,
-	spindash = nil,
-	wounded  = nil
+	face     = {},
+	spindash = {},
+	wounded  = {}
 }
 
 function Portrait_set:construct(face, spin, wound)
@@ -40,13 +40,13 @@ function Portrait_set:construct(face, spin, wound)
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	Set of all portraits for a character, accounting for transformations.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Char_portraits = class{
-	normal = nil,
-	super  = nil,
-	hyper  = nil
+	normal = {},
+	super  = {},
+	hyper  = {}
 }
 
 function Char_portraits:construct(face1, spin1, wound1, face2, spin2, wound2, face3, spin3, wound3)
@@ -74,9 +74,9 @@ function Char_portraits:construct(face1, spin1, wound1, face2, spin2, wound2, fa
 	return self
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --	All set of portraits for all characters.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 portraits = {
 	sonic    = Char_portraits:new("sonic-normal",
 	                              "sonic-spindash",
