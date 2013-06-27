@@ -27,12 +27,12 @@ function class(prototype)
 		return newinst
 	end
 
-	function new_class:extends(base)
-		setmetatable(new_class, {__index = base})
+	function new_class:extends(baseClass)
+		setmetatable(new_class, {__index = baseClass})
 
 		-- Return the super class object of the instance
 		function new_class:superClass()
-			return base
+			return baseClass
 		end
 		
 		return self
