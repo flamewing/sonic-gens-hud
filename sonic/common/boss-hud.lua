@@ -27,12 +27,12 @@ require("headers/widgets")
 -------------------------------------------------------------------------------
 --	This is the HUD of a single boss.
 -------------------------------------------------------------------------------
-Boss_hud = class({
+Boss_hud = class{
 	offset = nil,
 	icon_fun = nil,
 	hit_counter = nil,
 	flash_timer = nil,
-}, Container_widget)
+}:extends(Container_widget)
 
 if rom:is_sonic3() or rom:is_sonick() then
 	function Boss_hud:get_position()
@@ -112,10 +112,10 @@ end
 --	This is a self-organizing widget that watches for, and creates, the boss
 --	HUDs for each active boss.
 -------------------------------------------------------------------------------
-Boss_widget = class({
+Boss_widget = class{
 	boss_addr = nil,
 	cleanfun = nil,
-}, Container_widget)
+}:extends(Container_widget)
 
 local function make_boss_icons(hit, normal)
 	return function(hurt)

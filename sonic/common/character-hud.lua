@@ -27,9 +27,9 @@ require("sonic/common/game-info")
 require("sonic/common/char-info")
 
 --	Character HUD object.
-Character_hud = class({
+Character_hud = class{
 	character = nil,
-}, Container_widget)
+}:extends(Container_widget)
 
 local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.normal_shield]    = "shield-normal",

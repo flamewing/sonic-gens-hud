@@ -14,7 +14,7 @@
 -------------------------------------------------------------------------------
 
 --	Based on code from http://lua-users.org/wiki/InheritanceTutorial
-function class(prototype, baseClass)
+function class(prototype)
 	local new_class = prototype or {}
 	local class_mt = {__index = new_class}
 
@@ -27,8 +27,15 @@ function class(prototype, baseClass)
 		return newinst
 	end
 
-	if baseClass ~= nil then
-		setmetatable(new_class, {__index = baseClass})
+	function new_class:extends(base)
+		setmetatable(new_class, {__index = base})
+
+		-- Return the super class object of the instance
+		function new_class:superClass()
+			return base
+		end
+		
+		return self
 	end
 
 	-- Return the class object of the instance
@@ -38,7 +45,7 @@ function class(prototype, baseClass)
 
 	-- Return the super class object of the instance
 	function new_class:superClass()
-		return baseClass
+		return nil
 	end
 
 	-- Return true if the caller is an instance of theClass

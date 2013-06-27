@@ -24,8 +24,8 @@ require("headers/lua-oo")
 require("headers/widgets")
 require("sonic/common/char-info")
 
-Status_widget = class({
-}, Container_widget)
+Status_widget = class{
+}:extends(Container_widget)
 
 function Status_widget:move(x, y)
 	local dx = x - self.x

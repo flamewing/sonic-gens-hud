@@ -23,10 +23,10 @@
 require("headers/lua-oo")
 require("headers/widgets")
 
-Config_menu = class({
+Config_menu = class{
 	showing_menu = nil,
 	draw_fun = nil,
-}, Frame_widget)
+}:extends(Frame_widget)
 
 local function make_emerald_toggle(callback, udata, icon, text, h, active)
 	local btn = Clickable_widget:new(0, 0, 1 + 16 + 1 + 4 * #text + 1, h, callback, udata, {0, 0, 0, 0}, {0, 0, 0, 0})

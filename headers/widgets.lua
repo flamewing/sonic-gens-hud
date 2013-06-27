@@ -33,6 +33,19 @@ widget = class{
 	y = nil
 }
 
+--[[
+--	Static assertion function For debugging purposes.
+function widget.assert(instance)
+	if instance.isa ~= nil then
+		if instance:isa(widget) == true then
+			return true
+		end
+	end
+	error(debug.traceback(string.format("Error: The variable 'child' must descend from the class 'widget'.")), 0)
+	return false
+end
+]]
+
 --	Note: calling this from any but derived widgets with an 'add' member will
 --	result in an error.
 function widget:add_status_icon(dx, dy, image, objim, text, objt, border, fill)
@@ -58,10 +71,10 @@ end
 -------------------------------------------------------------------------------
 --	A widget which displays an image.
 -------------------------------------------------------------------------------
-Icon_widget = class({
+Icon_widget = class{
 	image = nil,
 	draw = nil
-}, widget)
+}:extends(widget)
 
 --	'image' can be a gdimage or a drawing function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
@@ -80,12 +93,12 @@ end
 -------------------------------------------------------------------------------
 --	A widget which displays text.
 -------------------------------------------------------------------------------
-Text_widget = class({
+Text_widget = class{
 	text = nil,
 	border = nil,
 	fill = nil,
 	draw = nil
-}, widget)
+}:extends(widget)
 
 --	'image' can be a raw string or a function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
@@ -106,16 +119,17 @@ end
 -------------------------------------------------------------------------------
 --	A container widget which draws a rectangular box.
 -------------------------------------------------------------------------------
-Frame_widget = class({
+Frame_widget = class{
 	w = nil,
 	h = nil,
 	border = nil,
 	fill = nil,
 	children = nil
-}, widget)
+}:extends(widget)
 
 --	Children are added relative.
 function Frame_widget:add(child, dx, dy)
+	--widget.assert(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert(self.children, child)
 end
@@ -153,11 +167,11 @@ end
 -------------------------------------------------------------------------------
 --	A clickable version of a frame widget.
 -------------------------------------------------------------------------------
-Clickable_widget = class({
+Clickable_widget = class{
 	hot = nil,
 	on_click = nil,
 	udata = nil
-}, Frame_widget)
+}:extends(Frame_widget)
 
 --	Check if mouse is on the widget's area.
 function Clickable_widget:is_hot()
@@ -204,12 +218,13 @@ end
 --	Clickable widget with 'on' and 'off' states. This widget has a separate
 --	list of children that are drawn if the widget is 'off'.
 -------------------------------------------------------------------------------
-Toggle_widget = class({
+Toggle_widget = class{
 	active = nil,
 	off_children = nil
-}, Clickable_widget)
+}:extends(Clickable_widget)
 
 function Toggle_widget:add(child, dx, dy, active)
+	--widget.assert(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert((active == true and self.children) or self.off_children, child)
 end
@@ -266,11 +281,11 @@ end
 --	Container widget with a separate toggle widget. The toggle widget is used
 --	to toggle the display of the container's children on or off.
 -------------------------------------------------------------------------------
-Container_widget = class({
+Container_widget = class{
 	active = nil,
 	toggle = nil,
 	children = nil
-}, widget)
+}:extends(widget)
 
 function Container_widget:toggled()
 	self.active = not self.active
@@ -284,11 +299,13 @@ function Container_widget:set_state(flag)
 end
 
 function Container_widget:add(child, dx, dy)
+	--widget.assert(child)
 	child:move(self.x + dx, self.y + dy)
 	table.insert(self.children, child)
 end
 
 function Container_widget:add_toggle(child, dx, dy)
+	--widget.assert(child)
 	child:move(self.x + dx, self.y + dy)
 	self.toggle = child
 end
@@ -329,12 +346,13 @@ end
 -------------------------------------------------------------------------------
 --	Container which only shows if certain definable conditions hold.
 -------------------------------------------------------------------------------
-Conditional_widget = class({
+Conditional_widget = class{
 	is_active = nil,
 	obj = nil
-}, Container_widget)
+}:extends(Container_widget)
 
 function Conditional_widget:add_toggle(child, dx, dy)
+	--widget.assert(child)
 end
 
 function Conditional_widget:move(x, y)
