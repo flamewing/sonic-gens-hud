@@ -34,7 +34,7 @@ widget = class{
 }
 
 --[[
---	Static assertion function For debugging purposes.
+--	Static assertion function for debugging purposes.
 function widget.assert(instance)
 	if instance.isa ~= nil then
 		if instance:isa(widget) == true then
@@ -45,6 +45,10 @@ function widget.assert(instance)
 	return false
 end
 ]]
+
+function widget:add(child, dx, dy)
+	error(debug.traceback(string.format("Error: Pure virtual function 'widget:add' called.")), 0)
+end
 
 --	Note: calling this from any but derived widgets with an 'add' member will
 --	result in an error.

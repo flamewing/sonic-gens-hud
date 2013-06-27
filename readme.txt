@@ -118,6 +118,7 @@ Jun 26/2013:
  *	Fixed two of Hyper Sonic's icons.
  *	Better object-oriented base model.
  *	More improvements to object-oriented model/syntax.
+ *	Pure virtual error check for widget:add function.
 
 Jun 25/2013:
  *	Icons are dynamically loaded as needed, instead of all at once at startup.
