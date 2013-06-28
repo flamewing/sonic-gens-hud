@@ -116,7 +116,7 @@ elseif rom:is_sonic2() then
 	end
 
 	function game:scroll_delay()
-		return memory.readbyte(0xffeed2)
+		return memory.readbyte(0xffeed0)
 	end
 else
     --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
@@ -143,7 +143,7 @@ function game:scroll_delay_timer()
 end
 
 function game:scroll_delay_active()
-	return memory.readword(0xffee24) ~= 0
+	return self:scroll_delay() ~= 0
 end
 
 function game:cputime_time_left()
