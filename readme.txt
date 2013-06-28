@@ -115,6 +115,9 @@ their own.
 --------------------------------------------------------------------------------
 
 Jun 27/2013:
+ *	Fixed horizontal scroll delay for non-S3/S&K/S3&K.
+
+Jun 27/2013:
  *	Reformatted comments and readme to fill 80 columns.
  *	Added code to verify that functions are being supplied for callbacks.
  *	Added code to verify that widgets are being supplied to add to all container
