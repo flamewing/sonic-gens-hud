@@ -114,7 +114,7 @@ their own.
 4) Changelog
 --------------------------------------------------------------------------------
 
-Jun 27/2013:
+Jun 28/2013:
  *	Fixed horizontal scroll delay for non-S3/S&K/S3&K.
 
 Jun 27/2013:
