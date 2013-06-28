@@ -126,7 +126,6 @@ Jun 27/2013:
  	an instance of the class. Added a Java-like 'super' method to call the next
  	constructor up on the class hierarchy (if any, with with error checking);
  	syntax is 'self:super([args])'.
- 
 
 Jun 26/2013:
  *	Fixed two of Hyper Sonic's icons.
