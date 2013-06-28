@@ -18,21 +18,30 @@ function class(prototype)
 	local new_class = prototype or {}
 	local class_mt = {__index = new_class}
 
-	function new_class:new(...)
+	function new_class.new(self, ...)
 		local newinst = {}
 		setmetatable(newinst, class_mt)
 		if newinst.construct then
 			newinst:construct(unpack(arg))
+			assert(self["@super_chain@"] == nil or self["@super_chain@"].construct == nil,
+			       debug.traceback("Error: A constructor in the class hierarchy does not call self:super([args])."))
 		end
 		return newinst
 	end
 
 	function new_class:extends(baseClass)
-		setmetatable(new_class, {__index = baseClass})
+		setmetatable(self, {__index = baseClass})
 
 		-- Return the super class object of the instance
 		function new_class:superClass()
 			return baseClass
+		end
+
+		function new_class.super(self_, ...)
+			local super = self_["@super_chain@"] or baseClass
+			self_["@super_chain@"] = super:superClass()
+			assert(super.construct ~= nil, debug.traceback("Error: self:super([args]) called on class whose base class does not define a constructor."))
+			return super.construct(self_, unpack(arg))
 		end
 		
 		return self

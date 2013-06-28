@@ -75,7 +75,7 @@ Icon_widget = class{
 --	'image' can be a gdimage or a drawing function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
 function Icon_widget:construct(x, y, image, obj)
-	widget.construct(self, x, y)
+	self:super(x, y)
 	local type = type(image)
 	self.image = image
 	if type == "function" then
@@ -99,7 +99,7 @@ Text_widget = class{
 --	'image' can be a raw string or a function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
 function Text_widget:construct(x, y, text, obj, border, fill)
-	widget.construct(self, x, y)
+	self:super(x, y)
 	self.text = text
 	self.border = border or {0, 0, 0, 0}
 	self.fill = fill or {255, 255, 255, 255}
@@ -151,7 +151,7 @@ function Frame_widget:draw()
 end
 
 function Frame_widget:construct(x, y, w, h, border, fill)
-	widget.construct(self, x, y)
+	self:super(x, y)
 	self.w = w
 	self.h = h
 	self.border = border or {0, 0, 127, 255}
@@ -198,7 +198,7 @@ end
 
 function Clickable_widget:construct(x, y, w, h, callback, udata, border, fill)
 	assert_function(callback)
-	Frame_widget.construct(self, x, y, w, h, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
+	self:super(x, y, w, h, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
 	self.hot = false
 	self.on_click = callback
 	self.udata = udata
@@ -262,7 +262,7 @@ end
 --	'callback' is a function to be called when the container is 'toggled'.
 --	'udata' is an object which is passed to 'callback'.
 function Toggle_widget:construct(x, y, w, h, callback, udata, active, border, fill)
-	Clickable_widget.construct(self, x, y, w, h, callback, udata, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
+	self:super(x, y, w, h, callback, udata, border or {0, 0, 255, 255}, fill or {0, 0, 127, 255})
 	self.active = active
 	self.off_children = {}
 	return self
@@ -333,7 +333,7 @@ function Container_widget:draw()
 end
 
 function Container_widget:construct(x, y, active)
-	widget.construct(self, x, y)
+	self:super(x, y)
 	self.active = (active == nil and false) or active
 	self.children = {}
 	self.toggle = nil
@@ -375,7 +375,7 @@ end
 --	'is_active' is a function that defines the conditions under which the
 --	widget appears. 'obj' is an object which is passed to 'is_active'.
 function Conditional_widget:construct(x, y, active, is_active, obj)
-	Container_widget.construct(self, x, y, active)
+	self:super(x, y, active)
 	self.is_active = is_active
 	self.obj = obj
 	return self

@@ -90,7 +90,7 @@ function Status_widget:draw()
 end
 
 function Status_widget:construct(x, y, active)
-	Container_widget.construct(self, x, y, active)
+	self:super(x, y, active)
 	self:add_toggle(make_toggle(4 * 44 - 2, true, Container_widget.toggled, self, active), 0, 0)
 	self.cleanfun = function()
 			while #self.children > 0 do

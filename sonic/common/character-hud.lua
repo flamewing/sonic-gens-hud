@@ -38,7 +38,7 @@ local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.bubble_shield]    = "shield-bubble"}
 
 function Character_hud:construct(char, x, y, active)
-	Container_widget.construct(self, x, y, active)
+	self:super(x, y, active)
 	self.character = char
 
 	local pad = (char.is_p1 and 15) or 1

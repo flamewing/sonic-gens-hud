@@ -81,7 +81,7 @@ function Config_menu:menu_loop()
 end
 
 function Config_menu:construct(x, y, w, h, draw_fun, active)
-	Frame_widget.construct(self, x, y, w, h, nil, {0, 0, 0, 225})
+	self:super(x, y, w, h, nil, {0, 0, 0, 225})
 	self.showing_menu = false
 	self.draw_fun = draw_fun
 	

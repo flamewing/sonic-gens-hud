@@ -122,6 +122,11 @@ Jun 27/2013:
  *	Non-nil values passed to class prototypes, so they actually have the fields.
  *	ROM checker no longer caches the return value of s1tails_check -- it is only
  	ever called once per ROM anyway.
+ *	More improvements to object model: the 'new' operator no longer not requires
+ 	an instance of the class. Added a Java-like 'super' method to call the next
+ 	constructor up on the class hierarchy (if any, with with error checking);
+ 	syntax is 'self:super([args])'.
+ 
 
 Jun 26/2013:
  *	Fixed two of Hyper Sonic's icons.

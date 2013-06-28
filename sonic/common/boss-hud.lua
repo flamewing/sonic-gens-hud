@@ -84,7 +84,7 @@ function Boss_hud:draw()
 end
 
 function Boss_hud:construct(x, y, active, offset, icon_fun, hit_counter, flash_timer)
-	Container_widget.construct(self, x, y, active)
+	self:super(x, y, active)
 	self.offset = offset
 	self.icon_fun = icon_fun
 	self.hit_counter = hit_counter
@@ -142,7 +142,7 @@ elseif rom:is_sonick() or rom:is_sonic3k() then
 end
 
 function Boss_widget:construct(x, y, active)
-	Container_widget.construct(self, x, y, active)
+	self:super(x, y, active)
 	self:add_toggle(make_toggle(65, true, Container_widget.toggled, self, active), 134, 220)
 
 	-- Code locations of boss main loop.
