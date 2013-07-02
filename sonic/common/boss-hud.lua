@@ -123,13 +123,13 @@ local function make_boss_icons(hit, normal)
 	end
 end
 local eggmanicons = make_boss_icons("eggman-flashing"         , "eggman")
-local mecha_icons = make_boss_icons("mechasonic-blue-flashing", "mechasonic_blue")
+local mecha_icons = make_boss_icons("mechasonic-blue-flashing", "mechasonic-blue")
 
 local select_icons = function(val) return eggmanicons end
 if rom:is_sonic2() then
 	select_icons = function(val) return ((val == 0xaf) and mecha_icons) or eggmanicons end
 elseif rom:is_sonick() or rom:is_sonic3k() then
-	local knux_icons  = make_boss_icons("knuckles-wounded"    , "knuckles_normal")
+	local knux_icons  = make_boss_icons("knuckles-wounded"    , "knuckles-normal")
 	select_icons = function(val)
 			if val == 1 then
 				return mecha_icons
