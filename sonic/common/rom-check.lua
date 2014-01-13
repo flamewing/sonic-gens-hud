@@ -71,7 +71,7 @@ local sums = {
 	s1wrev0  = 0x264a,
 	s1wrev1  = 0xafc7,
 	s1knux   = 0x3f81,
-	s1amy    = 0x24d0,
+	s1amy    = 0x24c4,
 	s1charmy = 0x90ad,
 	s1tails  = 0x0000,
 	scd      = 0x4d7a,
@@ -205,7 +205,7 @@ function rom_info:has_air_speed_cap()
 end
 
 --	Constructor.
-function rom_info:construct(checksum, engine, air_cap, tails_flies, cream_flies, get_char, boss_array, ring_offset, hud_code, is_rom)
+function rom_info:construct(checksum, engine, air_cap, tails_flies, cream_flies, get_char, boss_array, ring_offset, scroll_delay, hud_code, is_rom)
 	self.checksum    = checksum
 	self.engine      = engine
 	self.air_cap     = air_cap
@@ -221,6 +221,7 @@ function rom_info:construct(checksum, engine, air_cap, tails_flies, cream_flies,
 	end
 	self.boss_array  = boss_array or {}
 	self.ring_offset = ring_offset or 0xfffe20
+	self.scroll_delay = scroll_delay
 	self.hud_code    = hud_code
 	return self
 end
@@ -230,7 +231,7 @@ local function s1tails_check(self, val)
 	if self.checksum ~= val then
 		return false
 	end
-	--	Pu7o really should add a proper checksum...
+	--	Checksum is no good for this hack.
 	local title = memory.readbyterange(0x120,0x30)
 	local base  = "MILES \"TAILS\" PROWER IN SONIC THE HEDGEHOG      "
 	local istails = true
@@ -276,29 +277,29 @@ end
 --	Data for all supported ROMS, gathered in an easy-to-use rom_info array.
 --------------------------------------------------------------------------------
 local supported_games = {
-	--  The parameters:                              Air    Tails  Cream  Character ID                       Rings      S2/S3/SK
-	--                       Checksum       Engine   cap    flies  flies  or function       boss code array  offset     HUD code      special rom check
+	--  The parameters:                              Air    Tails  Cream  Character ID                       Rings     Scroll     S2/S3/SK
+	--                       Checksum       Engine   cap    flies  flies  or function       boss code array  offset    Delay      HUD code      special rom check
 	s1wrev0  = rom_info:new(sums.s1wrev0  , eng.s1 , true , false, false, charids.sonic   , bosses.s1wrev0 , 0xfffe20),
 	s1wrev1  = rom_info:new(sums.s1wrev1  , eng.s1 , true , false, false, charids.sonic   , bosses.s1wrev1 , 0xfffe20),
-	s1knux   = rom_info:new(sums.s1knux   , eng.s1 , false, false, false, charids.knuckles, bosses.s1knux  , 0xfffe20),
-	s1tails  = rom_info:new(sums.s1tails  , eng.s1 , false, true , false, charids.tails   , bosses.s1tails , 0xfffe20 , nil         , s1tails_check),
+	s1knux   = rom_info:new(sums.s1knux   , eng.s1 , false, false, false, charids.knuckles, bosses.s1knux  , 0xfffe20, 0xfff7a6),
+	s1tails  = rom_info:new(sums.s1tails  , eng.s1 , false, true , false, charids.tails   , bosses.s1tails , 0xfffe20, 0xfffffc , nil         , s1tails_check),
 	s1amy    = rom_info:new(sums.s1amy    , eng.s1 , false, false, false, charids.amy_rose, bosses.s1amy   , 0xfffe20),
 	s1charmy = rom_info:new(sums.s1charmy , eng.s1 , false, false, false, charids.charmy  , bosses.s1charmy, 0xfffe20),
 	scd      = rom_info:new(sums.scd      , eng.scd, true , false, false, charids.sonic   , bosses.scd     , 0xff1512),
-	s2       = rom_info:new(sums.s2       , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20 , huds.s2    ),
-	s2knux   = rom_info:new(sums.sk       , eng.s2 , false, false, false, charids.knuckles, bosses.s2knux  , 0xfffe20 , huds.s2knux , sklockon_check(sums.s2)),
-	s2amy    = rom_info:new(sums.s2amy    , eng.s2 , false, false, false, s2amy_char      , bosses.s2amy   , 0xfffe20 , huds.s2amy ),
-	s2boom   = rom_info:new(sums.s2boom   , eng.s2 , false, false, false, charids.sonic   , bosses.s2boom  , 0xfffe02 , huds.s2boom),
-	s2rob    = rom_info:new(sums.s2rob    , eng.s2 , true , false, false, 0xffff72        , bosses.s2rob   , 0xfffe20 , huds.s2rob ),
-	s2vr     = rom_info:new(sums.s2vr     , eng.s2 , true , false, false, charids.sonic   , bosses.s2      , 0xfffe02 , huds.s2    ),
-	s2hrtw   = rom_info:new(sums.s2hrtw   , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20 , huds.s2    ),
-	s1and2   = rom_info:new(sums.s1and2   , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20 , huds.s1and2),
-	s1and2b  = rom_info:new(sums.s1and2b  , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20 , huds.s1and2),
-	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, 0xffff08        , bosses.s3      , 0xfffe20 , huds.s3    ),
-	sk       = rom_info:new(sums.sk       , eng.sk , false, true , false, 0xffff08        , bosses.sk      , 0xfffe20 , huds.sk     , sknolockon_check),
-	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20 , huds.sk     , sklockon_check(sums.s3)),
-	s3kmaster= rom_info:new(sums.s3kmaster, eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20 , huds.sk    ),
-	s3kamy   = rom_info:new(sums.s3kamy   , eng.s3k, false, true , false, s3kamy_char     , bosses.sk      , 0xfffe20 , huds.s3kamy),
+	s2       = rom_info:new(sums.s2       , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20, 0xffeed0 , huds.s2    ),
+	s2knux   = rom_info:new(sums.sk       , eng.s2 , false, false, false, charids.knuckles, bosses.s2knux  , 0xfffe20, 0xffeed0 , huds.s2knux , sklockon_check(sums.s2)),
+	s2amy    = rom_info:new(sums.s2amy    , eng.s2 , false, false, false, s2amy_char      , bosses.s2amy   , 0xfffe20, 0xffeed0 , huds.s2amy ),
+	s2boom   = rom_info:new(sums.s2boom   , eng.s2 , false, false, false, charids.sonic   , bosses.s2boom  , 0xfffe02, 0xffeed0 , huds.s2boom),
+	s2rob    = rom_info:new(sums.s2rob    , eng.s2 , true , false, false, 0xffff72        , bosses.s2rob   , 0xfffe20, 0xffeed0 , huds.s2rob ),
+	s2vr     = rom_info:new(sums.s2vr     , eng.s2 , true , false, false, charids.sonic   , bosses.s2      , 0xfffe02, 0xffeed0 , huds.s2    ),
+	s2hrtw   = rom_info:new(sums.s2hrtw   , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20, 0xffeed0 , huds.s2    ),
+	s1and2   = rom_info:new(sums.s1and2   , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20, 0xffeed0 , huds.s1and2),
+	s1and2b  = rom_info:new(sums.s1and2b  , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20, 0xffeed0 , huds.s1and2),
+	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, 0xffff08        , bosses.s3      , 0xfffe20, 0xffee24 , huds.s3    ),
+	sk       = rom_info:new(sums.sk       , eng.sk , false, true , false, 0xffff08        , bosses.sk      , 0xfffe20, 0xffee24 , huds.sk     , sknolockon_check),
+	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20, 0xffee24 , huds.sk     , sklockon_check(sums.s3)),
+	s3kmaster= rom_info:new(sums.s3kmaster, eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20, 0xffee24 , huds.sk    ),
+	s3kamy   = rom_info:new(sums.s3kamy   , eng.s3k, false, true , false, s3kamy_char     , bosses.sk      , 0xfffe20, 0xffee24 , huds.s3kamy),
 }
 
 --	These two variables will hold info on the currently loaded ROM.

@@ -65,6 +65,7 @@ require("sonic/kill-original")
 --------------------------------------------------------------------------------
 local status_huds = Status_widget:new(72, 0, stat_hud)
 local char_huds = nil
+local levelbounds = nil
 local boss_hud = Boss_widget:new(0, 0, boss_hud_active)
 
 --------------------------------------------------------------------------------
@@ -72,7 +73,8 @@ local boss_hud = Boss_widget:new(0, 0, boss_hud_active)
 --------------------------------------------------------------------------------
 local function create_main_hud(ly, w, h)
 	local main_hud = Frame_widget:new(0, 0, w, h)
-	main_hud:add_status_icon(1,          2, "score"         , nil, game.get_score         , game)
+	--main_hud:add_status_icon(1,          2, "score"         , nil, game.get_score         , game)
+	main_hud:add_status_icon(1,          2, "camera"        , nil, game.get_camera        , game)
 	main_hud:add_status_icon(1,     ly + 2, "clock"         , nil, game.get_time          , game)
 	main_hud:add_status_icon(1, 2 * ly + 2, "ring"          , nil, game.get_rings         , game)
 	main_hud:add_status_icon(1, 3 * ly + 2, "emeralds-chaos", nil, game.get_chaos_emeralds, game)
@@ -100,8 +102,10 @@ draw_hud = function ()
 	if characters == nil or game.curr_char ~= selchar then
 		set_chardata(selchar)
 		char_huds = {}
+		levelbounds = {}
 		for i, char in pairs(characters) do
 			table.insert(char_huds, Character_hud:new(char, (i == 2 and 197) or 0, 188, active_char_huds[i]))
+			table.insert(levelbounds, Level_bounds:new(char, (char.is_p1 and {255, 255, 0, 255}) or {255, 0, 255, 255}))
 		end
 	end
 
@@ -116,6 +120,13 @@ draw_hud = function ()
 		gui.box  (0, 0, 319, 223, {255, 0, 0, 128}, {255, 0, 0, 255})
 	end
 
+	--	Camera bounds:
+	for i, hud in pairs(levelbounds) do
+		if hud.character:in_game() and active_char_huds[i] then
+			hud:draw()
+		end
+	end
+	
 	--	Basic game HUD (rings, time, score, emeralds)
 	game_hud = main_hud:draw()
 

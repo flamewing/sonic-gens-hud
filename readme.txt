@@ -27,7 +27,8 @@ following features:
  	speed if you hold the 'C' button for the next two frames (so for optimal
  	benefit, you should avoid using that button); for S2 and SCD, this speed is
  	calculated as it will be without holding the forward direction, due to the
- 	air speed cap in those games.
+ 	air speed cap in those games. Also, lines show the level edges so that you
+ 	know where you will be stopped.
  *	Boss HUDs, showing number of hits, a timer showing remaining invulnerability
  	time (in frames) and position (pixel level). S2 Boom and SCD do not feature
  	boss HUDs, but all other games in the compatibility list do.
@@ -60,6 +61,7 @@ The timers (all in frames) currently watched by this script are:
  *	post-hit invulnerability timer (for both players);
  *	drowning timer (for both players);
  *	insta-shield (Sonic, S3/SK/S3&K);
+ *	horizontal scroll delay caused by spindashes and some other abilities;
  *	flight timer and flight boost timer (Tails, except S2);
  *	speed shoes timer;
  *	invincibility timer;
@@ -113,6 +115,19 @@ their own.
 
 4) Changelog
 --------------------------------------------------------------------------------
+
+Jan 08/2014:
+ *	Replaced score display by camera position display.
+ *	Added a level bounds display which shows where the player is stopped. Yellow
+ 	is for player 1, magenta for player 2; magenta is drawn after, so if only
+ 	magenta is being shown, then both are being coincident. These displays are
+ 	keyed by the character's HUDs, and will only display if those are also being
+ 	displayed. The computations in the games for level bounds use the player's
+ 	centerpoint; the HUD uses their hitbox instead. This means that the boundary
+ 	will shift when the character's size changes.
+ *	Found and added horizontal scroll delay for s1tails and for s1knux.
+ *	Fixed boss code tables for S&K and S3&Amy
+ *	Build scripts now skips missing ROMs and warns about it.
 
 Jun 28/2013:
  *	Fixed horizontal scroll delay for non-S3/S&K/S3&K.

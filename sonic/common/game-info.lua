@@ -100,10 +100,6 @@ if rom:is_sonic1() or rom:is_sonic_cd() then
 	function game:hyper_form()
 		return false
 	end
-	
-	function game:scroll_delay()
-		return 0
-	end
 elseif rom:is_sonic2() then
     --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
 	function game:super_status()
@@ -113,10 +109,6 @@ elseif rom:is_sonic2() then
     --	Super Sonic/Knuckles = 1, all others 0
 	function game:hyper_form()
 		return false
-	end
-
-	function game:scroll_delay()
-		return memory.readbyte(0xffeed0)
 	end
 else
     --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
@@ -128,9 +120,15 @@ else
 	function game:hyper_form()
 		return memory.readbytesigned(0xfffe19) == -1
 	end
+end
 
+if rom.scroll_delay ~= nil then
 	function game:scroll_delay()
-		return memory.readbyte(0xffee24)
+		return memory.readbyte(rom.scroll_delay)
+	end
+else
+	function game:scroll_delay()
+		return 0
 	end
 end
 
@@ -378,6 +376,85 @@ function game:warp_timer()
 	return string.format("%5d", self:warp_time_left())
 end
 
+if rom:is_sonic1() then
+	function game:camera_pos()
+		return memory.readword(0xFFFFF700), memory.readword(0xFFFFF704)
+	end
+
+	function game:level_bounds()
+		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
+		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
+	end
+	
+	function game:extend_screen_bounds()
+		return memory.readbyte(0xFFFFF7AA) == 0
+	end
+	
+	function game:bounds_deltas()
+		return 0x10, 0x128, 0x40, 0xE0
+	end
+elseif rom:is_sonic2() then
+	function game:camera_pos()
+		return memory.readword(0xFFFFEE00), memory.readword(0xFFFFEE04)
+	end
+
+	function game:level_bounds()
+		return memory.readword(0xFFFFEEC8), memory.readword(0xFFFFEECA),
+		       memory.readword(0xFFFFEECC), memory.readword(0xFFFFEECE)
+	end
+	
+	function game:extend_screen_bounds()
+		return memory.readbyte(0xFFFFF7AA) == 0
+	end
+	
+	function game:bounds_deltas()
+		return 0x10, 0x128, 0x40, 0xE0
+	end
+elseif rom:is_sonic3() or rom:is_sonick() then
+	function game:camera_pos()
+		return memory.readword(0xFFFFEE78), memory.readword(0xFFFFEE7C)
+	end
+
+	function game:level_bounds()
+		return memory.readword(0xFFFFEE14), memory.readword(0xFFFFEE16),
+		       memory.readword(0xFFFFEE18), memory.readword(0xFFFFEE1A)
+	end
+	
+	function game:extend_screen_bounds()
+		return false
+	end
+	
+	function game:bounds_deltas()
+		return 0x10, 0x128, 0x40, 0xE0
+	end
+elseif rom:is_sonic_cd() then
+	function game:get_camera()
+		return memory.readword(0xFFFFF700), memory.readword(0xFFFFF704)
+	end
+
+	function game:level_bounds()
+		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
+		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
+	end
+	
+	function game:extend_screen_bounds()
+		return memory.readbyte(0xFFFFF7AA) == 0
+	end
+	
+	function game:bounds_deltas()
+		return 0x10, 0x130, 0x38, 0xE0
+	end
+end
+
+function game:get_camera()
+	return string.format("%5d,%5d", game:camera_pos())
+end
+
+function game:get_camera_rect()
+	local l,r,t,b = game:level_bounds()
+	local x, y = game:camera_pos()
+	return l - x, r - x, t - y, b - y
+end
 
 function game:init()
 	if rom:is_sonic3() or rom:is_sonick() then

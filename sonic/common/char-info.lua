@@ -86,6 +86,10 @@ if rom:is_sonic3() or rom:is_sonick() then
 	function Character:shoes_timer()
 		return string.format("%5d", 8 * memory.readbyte(self.offset + 0x36) - game:get_level_frames() % 8)
 	end
+	
+	function Character:get_dimensions()
+		return memory.readbyte(self.offset + 0x1F), memory.readbyte(self.offset + 0x1E)
+	end
 else
 	function Character:get_position()
 		local xpospix   = memory.readword      (self.offset + 0x08)
@@ -124,6 +128,10 @@ else
 
 	function Character:shoes_timer()
 		return string.format("%5d", memory.readword(self.offset + 0x34))
+	end
+	
+	function Character:get_dimensions()
+		return memory.readbyte(self.offset + 0x17), memory.readbyte(self.offset + 0x16)
 	end
 end
 

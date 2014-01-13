@@ -26,7 +26,9 @@ require("sonic/common/enums")
 require("sonic/common/game-info")
 require("sonic/common/char-info")
 
+--------------------------------------------------------------------------------
 --	Character HUD object.
+--------------------------------------------------------------------------------
 Character_hud = class{
 	character = charids.sonic,
 }:extends(Container_widget)
@@ -94,6 +96,32 @@ function Character_hud:construct(char, x, y, active)
 
 	self:add(char_hud, 3, 0)
 
+	return self
+end
+
+--------------------------------------------------------------------------------
+--	Level bounds class
+--------------------------------------------------------------------------------
+Level_bounds = class{
+	border   = {0, 0, 127, 255},
+}:extends(widget)
+
+--	Also draws the contained widgets.
+function Level_bounds:draw()
+	local w, h = self.character:get_dimensions()
+	local l,r,t,b = game:get_camera_rect()
+	local dl,dr,dw,dh = game:bounds_deltas()
+	if game:extend_screen_bounds() then
+		r = r + dw
+	end
+	gui.box(l + dl - w, t - h, r + w + dr, b + h + dh, {0, 0, 0, 0}, self.border)
+	return true
+end
+
+function Level_bounds:construct(char, border)
+	self:super(0, 0)
+	self.character = char
+	self.border = border or {0, 0, 127, 255}
 	return self
 end
 

@@ -51,24 +51,29 @@ for game = 1,2 do
 	for n = 1, #files do
 		fid, filename = files[n][1], files[n][2]
 		file = io.open(filename, "rb")
-		bytes = file:read("*a")
+		if file == nil then
+			print("Warning: File '" .. filename .. "' was not found, and is being ignored.")
+			print("You will not be able to turn off the HUD for this game/hack unless you rerun this script with the missing file present.\n")
+		else
+			bytes = file:read("*a")
 
-		start = 1
-		if fid == "s2knux" then
-			start = 3 * 1024 * 1024
-		end
-		for i = start, #bytes do
-			if hudcode[1] < 0 or bytes:byte(i) == hudcode[1] then
-				found = true
-				for j = 2, #hudcode do
-					if hudcode[j] >= 0 and bytes:byte(i + j - 1) ~= hudcode[j] then
-						found = false
+			start = 1
+			if fid == "s2knux" then
+				start = 3 * 1024 * 1024
+			end
+			for i = start, #bytes do
+				if hudcode[1] < 0 or bytes:byte(i) == hudcode[1] then
+					found = true
+					for j = 2, #hudcode do
+						if hudcode[j] >= 0 and bytes:byte(i + j - 1) ~= hudcode[j] then
+							found = false
+							break
+						end
+					end
+					if found then
+						outfile:write(string.format("\t%-7s = 0x%06x,\n", fid, i + 7))
 						break
 					end
-				end
-				if found then
-					outfile:write(string.format("\t%-7s = 0x%06x,\n", fid, i + 7))
-					break
 				end
 			end
 		end
