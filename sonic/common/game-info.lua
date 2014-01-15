@@ -428,7 +428,7 @@ elseif rom:is_sonic3() or rom:is_sonick() then
 		return 0x10, 0x128, 0x40, 0xE0
 	end
 elseif rom:is_sonic_cd() then
-	function game:get_camera()
+	function game:camera_pos()
 		return memory.readword(0xFFFFF700), memory.readword(0xFFFFF704)
 	end
 

@@ -116,6 +116,9 @@ their own.
 4) Changelog
 --------------------------------------------------------------------------------
 
+Jan 15/2014:
+ *	Fixed issues with Sonic CD.
+
 Jan 08/2014:
  *	Replaced score display by camera position display.
  *	Added a level bounds display which shows where the player is stopped. Yellow
