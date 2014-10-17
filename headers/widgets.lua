@@ -35,20 +35,20 @@ widget = class{
 
 --	Static assertion function for debugging purposes.
 function assert_widget(instance)
-	assert(instance.isa ~= nil and instance:isa(widget), debug.traceback(string.format("Error: The variable 'child' must descend from the class 'widget'.")))
+	assert(instance.isa ~= nil and instance:isa(widget), debug.traceback("Error: The variable 'child' must descend from the class 'widget'."))
 end
 
 function widget:add(child, dx, dy)
-	error(debug.traceback(string.format("Error: Pure virtual function 'widget:add' called.")), 0)
+	error(debug.traceback("Error: Pure virtual function 'widget:add' called."), 0)
 end
 
 --	Note: calling this from any but derived widgets with an 'add' member will
 --	result in an error.
-function widget:add_status_icon(dx, dy, image, objim, text, objt, border, fill)
-	local icon  = Icon_widget:new(0, 0, image, objim)
-	local watch = Text_widget:new(0, 0, text, objt, border, fill)
-	self:add(icon , self.x + dx     , self.y + dy     )
-	self:add(watch, self.x + dx + 20, self.y + dy +  4)
+function widget:add_status_icon(dx, dy, image, text, border, fill)
+	local icon  = Icon_widget:new(0, 0, image)
+	local watch = Text_widget:new(0, 0, text, border, fill)
+	self:add(icon , dx     , dy     )
+	self:add(watch, dx + 20, dy +  4)
 end
 
 --	Move to different location.
@@ -74,12 +74,12 @@ Icon_widget = class{
 
 --	'image' can be a gdimage or a drawing function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
-function Icon_widget:construct(x, y, image, obj)
+function Icon_widget:construct(x, y, image)
 	self:super(x, y)
 	local type = type(image)
 	self.image = image
 	if type == "function" then
-		self.draw = function (self) gui.drawimage(self.x, self.y, ui_icons[self.image(obj)]) end
+		self.draw = function (self) gui.drawimage(self.x, self.y, ui_icons[self.image()]) end
 	elseif type == "string" then
 		self.draw = function (self) gui.drawimage(self.x, self.y, ui_icons[self.image]) end
 	end
@@ -98,14 +98,14 @@ Text_widget = class{
 
 --	'image' can be a raw string or a function. The latter requires an
 --	object to be supplied so that the function knowns what to do.
-function Text_widget:construct(x, y, text, obj, border, fill)
+function Text_widget:construct(x, y, text, border, fill)
 	self:super(x, y)
 	self.text = text
 	self.border = border or {0, 0, 0, 0}
 	self.fill = fill or {255, 255, 255, 255}
 	local type = type(text)
 	if type == "function" then
-		self.draw = function (self) gui.text(self.x, self.y, self.text(obj), self.fill, self.border) end
+		self.draw = function (self) gui.text(self.x, self.y, self.text(), self.fill, self.border) end
 	elseif type == "string" then
 		self.draw = function (self) gui.text(self.x, self.y, self.text, self.fill, self.border) end
 	end

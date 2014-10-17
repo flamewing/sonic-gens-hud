@@ -91,18 +91,18 @@ function Boss_hud:construct(x, y, active, offset, icon_fun, hit_counter, flash_t
 	self.flash_timer = flash_timer
 
 	local hud = Frame_widget:new(0, 0, 65, 29)
-	hud:add(Icon_widget:new(0, 0, self.face_icon, self), 2, 2)
+	hud:add(Icon_widget:new(0, 0, bind(self.face_icon, self)), 2, 2)
 
 	--	Hit counter
-	hud:add(Text_widget:new(0, 0, self.hit_counter_string, self), 22, 5)
-	hud:add(Text_widget:new(0, 0, self.flash_timer_string, self), 53, 5)
+	hud:add(Text_widget:new(0, 0, bind(self.hit_counter_string, self)), 22, 5)
+	hud:add(Text_widget:new(0, 0, bind(self.flash_timer_string, self)), 53, 5)
 	-- These are for debugging purposes:
-	--hud:add(Text_widget:new(0, 0, function (self) return string.format("0x%02x", memory.readbyte(self.offset)) end, self), 22, 12)
-	--hud:add(Text_widget:new(0, 0, function (self) return string.format("0x%06x", self.offset) end, self), 22, 12)
+	--hud:add(Text_widget:new(0, 0, bind(function (self) return string.format("0x%02x", memory.readbyte(self.offset)) end, self)), 22, 12)
+	--hud:add(Text_widget:new(0, 0, bind(function (self) return string.format("0x%06x", self.offset) end, self)), 22, 12)
 
 	--	Position
-	hud:add(Icon_widget:new(0, 0, "location"             ),  2, 18)
-	hud:add(Text_widget:new(0, 0, self.get_position, self), 17, 19)
+	hud:add(Icon_widget:new(0, 0, "location"                   ),  2, 18)
+	hud:add(Text_widget:new(0, 0, bind(self.get_position, self)), 17, 19)
 
 	self:add(hud, 0, 0)
 	return self

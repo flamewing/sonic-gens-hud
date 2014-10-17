@@ -47,51 +47,47 @@ function Character_hud:construct(char, x, y, active)
 	local char_hud = Frame_widget:new(8, 0, 115 + pad, 35)
 
 	self:add_toggle(make_toggle(35, false, Container_widget.toggled, self, active), (char.is_p1 and 0) or 118 + pad, 0)
-	char_hud:add(Icon_widget:new(0, 0, char.get_face, char), 2, 2)
+	char_hud:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 2, 2)
 	if char.is_p1 then
-		Text_widget:new(x, y, text, obj, border, fill)
-		char_hud:add(Text_widget:new(0, 0, game.get_lives, game), 20, 2)
-		char_hud:add(Text_widget:new(0, 0, game.get_continues, game), 20, 9)
+		char_hud:add(Text_widget:new(0, 0, bind(game.get_lives, game)), 20, 2)
+		char_hud:add(Text_widget:new(0, 0, bind(game.get_continues, game)), 20, 9)
 		char_hud:add(Icon_widget:new(0, 0,
-				function(char)
+				function()
 					return shield_icons[char:shield()]
-				end,
-				char ), 2, 20)
+				end) , 2, 20)
 	else
 		pad = 0
-		char_hud:add(Icon_widget:new   (0, 0,
-				function(char)
+		char_hud:add(Icon_widget:new(0, 0,
+				function()
 					return (game:cputime_time_left() == 0 and "cpu-2p") or "tails-player"
-				end,
-				char ), 2, 20)
+				end), 2, 20)
 	end
 	--	Position
-	char_hud:add(Icon_widget:new(0, 0, "location"             ), 21 + pad, 2)
-	char_hud:add(Text_widget:new(0, 0, char.get_position, char), 36 + pad, 2)
+	char_hud:add(Icon_widget:new(0, 0, "location"                   ), 21 + pad, 2)
+	char_hud:add(Text_widget:new(0, 0, bind(char.get_position, char)), 36 + pad, 2)
 
 	--	Speed
-	char_hud:add(Icon_widget:new(0, 0, "speed"                ), 21 + pad, 13)
-	char_hud:add(Text_widget:new(0, 0, char.get_speed   , char), 36 + pad, 10)
+	char_hud:add(Icon_widget:new(0, 0, "speed"                      ), 21 + pad, 13)
+	char_hud:add(Text_widget:new(0, 0, bind(char.get_speed   , char)), 36 + pad, 10)
 
 	--	Jump prediction
-	char_hud:add(Text_widget:new(0, 0,
-			function(char)
+	char_hud:add(Text_widget:new(0, 0, 
+			function()
 				if want_prediction() then
 					return char.jump_speed
 				else
 					return ""
 				end
-			end,
-			char), 36 + pad, 17)
+			end), 36 + pad, 17)
 
 	--	Angle
-	char_hud:add(Icon_widget:new(0, 0, "angle"             ), 21 + pad, 24)
-	char_hud:add(Text_widget:new(0, 0, char.get_slope, char), 36 + pad, 26)
+	char_hud:add(Icon_widget:new(0, 0, "angle"                   ), 21 + pad, 24)
+	char_hud:add(Text_widget:new(0, 0, bind(char.get_slope, char)), 36 + pad, 26)
 	
 	--	Move lock
 	local cond = Conditional_widget:new(0, 0, true, Character.move_lock_active, char)
-	cond:add(Icon_widget:new(0, 0, "move-lock"              ),  0, 0)
-	cond:add(Text_widget:new(0, 0, char.move_lock_text, char), 15, 2)
+	cond:add(Icon_widget:new(0, 0, "move-lock"                    ),  0, 0)
+	cond:add(Text_widget:new(0, 0, bind(char.move_lock_text, char)), 15, 2)
 	char_hud:add(cond, 77 + pad, 24)
 
 	self:add(char_hud, 3, 0)

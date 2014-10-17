@@ -32,7 +32,7 @@ require("headers/widgets")
 require("sonic/common/game-info")
 
 if rom:is_sonic2() then
-	local monitor_icon = Icon_widget:new(72 + 4 * 44, 0, function(self)
+	local monitor_icon = Icon_widget:new(72 + 4 * 44, 0, function()
 			local frames = AND(memory.readword(0xfffe04),7)
 			if frames == 0 then
 				return "sonic-normal"
@@ -53,7 +53,7 @@ if rom:is_sonic2() then
 			else
 				return "blank"
 			end
-		end, nil)
+		end)
 	callbacks.gens.registerafter:add(function()
 			if not game:disable_hud() and memory.readword(0xffffffd8) ~= 0 and memory.readword(0xffffff75) == 0 then
 				monitor_icon:draw()

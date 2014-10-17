@@ -30,13 +30,13 @@ Config_menu = class{
 
 local function make_emerald_toggle(callback, udata, icon, text, h, active)
 	local btn = Clickable_widget:new(0, 0, 1 + 16 + 1 + 4 * #text + 1, h, callback, udata, {0, 0, 0, 0}, {0, 0, 0, 0})
-	local emerald = Icon_widget:new(0, 0, function(self)
-			if self.hot then
+	local emerald = Icon_widget:new(0, 0, function()
+			if btn.hot then
 				return (icon() and "emeralds-slot-hot-on") or "emeralds-slot-hot-off"
 			else
 				return (icon() and "emeralds-chaos") or "emeralds-slot-empty"
 			end
-		end, btn)
+		end)
 	btn:add(emerald, 1, 1)
 	btn:add(Text_widget:new(0, 0, text), 1 + 16 + 1, math.floor((h - 1 - 5)/2))
 	return btn
@@ -86,8 +86,8 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 	self.draw_fun = draw_fun
 	
 	self:add(make_button(function(self) self.showing_menu = false end, self, "Close" , 30, 8), math.floor((w - 30)/2), h - 10)
-	self:add(Icon_widget:new(0, 0, "warning", nil), math.floor((w + 30 + 1)/2) + 10, h - 10)
-	self:add(Text_widget:new(0, 0, "May cause desynchs", nil), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)
+	self:add(Icon_widget:new(0, 0, "warning"), math.floor((w + 30 + 1)/2) + 10, h - 10)
+	self:add(Text_widget:new(0, 0, "May cause desynchs"), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)
 	h = h - 10
 
 	local fra0 = make_frame("HUD Options", 0, 0, math.floor(w/2)-3, h - 5)
@@ -157,7 +157,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 		function()
 			return disable_original_huds
 		end, "Disable Original HUDs", 15, disable_original_huds), 2, 7)
-	fra1:add(Icon_widget:new(0, 0, "warning", nil), math.floor(w/2)-15, 10)
+	fra1:add(Icon_widget:new(0, 0, "warning"), math.floor(w/2)-15, 10)
 	if rom:is_sonic3() or rom:is_sonick() then
 		--	Super/hyper music diabler.
 		fra1:add(make_emerald_toggle(

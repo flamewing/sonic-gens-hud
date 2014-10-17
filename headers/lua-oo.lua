@@ -80,3 +80,11 @@ function assert_function(fun)
 	assert(ty == "function", debug.traceback(string.format("Error: Function expected for variable 'fun', got '" .. ty .. "'.")))
 end
 
+-- Binds an argument to a function
+function bind(f, arg)
+	-- Debugging, disabled for now.
+	--assert(f ~= nil, debug.traceback("Error: Binding nil function."))
+	--assert(f ~= nil and type(f) == "function", debug.traceback("Error: Binding non-function."))
+	return function () return f(arg) end
+end
+

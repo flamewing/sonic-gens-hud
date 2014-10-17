@@ -73,15 +73,15 @@ local boss_hud = Boss_widget:new(0, 0, boss_hud_active)
 --------------------------------------------------------------------------------
 local function create_main_hud(ly, w, h)
 	local main_hud = Frame_widget:new(0, 0, w, h)
-	--main_hud:add_status_icon(1,          2, "score"         , nil, game.get_score         , game)
-	main_hud:add_status_icon(1,          2, "camera"        , nil, game.get_camera        , game)
-	main_hud:add_status_icon(1,     ly + 2, "clock"         , nil, game.get_time          , game)
-	main_hud:add_status_icon(1, 2 * ly + 2, "ring"          , nil, game.get_rings         , game)
-	main_hud:add_status_icon(1, 3 * ly + 2, "emeralds-chaos", nil, game.get_chaos_emeralds, game)
+	--main_hud:add_status_icon(1,          2, "score"         , bind(game.get_score         , game))
+	main_hud:add_status_icon(1,          2, "camera"        , bind(game.get_camera        , game))
+	main_hud:add_status_icon(1,     ly + 2, "clock"         , bind(game.get_time          , game))
+	main_hud:add_status_icon(1, 2 * ly + 2, "ring"          , bind(game.get_rings         , game))
+	main_hud:add_status_icon(1, 3 * ly + 2, "emeralds-chaos", bind(game.get_chaos_emeralds, game))
 	if rom:is_sonic3k() then
-		main_hud:add_status_icon(36, 3 * ly + 2, "emeralds-super", nil, game.get_super_emeralds, game)
+		main_hud:add_status_icon(36, 3 * ly + 2, "emeralds-super", bind(game.get_super_emeralds, game))
 	elseif rom:is_sonic_cd() then
-		main_hud:add(Icon_widget:new(0, 0, game.get_timewarp_icon, game), 36, 3 * ly + 2)
+		main_hud:add(Icon_widget:new(0, 0, bind(game.get_timewarp_icon, game)), 36, 3 * ly + 2)
 	end
 	return main_hud
 end

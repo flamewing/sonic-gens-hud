@@ -572,7 +572,7 @@ function Character:init(id, p1, port)
 	local function Create_HUD(this, active_fun, timer_fun, icon)
 		local cond = Conditional_widget:new(0, 0, false, active_fun, this)
 		local hud  = Frame_widget:new(0, 0, 42, 17)
-		hud:add_status_icon(2, 2, icon, this, timer_fun, this)
+		hud:add_status_icon(2, 2, icon, bind(timer_fun, this))
 		cond:add(hud, 0, 0)
 
 		return cond
@@ -581,9 +581,9 @@ function Character:init(id, p1, port)
 	--	Here we generate the list of status monitor icons for each character, starting with
 	--	the common icons. To add new ones, just copy and modify accordingly.
 	self.status_huds = {
-		Create_HUD(self, self.spindash_active, self.spindash_charge, self.spindash_icon    ),
-		Create_HUD(self, self.hit_active     , self.hit_timer      , self.wounded_icon     ),
-		Create_HUD(self, self.is_drowning    , self.drowning_timer , self.drown_icon       ),
+		Create_HUD(self, self.spindash_active, self.spindash_charge, bind(self.spindash_icon, self)),
+		Create_HUD(self, self.hit_active     , self.hit_timer      , bind(self.wounded_icon , self)),
+		Create_HUD(self, self.is_drowning    , self.drowning_timer , self.drown_icon               ),
 	}
 
 	if self.charid == charids.sonic then
