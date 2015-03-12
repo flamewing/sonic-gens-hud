@@ -3,12 +3,12 @@ HUD also supports several hacks.
 
 
 ## Index
-1). Introduction
-2). Building
-3). Using
-4). Changelog
+1. Introduction
+2. Building
+3. Using
+4. Changelog
 
-## 1) Introduction
+## 1 Introduction
 This HUD displays a load of useful information for TASing such games. It has the
 following features:
 
@@ -91,7 +91,7 @@ displayed in the respective character HUD.
 *	Sonic the Hedgehog 3 locked on to Sonic & Knuckles
 *	E-122-Psi's Sonic 3 and Amy Rose v1.3
 
-## 2) Building
+## 2 Building
 You need have a Unix environment with bash, plus Lua, GD tools (specifically,
 png2gd) and 7z in order to build the HUD. If you have none of this, you can't
 build it at the moment.
@@ -99,7 +99,7 @@ build it at the moment.
 After installing all required tools, edit 'make.sh' so that the environment
 variables it sets have the correct locations.
 
-## 3) Using
+## 3 Using
 Extract all the contents of the distributed package somewhere you like. Open a
 supported ROM in Gens, then start 'sonic-hud.lua'.
 
@@ -107,7 +107,7 @@ Alternatively, all of the '*.lua' files in the 'sonic' subdirectory (but not on
 the 'sonic/common' subdirectory) can be opened in Gens and they will work on
 their own.
 
-## 4) Changelog
+## 4 Changelog
 **Jan 15/2014:**
 * Fixed issues with Sonic CD.
 
