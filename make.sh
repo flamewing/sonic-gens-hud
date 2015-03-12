@@ -23,8 +23,8 @@ BUILD="builds/sonic-hud-$(date +"%F").7z"
 mkdir -p builds
 rm -f "$BUILD"
 echo "Creating archive '$BUILD'..."
-unix2dos *.txt
-7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "$BUILD" *.txt sonic-hud.lua headers/*.lua img/*.luaimg sonic/*.lua sonic/common/*.lua &> /dev/null
-dos2unix *.txt
+unix2dos *.txt *.md
+7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "$BUILD" *.txt *.md sonic-hud.lua headers/*.lua img/*.luaimg sonic/*.lua sonic/common/*.lua &> /dev/null
+dos2unix *.txt *.md
 echo "All done."
 
