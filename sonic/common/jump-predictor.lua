@@ -77,6 +77,7 @@ function predict_jumps()
 	for _, char in pairs(characters) do
 		char.jump_speed = char:get_speed()
 	end
+
 	savestate.load(state)
 end
 

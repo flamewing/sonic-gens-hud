@@ -195,7 +195,7 @@ for game = 1,8 do
 	elseif game == 5 then
 		files = {
 			[01]={"sk"    , romdir .. "Sonic and Knuckles & Sonic 3 (W) [!].bin"},
-			[02]={"s3kamy", hackdir .. "Sonic_3_And_Amy_Rev_1.3.bin"},
+			[02]={"s3kamy", hackdir .. "Sonic_3_And_Amy_Rev_1.4.bin"},
 			}
 		bosses = {
 			[01]={0xfa, 0xb8, 0x4e, 0xf9,   -1,   -1,   -1,   -1, 0x70, 0x00, 0x10, 0x28, 0x00, 0x05, 0x32, 0x3b,   -1,   -1, 0x4e, 0xbb,   -1,   -1, 0x30, 0x28, 0x00, 0x44},

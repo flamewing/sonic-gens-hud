@@ -31,8 +31,9 @@ game = {
 
 if rom:is_sonic_cd() then
 	function game:get_time()
-		return string.format("  %2d:%02d::%02d", memory.readbyte(0xff1515),
-							 memory.readbyte(0xff1516), memory.readbyte(0xff1517))
+		return string.format("  %2d'%02d''%02d", memory.readbyte(0xff1515),
+							 memory.readbyte(0xff1516),
+							 math.floor(memory.readbyte(0xff1517) * 10/6))
 	end
 	
 	function game:get_level_frames()

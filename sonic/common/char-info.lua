@@ -372,13 +372,28 @@ if rom:is_sonic_cd() then
 
 	function Character:spindash_charge()
 		-- You can release it a frame earlier than this, but it will be slower.
-		local max = (self:is_rolling() and 45) or 30
+		local max = (self:is_rolling() and 45-1) or 30-1
 		local val = self:spindash_time()
-		return string.format("%4d%%", (val >= max and 100) or (100 * val/max))
+		local sonicspd = memory.readword(0xfff760)
+		local absinertia = math.abs(memory.readwordsigned(self.offset + 0x14))
+		local maxcharge = (Character:shoes_active() and (sonicspd * 3 / 2)) or (sonicspd * 2)
+		return string.format("%s%3d%%", (val >= max and "Y") or "N", math.floor((100 * absinertia) / maxcharge))
 	end
 
 	function Character:spindash_icon()
 		return (self:is_rolling() and self.curr_set.spindash) or "sonic-peelout"
+	end
+
+	function Character:no_peelout_time()
+		return AND(memory.readbyte(0xfff788), 0xf)
+	end
+
+	function Character:no_peelout_active()
+		return self:no_peelout_time() ~= 0
+	end
+
+	function Character:no_peelout_value()
+		return string.format("%5d", 0x10 - self:no_peelout_time())
 	end
 else
 	-- Standard spindash.
@@ -402,6 +417,14 @@ else
 
 	function Character:spindash_icon()
 		return self.curr_set.spindash
+	end
+
+	function Character:no_peelout_active()
+		return false
+	end
+
+	function Character:no_peelout_value()
+		return ""
 	end
 end
 
@@ -581,14 +604,16 @@ function Character:init(id, p1, port)
 	--	Here we generate the list of status monitor icons for each character, starting with
 	--	the common icons. To add new ones, just copy and modify accordingly.
 	self.status_huds = {
-		Create_HUD(self, self.spindash_active, self.spindash_charge, bind(self.spindash_icon, self)),
-		Create_HUD(self, self.hit_active     , self.hit_timer      , bind(self.wounded_icon , self)),
-		Create_HUD(self, self.is_drowning    , self.drowning_timer , self.drown_icon               ),
+		Create_HUD(self, self.spindash_active  , self.spindash_charge , bind(self.spindash_icon, self)),
+		Create_HUD(self, self.hit_active       , self.hit_timer       , bind(self.wounded_icon , self)),
+		Create_HUD(self, self.is_drowning      , self.drowning_timer  , self.drown_icon               ),
 	}
 
 	if self.charid == charids.sonic then
 	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.doing_instashield  , self.instashield_time      , "sonic-instashield"))
+			Create_HUD(self, self.doing_instashield , self.instashield_time , "sonic-instashield"))
+	 	table.insert(self.status_huds, 1,
+			Create_HUD(self, self.no_peelout_active , self.no_peelout_value , "sonic-no-peelout" ))
 	end
 
 	if self.flies then
