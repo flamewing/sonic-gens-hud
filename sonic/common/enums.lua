@@ -29,6 +29,7 @@ charids = {
 	amy_tails   = 4,
 	amy_rose    = 5,
 	charmy      = 6,
+	bunnie      = 7,
 }
 
 shieldids = {

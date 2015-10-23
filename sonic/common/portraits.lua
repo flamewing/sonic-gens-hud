@@ -99,6 +99,9 @@ portraits = {
 	charmy   = Char_portraits:new("charmy-normal",
 	                              "charmy-spindash",
 	                              "charmy-wounded"),
+	bunnie   = Char_portraits:new("bunnie-normal",
+	                              "bunnie-spindash",
+	                              "bunnie-wounded"),
 
 	sel_char  = nil,
 	curr_set  = nil
