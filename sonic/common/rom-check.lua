@@ -84,6 +84,7 @@ local sums = {
 	s2rob    = 0xda21,
 	s2vr     = 0xb617,
 	s2hrtw   = 0xe1e9,
+	s2keh    = 0x96f4,
 	s1and2   = 0x80a5,
 	s1and2b  = 0x75c5,
 	s3       = 0xa8f2,
@@ -101,6 +102,7 @@ local eng = {
 	sk  = 4,
 	scd = 5,
 	s3k = 6,	--	Slightly different from S&K (e.g., Hyper forms)
+	keh = 7,	--	Different RAM layout to S2
 }
 
 --	Array containing the boss ids,  and functions for determining the current
@@ -139,6 +141,7 @@ local boss_data = {
 		SLZ3 = {0xe7, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
 		FZ   = {0xe9, make_unsigned_read(0x21,  0), s1_fz_flash_timer           },
 	},
+	s2keh = {},
 	s3k = {
 		knux   = {    2, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	HPZ, Knuckles
 		mecha1 = {    1, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	SSZ, Mecha Sonic
@@ -203,6 +206,10 @@ end
 
 function rom_info:is_sonic3k()
 	return self.engine == eng.s3k
+end
+
+function rom_info:is_keh()
+	return self.engine == eng.keh
 end
 
 function rom_info:has_air_speed_cap()
@@ -301,6 +308,7 @@ local supported_games = {
 	s2rob    = rom_info:new(sums.s2rob    , eng.s2 , true , false, false, 0xffff72        , bosses.s2rob   , 0xfffe20, 0xffeed0 , huds.s2rob ),
 	s2vr     = rom_info:new(sums.s2vr     , eng.s2 , true , false, false, charids.sonic   , bosses.s2      , 0xfffe02, 0xffeed0 , huds.s2    ),
 	s2hrtw   = rom_info:new(sums.s2hrtw   , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20, 0xffeed0 , huds.s2    ),
+	s2keh    = rom_info:new(sums.s2keh    , eng.keh, false, false, false, charids.knuckles, bosses.s2keh   , 0xfffefc, 0xfff47e , huds.s2keh ),
 	s1and2   = rom_info:new(sums.s1and2   , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20, 0xffeed0 , huds.s1and2),
 	s1and2b  = rom_info:new(sums.s1and2b  , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20, 0xffeed0 , huds.s1and2),
 	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, 0xffff08        , bosses.s3      , 0xfffe20, 0xffee24 , huds.s3    ),

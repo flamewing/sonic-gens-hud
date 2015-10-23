@@ -37,6 +37,7 @@ for game = 1,2 do
 			[04]={"s2rob" , hackdir .. "Robotnik's Revenge v1.bin"},
 			[05]={"s1and2", hackdir .. "Sonic 1 and 2.bin"},
 			[06]={"s2boom", hackdir .. "SBOOM.BIN"},
+			[07]={"s2keh" , hackdir .. "KEH.bin"},
 		}
 		hudcode = {0x36, 0x3c, 0x00, 0x90, 0x34, 0x3c, 0x01, 0x08, 0x43, 0xf9, 0x00}
 	elseif game == 2 then

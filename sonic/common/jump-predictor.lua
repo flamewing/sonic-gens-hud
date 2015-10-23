@@ -43,6 +43,19 @@ elseif rom:is_sonic3() or rom:is_sonick() then
 				local mode = memory.readbyte(0xfff600)
 				return mode == 0xc or mode == 0x10
 			end
+elseif rom:is_keh() then
+	local function check_bound(val, min, max)
+		return val > min and val < max
+	end
+	prediction_wanted = function ()
+				local mode = memory.readbyte(0xfff6c2)
+				if mode == 3 then
+					return true
+				elseif mode == 0x83 then
+					return not check_bound(memory.readlong(0xfffe50), 0, 4)
+				end
+				return false
+			end
 else
 	local function check_bound(val, min, max)
 		return val > min and val < max

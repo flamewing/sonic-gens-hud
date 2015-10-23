@@ -51,6 +51,27 @@ if rom:is_sonic_cd() then
 	function game:get_score()
 		return string.format("%11d", 10 * memory.readlong(0xff1518))
 	end
+elseif rom:is_keh() then
+	function game:get_time()
+		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe51),
+							 memory.readbyte(0xfffe52), memory.readbyte(0xfffe53))
+	end
+	
+	function game:get_level_frames()
+		return memory.readbyte(0xfffe3a)
+	end
+
+	function game:get_lives()
+		return string.format("x%2d", memory.readbyte(0xfffe3d))
+	end
+	
+	function game:get_continues()
+		return string.format("x%2d", 0)
+	end
+	
+	function game:get_score()
+		return string.format("%11d", 10 * memory.readlong(0xfffe54))
+	end
 else
 	function game:get_time()
 		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe23),
@@ -78,7 +99,11 @@ function game:get_raw_rings()
 	return memory.readword(rom.ring_offset)
 end
 
-if rom:is_sonic2() then
+if rom:is_keh() then
+	function game:get_rings()
+		return string.format("%3d (%d)", self:get_raw_rings(), memory.readwordsigned(0xfffece))
+	end
+elseif rom:is_sonic2() then
 	function game:get_rings()
 		return string.format("%3d (%d)", self:get_raw_rings(), memory.readwordsigned(0xffff40))
 	end
@@ -98,6 +123,16 @@ if rom:is_sonic1() or rom:is_sonic_cd() then
 		return 0
 	end
 
+	function game:hyper_form()
+		return false
+	end
+elseif rom:is_keh() then
+    --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
+	function game:super_status()
+		return 0
+	end
+
+    --	Super Sonic/Knuckles = 1, all others 0
 	function game:hyper_form()
 		return false
 	end
@@ -174,7 +209,16 @@ function game:respawn_time_left()
 	return (64 - AND(memory.readword(0xfffe04),0x3f)) % 64
 end
 
-if rom:is_sonic2() then
+if rom:is_keh() then
+	function game:respawn_active()
+		if memory.readword(0xfff708) == 2 then
+			return self:respawn_time_left() ~= 0
+				   and memory.readbyte(0xffa000 + 0x2a) == 0
+				   and AND(memory.readbyte(0xffa000 + 0x22),0xd2) == 0
+		end
+		return false
+	end
+elseif rom:is_sonic2() then
 	function game:respawn_active()
 		if memory.readword(0xfff708) == 2 then
 			return self:respawn_time_left() ~= 0
@@ -263,6 +307,32 @@ elseif rom:is_sonic3() or rom:is_sonick() then
 	function game:get_level()
 		return memory.readword(0xffee4e)
 	end
+elseif rom:is_keh() then
+	function game:disable_hud()
+		local mode = memory.readbyte(0xfff6c2)
+		for _,m in ipairs({0,1,2,5,6,7,8,9,10}) do
+			if mode == m then
+				return true
+			end
+		end
+		if mode == 0x83 then
+			local time = memory.readlong(0xfffe50)
+			return not (time > 0 and time < 5)
+		end
+		return false
+	end
+	
+	function game:get_zone()
+		return memory.readbyte(0xfffe46)
+	end
+	
+	function game:get_act()
+		return 0
+	end
+	
+	function game:get_level()
+		return memory.readbyte(0xfffe46)
+	end
 else
 	local boringmodes = (rom:is_sonic2() and
 						{0,4,0x10,0x14,0x18,0x1c,0x20,0x24,0x28}) or
@@ -341,6 +411,27 @@ if rom:is_sonic_cd() then
 		--	If a warp has been initiated
 		return memory.readbyte(0xff1521) == 1 and game:warp_time_left() > 0
 	end
+elseif rom:is_keh() then
+	function game:in_score_tally()
+		return memory.readbyte(0xfff6c2) == 0xc and memory.readlong(0xfff842) ~= 0
+	end
+
+	function game:get_chaos_emeralds()
+		return 0
+	end
+
+	function game:get_timewarp_icon()
+		return nil
+	end
+
+	function game:warp_time_left()
+		return 0
+	end
+
+	function game:warp_active()
+		--	If a warp has been initiated and
+		return false
+	end
 else
 	function game:in_score_tally()
 		return memory.readbyte(0xfff600) == 0xc and memory.readlong(0xfff7d2) ~= 0
@@ -406,6 +497,23 @@ elseif rom:is_sonic2() then
 	
 	function game:extend_screen_bounds()
 		return memory.readbyte(0xFFFFF7AA) == 0
+	end
+	
+	function game:bounds_deltas()
+		return 0x10, 0x128, 0x40, 0xE0
+	end
+elseif rom:is_keh() then
+	function game:camera_pos()
+		return memory.readword(0xFFFFF3C0), memory.readword(0xFFFFF3C4)
+	end
+
+	function game:level_bounds()
+		return memory.readword(0xFFFFF476), memory.readword(0xFFFFF47A),
+		       memory.readword(0xFFFFF478), memory.readword(0xFFFFF47C)
+	end
+	
+	function game:extend_screen_bounds()
+		return false
 	end
 	
 	function game:bounds_deltas()

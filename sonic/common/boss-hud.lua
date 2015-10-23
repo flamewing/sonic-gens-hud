@@ -157,7 +157,8 @@ end
 
 function Boss_widget:scan_bosses()
 	self.children = {}
-	if rom:is_sonic3() or rom:is_sonick() then
+	if rom:is_keh() then
+	elseif rom:is_sonic3() or rom:is_sonick() then
 		local offset = 0xffb094
 		local last   = 0xffcfcb
 		while offset < last do
