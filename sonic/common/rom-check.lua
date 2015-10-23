@@ -90,6 +90,7 @@ local sums = {
 	sk       = 0xdfb3,
 	s3kmaster= 0xb2d9,
 	s3kamy   = 0x3030,
+	s4cyb    = 0xbbc3,
 }
 
 --	Enum which allows splitting of game engines.
@@ -147,7 +148,8 @@ local boss_data = {
 		DEZ1   = {    0, s3k_dez1_hit_count          , make_unsigned_read(0x20,  0)},	--	This boss is a mess, read the comments in s3k_dez1_hit_count
 		DDZ    = {    0, make_unsigned_read(0x29,  1), make_unsigned_read(0x20,  0)},	--	Both DDZ bosses report one less hit they can take
 		normal = {    0, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	All other bosses
-	}
+	},
+	s4cyb = {},
 }
 
 --	This maps the above array entries into the relevant code addresses.
@@ -306,6 +308,7 @@ local supported_games = {
 	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20, 0xffee24 , huds.sk     , sklockon_check(sums.s3)),
 	s3kmaster= rom_info:new(sums.s3kmaster, eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20, 0xffee24 , huds.sk    ),
 	s3kamy   = rom_info:new(sums.s3kamy   , eng.s3k, false, true , false, s3kamy_char     , bosses.sk      , 0xfffe20, 0xffee24 , huds.s3kamy),
+	s4cyb    = rom_info:new(sums.s4cyb    , eng.s3k, false, true , false, charids.sonic   , bosses.s4cyb   , 0xfffe20, 0xffee24),
 }
 
 --	These two variables will hold info on the currently loaded ROM.
