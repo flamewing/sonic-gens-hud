@@ -200,8 +200,8 @@ function predict_emeralds()
 				px5, py5 = emerald_pos(emerald5)
 			end
 			print(iter, ":", px1, px2, px3, px4, px5)
-			local limit1 = 2500
-			local limit2 = 5000
+			local limit1 = 5000
+			local limit2 = 8000
 			if px1 > limit2 and px2 > limit2 and px3 > limit2 and ((ge4 ~= 0 and (px4 > limit2 and px5 > limit2)) or true) then
 				break
 			elseif px1 < limit1 and px2 < limit1 and px3 < limit1 and px4 < limit1 and px5 < limit1 then
