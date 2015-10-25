@@ -719,7 +719,6 @@ function set_chardata(selchar)
 		characters = {
 			Character:new(charids.charmy  , true , portraits.charmy  )
 		}
-	end
 	elseif selchar == charids.bunnie then			--	Bunnie
 		characters = {
 			Character:new(charids.bunnie  , true , portraits.bunnie  )
