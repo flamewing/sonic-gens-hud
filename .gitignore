@@ -1,4 +1,3 @@
-syntax: glob
 *~
 img/*.luaimg
 sonic-hud.7z
