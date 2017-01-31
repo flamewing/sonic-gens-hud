@@ -340,6 +340,7 @@ if rom == nil then
 	local s1 = "Error: Unsupported ROM"
 	if checksum == sums.sk then
 		s2 = "Error details: 'Sonic & Knuckles' ROM is not supported if it is locked on to anything but 'Sonic 2' or 'Sonic 3'."
+		s2 = string.format("%s\nLock-on checksum '0x%04x' is unsupported.", s2, memory.readword(0x20018e))
 	else
 		s2 = string.format("Error details: ROM with checksum '0x%04x' is unsupported.", checksum)
 	end
