@@ -44,11 +44,13 @@ end
 
 --	Note: calling this from any but derived widgets with an 'add' member will
 --	result in an error.
-function widget:add_status_icon(dx, dy, image, text, border, fill)
+function widget:add_status_icon(dx, dy, image, text, border, fill, txtxoff, txtyoff)
 	local icon  = Icon_widget:new(0, 0, image)
 	local watch = Text_widget:new(0, 0, text, border, fill)
 	self:add(icon , dx     , dy     )
-	self:add(watch, dx + 20, dy +  4)
+	txtxoff = txtxoff or 20
+	txtyoff = txtyoff or 4
+	self:add(watch, dx + txtxoff, dy + txtyoff)
 end
 
 --	Move to different location.
