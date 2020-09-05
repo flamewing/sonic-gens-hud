@@ -44,7 +44,7 @@ function callback:call()
 	for _,callfun in pairs(self.callbacks) do
 		callfun()
 	end
-	if redraw then
+	if self.redraw then
 		gens.redraw()
 	end
 	self.in_call = false
