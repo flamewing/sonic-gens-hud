@@ -1,8 +1,13 @@
 #!/bin/bash
 
-ROMDIR="$HOME/.wine/drive_c/games/gens/ROMS/GenRen/"
-HACKDIR="$HOME/.wine/drive_c/games/gens/ROMS/"
-CDDIR="$HOME/.wine/drive_c/games/gens/ROMS/"
+if [[ -v MSYSTEM ]]; then
+	BASE="/c/Users/marzo/Documents/gens/ROMS"
+else
+	BASE="$HOME/.wine/drive_c/games/gens/ROMS"
+fi
+ROMDIR="$BASE/GenRen/"
+HACKDIR="$BASE/"
+CDDIR="$BASE/"
 export ROMDIR HACKDIR CDDIR
 
 function check_run()
