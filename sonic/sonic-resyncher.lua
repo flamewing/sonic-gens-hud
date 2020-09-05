@@ -93,7 +93,11 @@ local function save_level(self)
 	end
 	local iter = 0
 	local level = get_level()
-	local file = io.open(get_filename(level), "w+")
+	local file, err = io.open(get_filename(level), "w+")
+	if file == nil then
+		print(string.format("ERROR: Could not create file '%s'. This is most likely because there is no directory called 'movies' under the Gens directory; please create it.\n", get_filename(level)))
+		return
+	end
 	file:write("joypads = {\n")
 	while movie.playing() and level == get_level() do
 		sound.clear()
