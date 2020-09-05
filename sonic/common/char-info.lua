@@ -451,7 +451,7 @@ function Character:move_lock_active()
 end
 
 function Character:move_lock_text()
-	return string.format("%5d", self:move_lock_timer())
+	return string.format("%4d", self:move_lock_timer())
 end
 
 

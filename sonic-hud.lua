@@ -104,7 +104,7 @@ draw_hud = function ()
 		char_huds = {}
 		levelbounds = {}
 		for i, char in pairs(characters) do
-			table.insert(char_huds, Character_hud:new(char, (i == 2 and 197) or 0, 188, active_char_huds[i]))
+			table.insert(char_huds, Character_hud:new(char, (i == 2 and 214) or 0, 169, active_char_huds[i]))
 			table.insert(levelbounds, Level_bounds:new(char, (char.is_p1 and {255, 255, 0, 255}) or {255, 0, 255, 255}))
 		end
 	end
