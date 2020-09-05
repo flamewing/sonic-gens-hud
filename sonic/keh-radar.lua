@@ -80,7 +80,7 @@ function Emerald_widget:move(x, y)
 	if self.toggle then
 		self.toggle:move(self.toggle.x + dx, self.toggle.y + dy)
 	end
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end
@@ -88,7 +88,7 @@ end
 function Emerald_widget:draw()
 	self.active = self.is_active(self.offset)
 	if self.active then
-		for _,m in pairs(self.children) do
+		for _, m in pairs(self.children) do
 			m:draw()
 		end
 		if self.got_em(self.offset) then
@@ -224,7 +224,7 @@ function predict_emeralds()
 			iter = iter + 1
 			joypad.set(1, {start=true})
 			gens.emulateframeinvisible()
-			for n=1,100 do
+			for n=1, 100 do
 				repeat
 					gens.emulateframeinvisible()
 				until not gens.lagged()

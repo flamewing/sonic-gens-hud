@@ -119,7 +119,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 		function()
 			return game_hud
 		end, "Show Main HUD", 15, game_hud), 0, 17)
-	for n=1,2 do
+	for n=1, 2 do
 		--	Pn toggle.
 		cond:add(make_emerald_toggle(
 			function(self)

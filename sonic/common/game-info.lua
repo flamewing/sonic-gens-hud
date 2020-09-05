@@ -29,138 +29,104 @@ game = {
 	shields      = nil,
 }
 
-if rom:is_sonic_cd() then
-	function game:get_time()
-		return string.format("  %2d'%02d''%02d", memory.readbyte(0xff1515),
-							 memory.readbyte(0xff1516),
-							 math.floor(memory.readbyte(0xff1517) * 10/6))
-	end
+local curr_data = rom.data
 
+if rom:is_scheroes() or rom:is_sonic_cd() then
+	-- Timer with centiseconds
+	function game:get_time()
+		return string.format("  %2d'%02d''%02d", memory.readbyte(curr_data.Timer_minute),
+							 memory.readbyte(curr_data.Timer_second),
+							 math.floor(memory.readbyte(curr_data.Timer_frame) * 10/6))
+	end
+else
+	-- Timer with frames
+	function game:get_time()
+		return string.format("  %2d:%02d::%02d", memory.readbyte(curr_data.Timer_minute),
+							 memory.readbyte(curr_data.Timer_second),
+							 memory.readbyte(curr_data.Timer_frame))
+	end
+end
+
+if curr_data.Timer_frames == nil then
 	function game:get_level_frames()
 		return 0    --	Not used.
 	end
-
-	function game:get_lives()
-		return string.format("x%2d", memory.readbyte(0xff1508))
-	end
-
-	function game:get_continues()
-		return string.format("x%2d", memory.readbyte(0xff150e))
-	end
-
-	function game:get_score()
-		return string.format("%11d", 10 * memory.readlong(0xff1518))
-	end
-elseif rom:is_keh() then
-	function game:get_time()
-		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe51),
-							 memory.readbyte(0xfffe52), memory.readbyte(0xfffe53))
-	end
-
-	function game:get_level_frames()
-		return memory.readbyte(0xfffe3a)
-	end
-
-	function game:get_lives()
-		return string.format("x%2d", memory.readbyte(0xfffe3d))
-	end
-
-	function game:get_continues()
-		return string.format("x%2d", 0)
-	end
-
-	function game:get_score()
-		return string.format("%11d", 10 * memory.readlong(0xfffe54))
-	end
 else
-	function game:get_time()
-		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe23),
-							 memory.readbyte(0xfffe24), memory.readbyte(0xfffe25))
-	end
-
 	function game:get_level_frames()
-		return memory.readbyte(0xfffe05)
+		return memory.readbyte(curr_data.Timer_frames+1)
 	end
+end
 
-	function game:get_lives()
-		return string.format("x%2d", memory.readbyte(0xfffe12))
-	end
+function game:get_lives()
+	return string.format("x%2d", memory.readbyte(curr_data.Life_count))
+end
 
+if curr_data.Continue_count ~= nil then
 	function game:get_continues()
-		return string.format("x%2d", memory.readbyte(0xfffe18))
+		return string.format("x%2d", memory.readbyte(curr_data.Continue_count))
 	end
+end
 
-	function game:get_score()
-		return string.format("%11d", 10 * memory.readlong(0xfffe26))
-	end
+function game:get_score()
+	return string.format("%11d", 10 * memory.readlong(curr_data.Score))
 end
 
 function game:get_raw_rings()
 	return memory.readword(rom.ring_offset)
 end
 
-if rom:is_keh() then
-	function game:get_rings()
-		return string.format("%3d (%d)", self:get_raw_rings(), memory.readwordsigned(0xfffece))
-	end
-elseif rom:is_sonic2() then
-	function game:get_rings()
-		return string.format("%3d (%d)", self:get_raw_rings(), memory.readwordsigned(0xffff40))
-	end
-else
+if curr_data.Perfect_rings_left == nil then
 	function game:get_rings()
 		return string.format("%3d", self:get_raw_rings())
 	end
+else
+	function game:get_rings()
+		return string.format("%3d (%d)", self:get_raw_rings(), memory.readwordsigned(curr_data.Perfect_rings_left))
+	end
 end
 
---	Only gets called for S3K:
+function game:has_super_emeralds()
+	return curr_data.S2_Emerald_count ~= nil
+end
+
+--	Only gets called for S3K or SCH:
 function game:get_super_emeralds()
-	return string.format("%2d", memory.readbyte(0xffffb1))
+	return string.format("%2d", memory.readbyte(curr_data.S2_Emerald_count))
 end
 
-if rom:is_sonic1() or rom:is_sonic_cd() then
+--	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
+if curr_data.Turning_Super_flag == nil then
 	function game:super_status()
 		return 0
 	end
-
-	function game:hyper_form()
-		return false
-	end
-elseif rom:is_keh() then
-    --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
+else
 	function game:super_status()
-		return 0
+		return memory.readbytesigned(curr_data.Turning_Super_flag)
 	end
+end
 
-    --	Super Sonic/Knuckles = 1, all others 0
-	function game:hyper_form()
-		return false
-	end
-elseif rom:is_sonic2() then
-    --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
-	function game:super_status()
-		return memory.readbytesigned(0xfff65f)
-	end
-
-    --	Super Sonic/Knuckles = 1, all others 0
+--	Super Sonic/Knuckles = 1, Hyper Sonic/Knuckles = -1, all others 0
+if curr_data.Super_Sonic_flag == nil then
 	function game:hyper_form()
 		return false
 	end
 else
-    --	normal = 0; becoming super = 1; reverting to normal = 2; transformed = -1
-	function game:super_status()
-		return memory.readbytesigned(0xfff65f)
-	end
-
-    --	Super Sonic/Knuckles = 1, Hyper Sonic/Knuckles = -1, all others 0
 	function game:hyper_form()
-		return memory.readbytesigned(0xfffe19) == -1
+		return memory.readbytesigned(curr_data.Super_Sonic_flag) == -1
 	end
 end
 
 if rom.scroll_delay ~= nil then
-	function game:scroll_delay()
-		return memory.readbyte(rom.scroll_delay)
+	if rom:is_scheroes() then
+		-- Indirect value in SCH
+		function game:scroll_delay()
+			local delayaddr = 0xff0000 + memory.readword(rom.scroll_delay)
+			return memory.readword(delayaddr)
+		end
+	else
+		function game:scroll_delay()
+			return memory.readbyte(rom.scroll_delay)
+		end
 	end
 else
 	function game:scroll_delay()
@@ -180,8 +146,15 @@ function game:scroll_delay_active()
 	return self:scroll_delay() ~= 0
 end
 
-function game:cputime_time_left()
-	return memory.readword(0xfff702)
+-- TODO: Fix for SCH (SST control_counter)
+if curr_data.Tails_control_counter ~= nil then
+	function game:cputime_time_left()
+		return memory.readword(curr_data.Tails_control_counter)
+	end
+else
+	function game:cputime_time_left()
+		return 1
+	end
 end
 
 function game:cputime_active()
@@ -193,8 +166,15 @@ function game:cputime_timer()
 	return string.format("%5d", self.cputime_time_left())
 end
 
-function game:despawn_time_left()
-	return memory.readword(0xfff704)
+-- TODO: Fix for SCH (SST respawn_counter)
+if curr_data.Tails_respawn_counter ~= nil then
+	function game:despawn_time_left()
+		return memory.readword(curr_data.Tails_respawn_counter)
+	end
+else
+	function game:despawn_time_left()
+		return 1
+	end
 end
 
 function game:despawn_active()
@@ -206,36 +186,31 @@ function game:despawn_timer()
 end
 
 function game:respawn_time_left()
-	return (64 - AND(memory.readword(0xfffe04),0x3f)) % 64
+	return (64 - AND(self:get_level_frames(), 0x3f)) % 64
 end
 
-if rom:is_keh() then
-	function game:respawn_active()
-		if memory.readword(0xfff708) == 2 then
-			return self:respawn_time_left() ~= 0
-				   and memory.readbyte(0xffa000 + 0x2a) == 0
-				   and AND(memory.readbyte(0xffa000 + 0x22),0xd2) == 0
+-- TODO: Fix for SCH (SST CPU_routine)
+if curr_data.Tails_CPU_routine ~= nil and curr_data.obj_control ~= nil then
+	if rom:is_scheroes() then
+		function game:respawn_active()
+			if memory.readword(0xfff708) == 2 then
+				local leader_ptr = 0xff0000 + memory.readword(curr_data.Leader_ptr)
+				return self:respawn_time_left() ~= 0
+					   and memory.readbyte(leader_ptr + curr_data.obj_control) == 0
+					   and AND(memory.readbyte(leader_ptr + curr_data.status), 0xd2) == 0
+			end
+			return false
 		end
-		return false
-	end
-elseif rom:is_sonic2() then
-	function game:respawn_active()
-		if memory.readword(0xfff708) == 2 then
-			return self:respawn_time_left() ~= 0
-				   and memory.readbyte(0xffb000 + 0x2a) == 0
-				   and AND(memory.readbyte(0xffb000 + 0x22),0xd2) == 0
+	else
+		function game:respawn_active()
+			if memory.readword(curr_data.Tails_CPU_routine) == 2 then
+				return self:respawn_time_left() ~= 0
+					   and memory.readbyte(curr_data.Player1 + curr_data.obj_control) == 0
+					   and AND(memory.readbyte(curr_data.Player1 + curr_data.status), 0xd2) == 0
+			end
+			return false
 		end
-		return false
-	end
-elseif rom:is_sonic3() or rom:is_sonick() then
-	function game:respawn_active()
-		if memory.readword(0xfff708) == 2 then
-			return self:respawn_time_left() ~= 0
-				   and memory.readbytesigned(0xffb000 + 0x2e) >= 0
-				   and AND(memory.readbyte(0xffb000 + 0x2a),0x80) == 0
 		end
-		return false
-	end
 else
 	function game:respawn_active()
 		return false
@@ -246,121 +221,97 @@ function game:respawn_timer()
 	return string.format("%5d", self:respawn_time_left())
 end
 
-function game:super_timer()
-	return string.format("%5d", 61 * game:get_raw_rings() + memory.readword(0xfff670) - 60)
+if curr_data.Super_Sonic_frame_count ~= nil then
+	function game:super_timer()
+		return string.format("%5d", 61 * game:get_raw_rings() + memory.readword(curr_data.Super_Sonic_frame_count) - 60)
+	end
+else
+	function game:super_timer()
+		return string.format("%5d", 0)
+	end
 end
 
 if rom:is_sonic_cd() then
+	-- This is an ugly hack.
 	local function showing_hud()
-		return AND(memory.readword(0xffd082),0x7ff) ~= 0x568 or
-		       AND(memory.readword(0xffd0c2),0x7ff) ~= 0x568 or
-		       AND(memory.readword(0xffd142),0x7ff) ~= 0x568
+		return AND(memory.readword(0xffd082), 0x7ff) ~= 0x568 or
+		       AND(memory.readword(0xffd0c2), 0x7ff) ~= 0x568 or
+		       AND(memory.readword(0xffd142), 0x7ff) ~= 0x568
 	end
 	function game:disable_hud()
 		--	RAM byte 0xff1522 indicates if Sonic is actually travelling in time;
 		--	this is the time travel cutscene proper.
-		if memory.readbyte(0xff1522) == 2 or showing_hud() then
+		if memory.readbyte(curr_data.ResetLevel_Flags) == 2 or showing_hud() then
 			return true
 		end
 		return false
 	end
-
-	function game:in_score_tally()
-		return memory.readlong(0xfff7d2) ~= 0
-	end
-
-	function game:get_zone()
-		return memory.readbyte(0xff1506)
-	end
-
-	function game:get_act()
-		return memory.readbyte(0xff1507)
-	end
-
-	function game:get_level()
-		return memory.readword(0xff1506)
-	end
-elseif rom:is_sonic3() or rom:is_sonick() then
+elseif curr_data.Ending_running_flag ~= nil then
+	local boringmodes = {0, 4, 0x28, 0x34, 0x48, 0x4c, 0x8c}
 	function game:disable_hud()
-		local mode = memory.readbyte(0xfff600)
-		for _,m in ipairs({0,4,0x28,0x34,0x48,0x4c,0x8c}) do
+		local mode = memory.readbyte(curr_data.Game_Mode)
+		for _, m in ipairs(boringmodes) do
 			if mode == m then
 				return true
 			end
 		end
 		-- Endgame.
-		return memory.readword(0xffef72) == 0xff00
+		return memory.readbytesigned(curr_data.Ending_running_flag) == -1
+	end
+else
+	local boringmodes = nil
+	local level_loading = 0x80 + curr_data.GameModeID_Level
+	if rom:is_scheroes() then
+		boringmodes = {
+			curr_data.GameModeID_SegaScreen,
+			curr_data.GameModeID_TitleScreen,
+			curr_data.GameModeID_SpecialStage,
+			curr_data.GameModeID_EndingSequence,
+			curr_data.GameModeID_OptionsScreen,
+			curr_data.GameModeID_S1_Ending,
+		}
+	elseif rom:is_keh() then
+		boringmodes = {0, 1, 2, 5, 6, 7, 8, 9, 10}
+	elseif rom:is_sonic2() then
+		boringmodes = {0, 4, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28}
+	else
+		boringmodes = {0, 4, 0x14, 0x18, 0x1c}
 	end
 
-	function game:in_score_tally()
-		return memory.readlong(0xfff7d2) ~= 0
-	end
-
-	function game:get_zone()
-		return memory.readbyte(0xffee4e)
-	end
-
-	function game:get_act()
-		return memory.readbyte(0xffee4f)
-	end
-
-	function game:get_level()
-		return memory.readword(0xffee4e)
-	end
-elseif rom:is_keh() then
 	function game:disable_hud()
-		local mode = memory.readbyte(0xfff6c2)
-		for _,m in ipairs({0,1,2,5,6,7,8,9,10}) do
+		local mode = memory.readbyte(curr_data.Game_Mode)
+		for _, m in ipairs(boringmodes) do
 			if mode == m then
 				return true
 			end
 		end
-		if mode == 0x83 then
-			local time = memory.readlong(0xfffe50)
+		if mode == level_loading then
+			local time = memory.readlong(curr_data.Timer)
 			return not (time > 0 and time < 5)
 		end
 		return false
 	end
+end
 
-	function game:get_zone()
-		return memory.readbyte(0xfffe46)
-	end
+function game:get_zone()
+	return memory.readbyte(curr_data.Apparent_Zone)
+end
 
+if curr_data.Apparent_Act == nil then
 	function game:get_act()
 		return 0
 	end
 
 	function game:get_level()
-		return memory.readbyte(0xfffe46)
+		return game:get_zone()
 	end
 else
-	local boringmodes = (rom:is_sonic2() and
-						{0,4,0x10,0x14,0x18,0x1c,0x20,0x24,0x28}) or
-						{0,4,0x14,0x18,0x1c}
-	function game:disable_hud()
-		local mode = memory.readbyte(0xfff600)
-		for _,m in ipairs(boringmodes) do
-			if mode == m then
-				return true
-			end
-		end
-		if mode == 0x8c then
-			local time = memory.readlong(0xfffe22)
-			return not (time > 0 and time < 5)
-		end
-		return false
-	end
-
-	function game:get_zone()
-		return memory.readbyte(0xfffe10)
-	end
-
 	function game:get_act()
-		return memory.readbyte(0xfffe11)
+		return memory.readbyte(curr_data.Apparent_Act)
 	end
 
 	function game:get_level()
-		return memory.readword(0xfffe10)
+		return memory.readword(curr_data.Apparent_Zone)
 	end
 end
 
@@ -368,16 +319,19 @@ function game:get_char()
 	return rom.get_char()
 end
 
+function game:in_score_tally()
+	return memory.readbyte(curr_data.Game_Mode) == curr_data.GameModeID_Level and memory.readlong(curr_data.Bonus_Countdown_1) ~= 0
+end
 
-if rom:is_sonic_cd() then
-	function game:in_score_tally()
-		return memory.readlong(0xfff7d2) ~= 0
+if curr_data.S1_Emerald_count == nil then
+	function game:get_chaos_emeralds()
+		return 0
 	end
-
+elseif rom:is_sonic_cd() then
 	--	Emeralds are stored as a bit mask in SCD.
 	local emerald_mask = {}
 	--	This is probably overkill:
-	for i = 0,255,1 do
+	for i = 0, 255, 1 do
 		local count = 0
 		local n = i
 		while n ~= 0 do
@@ -388,11 +342,21 @@ if rom:is_sonic_cd() then
 	end
 
 	function game:get_chaos_emeralds()
-		return string.format("%3d", emerald_mask[memory.readbyte(0xff0f20)])
+		return string.format("%3d", emerald_mask[memory.readbyte(curr_data.S1_Emerald_count)])
 	end
+else
+	function game:get_chaos_emeralds()
+		return string.format("%3d", memory.readbyte(curr_data.S1_Emerald_count))
+	end
+end
 
+if curr_data.TimeWarp_Direction == nil then
 	function game:get_timewarp_icon()
-		local val = memory.readbytesigned(0xfff784)
+		return nil
+	end
+else
+	function game:get_timewarp_icon()
+		local val = memory.readbytesigned(curr_data.TimeWarp_Direction)
 		if val == -1 then
 			return "warp-past"
 		elseif val == 1 then
@@ -400,67 +364,29 @@ if rom:is_sonic_cd() then
 		end
 		return "blank"
 	end
+end
 
+if curr_data.TimeWarp_Counter == nil then
+	function game:warp_time_left()
+		return 0
+	end
+else
 	function game:warp_time_left()
 		--	Time until warp
-		local val = 210 - memory.readword(0xfff786)
+		local val = 210 - memory.readword(curr_data.TimeWarp_Counter)
 		return (val >= 0 and val) or 0
 	end
+end
 
-	function game:warp_active()
-		--	If a warp has been initiated
-		return memory.readbyte(0xff1521) == 1 and game:warp_time_left() > 0
-	end
-elseif rom:is_keh() then
-	function game:in_score_tally()
-		return memory.readbyte(0xfff6c2) == 0xc and memory.readlong(0xfff842) ~= 0
-	end
-
-	function game:get_chaos_emeralds()
-		return 0
-	end
-
-	function game:get_timewarp_icon()
-		return nil
-	end
-
-	function game:warp_time_left()
-		return 0
-	end
-
+if curr_data.TimeWarp_Active == nil then
 	function game:warp_active()
 		--	If a warp has been initiated and
 		return false
 	end
 else
-	function game:in_score_tally()
-		return memory.readbyte(0xfff600) == 0xc and memory.readlong(0xfff7d2) ~= 0
-	end
-
-	local emeralds = nil
-	if rom:is_sonic1() then
-		emeralds   = 0xfffe57
-	elseif rom:is_sonic2() then
-		emeralds   = 0xffffb1
-	elseif rom:is_sonic3() or rom:is_sonick() then
-		emeralds   = 0xffffb0
-	end
-
-	function game:get_chaos_emeralds()
-		return string.format("%3d", memory.readbyte(emeralds))
-	end
-
-	function game:get_timewarp_icon()
-		return nil
-	end
-
-	function game:warp_time_left()
-		return 0
-	end
-
 	function game:warp_active()
-		--	If a warp has been initiated and
-		return false
+		--	If a warp has been initiated
+		return memory.readbyte(curr_data.TimeWarp_Active) == 1 and game:warp_time_left() > 0
 	end
 end
 
@@ -468,90 +394,36 @@ function game:warp_timer()
 	return string.format("%5d", self:warp_time_left())
 end
 
-if rom:is_sonic1() then
-	function game:camera_pos()
-		return memory.readword(0xFFFFF700), memory.readword(0xFFFFF704)
-	end
+function game:camera_pos()
+	return memory.readword(curr_data.Camera_X_pos), memory.readword(curr_data.Camera_Y_pos)
+end
 
-	function game:level_bounds()
-		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
-		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
-	end
+function game:level_bounds()
+	return memory.readword(curr_data.Camera_Min_X_pos), memory.readword(curr_data.Camera_Max_X_pos),
+		   memory.readword(curr_data.Camera_Min_Y_pos), memory.readword(curr_data.Camera_Max_Y_pos_now)
+end
 
+if rom:is_scheroes() then
 	function game:extend_screen_bounds()
-		return memory.readbyte(0xFFFFF7AA) == 0
+		return self:get_zone() == curr_data.sky_chase_zone
 	end
-
-	function game:bounds_deltas()
-		return 0x10, 0x128, 0x40, 0xE0
-	end
-elseif rom:is_sonic2() then
-	function game:camera_pos()
-		return memory.readword(0xFFFFEE00), memory.readword(0xFFFFEE04)
-	end
-
-	function game:level_bounds()
-		return memory.readword(0xFFFFEEC8), memory.readword(0xFFFFEECA),
-		       memory.readword(0xFFFFEECC), memory.readword(0xFFFFEECE)
-	end
-
-	function game:extend_screen_bounds()
-		return memory.readbyte(0xFFFFF7AA) == 0
-	end
-
-	function game:bounds_deltas()
-		return 0x10, 0x128, 0x40, 0xE0
-	end
-elseif rom:is_keh() then
-	function game:camera_pos()
-		return memory.readword(0xFFFFF3C0), memory.readword(0xFFFFF3C4)
-	end
-
-	function game:level_bounds()
-		return memory.readword(0xFFFFF476), memory.readword(0xFFFFF47A),
-		       memory.readword(0xFFFFF478), memory.readword(0xFFFFF47C)
-	end
-
+elseif rom:is_keh() or rom:is_sonic3() or rom:is_sonick() then
 	function game:extend_screen_bounds()
 		return false
 	end
-
-	function game:bounds_deltas()
-		return 0x10, 0x128, 0x40, 0xE0
-	end
-elseif rom:is_sonic3() or rom:is_sonick() then
-	function game:camera_pos()
-		return memory.readword(0xFFFFEE78), memory.readword(0xFFFFEE7C)
-	end
-
-	function game:level_bounds()
-		return memory.readword(0xFFFFEE14), memory.readword(0xFFFFEE16),
-		       memory.readword(0xFFFFEE18), memory.readword(0xFFFFEE1A)
-	end
-
+else
 	function game:extend_screen_bounds()
-		return false
+		return memory.readbyte(curr_data.Current_Boss_ID) == 0
 	end
+end
 
-	function game:bounds_deltas()
-		return 0x10, 0x128, 0x40, 0xE0
-	end
-elseif rom:is_sonic_cd() then
-	function game:camera_pos()
-		return memory.readword(0xFFFFF700), memory.readword(0xFFFFF704)
-	end
-
-	function game:level_bounds()
-		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
-		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
-	end
-
-	function game:extend_screen_bounds()
-		return memory.readbyte(0xFFFFF7AA) == 0
-	end
-
+if rom:is_scheroes() or rom:is_sonic_cd() then
 	function game:bounds_deltas()
 		return 0x10, 0x130, 0x38, 0xE0
+	end
+else
+	function game:bounds_deltas()
+		return 0x10, 0x128, 0x40, 0xE0
 	end
 end
 
@@ -560,13 +432,15 @@ function game:get_camera()
 end
 
 function game:get_camera_rect()
-	local l,r,t,b = game:level_bounds()
+	local l, r, t, b = game:level_bounds()
 	local x, y = game:camera_pos()
 	return l - x, r - x, t - y, b - y
 end
 
 function game:init()
-	if rom:is_sonic3() or rom:is_sonick() then
+	if rom:is_scheroes() then
+		self.shields = {shieldids.normal_shield, shieldids.flame_shield, shieldids.lightning_shield, shieldids.bubble_shield}
+	elseif rom:is_sonic3() or rom:is_sonick() then
 		self.shields = {shieldids.flame_shield, shieldids.lightning_shield, shieldids.bubble_shield}
 	else
 		self.shields = {shieldids.normal_shield}
@@ -574,4 +448,3 @@ function game:init()
 end
 
 game:init()
-

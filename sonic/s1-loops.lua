@@ -56,7 +56,7 @@ local function in_roll()
 	if not has_loops() then
 		return false
 	end
-	local roll1,roll2 = memory.readbyte(v_256roll1),memory.readbyte(v_256roll2)
+	local roll1, roll2 = memory.readbyte(v_256roll1), memory.readbyte(v_256roll2)
 	local chunk = get_chunk()
 	return chunk == roll1 or chunk == roll2
 end
@@ -65,13 +65,13 @@ local function in_loop()
 	if not has_loops() then
 		return false
 	end
-	local loop1,loop2 = memory.readbyte(v_256loop1),memory.readbyte(v_256loop2)
+	local loop1, loop2 = memory.readbyte(v_256loop1), memory.readbyte(v_256loop2)
 	local chunk = get_chunk()
 	return chunk == loop1 or chunk == loop2
 end
 
 local function looptype()
-	local loop1,loop2 = memory.readbyte(v_256loop1),memory.readbyte(v_256loop2)
+	local loop1, loop2 = memory.readbyte(v_256loop1), memory.readbyte(v_256loop2)
 	local chunk = get_chunk()
 	if chunk == loop1 then
 		return "Air chk: N"
@@ -91,10 +91,10 @@ local function angle()
 end
 
 local function get_plane()
-	local loop1,loop2 = memory.readbyte(v_256loop1),memory.readbyte(v_256loop2)
+	local loop1, loop2 = memory.readbyte(v_256loop1), memory.readbyte(v_256loop2)
 	local chunk = get_chunk()
 	if chunk == loop2 then
-		if AND(memory.readbyte(0xFFFFD022),64) ~= 0 then
+		if AND(memory.readbyte(0xFFFFD022), 64) ~= 0 then
 			return "high plane"
 		end
 	elseif chunk ~= loop1 then
@@ -102,7 +102,7 @@ local function get_plane()
 	end
 	local lowx  = memory.readbyte(0xFFFFD009)
 	local angle = memory.readbyte(0xFFFFD026)
-	local plane = AND(memory.readbyte(0xFFFFD001),64)
+	local plane = AND(memory.readbyte(0xFFFFD001), 64)
 	if lowx < 0x2C then
 		return "high plane"
 	elseif lowx >= 0xE0 then

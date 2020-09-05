@@ -28,8 +28,8 @@ end
 require("sonic/common/game-info")
 require("headers/register")
 
-local tx, ty = 100,100
-local dx, dy =   1,1
+local tx, ty = 100, 100
+local dx, dy =   1, 1
 
 local function want_fast_forward()
 	return game:disable_hud() or (skip_score_tally and game:in_score_tally())
@@ -45,7 +45,7 @@ local function fast_forward()
 			iter = iter + 1
 			if iter == 30 then
 				iter = 0
-				gui.drawtext(320-ty*3/2,tx*2/3, "Please Wait...")
+				gui.drawtext(320-ty*3/2, tx*2/3, "Please Wait...")
 				tx = tx + dx
 				ty = ty + dy
 				if tx < 0 or tx >= 320 then

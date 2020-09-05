@@ -77,7 +77,7 @@ end
 
 function predict_jumps()
 	savestate.save(state)
-	for n=1,2 do
+	for n=1, 2 do
 		repeat
 			for i, _ in pairs(characters) do
 				joypad.set(i, buttons)

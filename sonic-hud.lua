@@ -78,7 +78,7 @@ local function create_main_hud(ly, w, h)
 	main_hud:add_status_icon(1,     ly + 2, "clock"         , bind(game.get_time          , game))
 	main_hud:add_status_icon(1, 2 * ly + 2, "ring"          , bind(game.get_rings         , game))
 	main_hud:add_status_icon(1, 3 * ly + 2, "emeralds-chaos", bind(game.get_chaos_emeralds, game))
-	if rom:is_sonic3k() then
+	if game:has_super_emeralds() then
 		main_hud:add_status_icon(36, 3 * ly + 2, "emeralds-super", bind(game.get_super_emeralds, game))
 	elseif rom:is_sonic_cd() then
 		main_hud:add(Icon_widget:new(0, 0, bind(game.get_timewarp_icon, game)), 36, 3 * ly + 2)

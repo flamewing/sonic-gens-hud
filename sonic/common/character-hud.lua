@@ -50,7 +50,9 @@ function Character_hud:construct(char, x, y, active)
 	char_hud:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 2, 2)
 	if char.is_p1 then
 		char_hud:add(Text_widget:new(0, 0, bind(game.get_lives, game)), 20, 2)
-		char_hud:add(Text_widget:new(0, 0, bind(game.get_continues, game)), 20, 9)
+		if game.get_continues ~= nil then
+			char_hud:add(Text_widget:new(0, 0, bind(game.get_continues, game)), 20, 9)
+		end
 		char_hud:add(Icon_widget:new(0, 0,
 				function()
 					return shield_icons[char:shield()]
@@ -105,8 +107,8 @@ Level_bounds = class{
 --	Also draws the contained widgets.
 function Level_bounds:draw()
 	local w, h = self.character:get_dimensions()
-	local l,r,t,b = game:get_camera_rect()
-	local dl,dr,dw,dh = game:bounds_deltas()
+	local l, r, t, b = game:get_camera_rect()
+	local dl, dr, dw, dh = game:bounds_deltas()
 	if game:extend_screen_bounds() then
 		r = r + dw
 	end

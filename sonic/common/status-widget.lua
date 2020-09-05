@@ -38,7 +38,7 @@ function Status_widget:move(x, y)
 	if self.toggle then
 		self.toggle:move(self.toggle.x + dx, self.toggle.y + dy)
 	end
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end

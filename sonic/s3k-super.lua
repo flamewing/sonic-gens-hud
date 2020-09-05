@@ -374,7 +374,7 @@ function go_super()
 	end
 	-- More common values:
 	memory.writebyte(p1_off + invinc_off, 0)
-	memory.writebyte(p1_off + status_off, OR(memory.readbyte(p1_off + status_off),2))
+	memory.writebyte(p1_off + status_off, OR(memory.readbyte(p1_off + status_off), 2))
 
 	-- The following four lines *should* play the transformation sound and start the music.
 	-- However, only one of them actually gets played...
@@ -406,19 +406,19 @@ local width    = 41
 function create_menu()
 	update_input()
 
-	if do_icon_button    ("ring"            , 0,  63, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	if do_icon_button    ("ring"            ,  0,  63, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		give_rings(10)
-	elseif do_icon_button("shield-flame"    , 0,  78, 16, 14) then
+	elseif do_icon_button("shield-flame"    ,  0,  78, 16, 14) then
 		give_shield(fire_shield)
-	elseif do_icon_button("shield-lightning",17,  78, 16, 14) then
+	elseif do_icon_button("shield-lightning", 17,  78, 16, 14) then
 		give_shield(lightning_shield)
-	elseif do_icon_button("shield-bubble"   ,34,  78, 16, 14) then
+	elseif do_icon_button("shield-bubble"   , 34,  78, 16, 14) then
 		give_shield(bubble_shield)
-	elseif do_icon_button("superspeed"      , 0,  93, 16, 14) then
+	elseif do_icon_button("superspeed"      ,  0,  93, 16, 14) then
 		give_shoes()
-	elseif do_icon_button("invincibility"   ,17,  93, 16, 14) then
+	elseif do_icon_button("invincibility"   , 17,  93, 16, 14) then
 		give_invincibility()
-	elseif do_icon_button("emeralds-chaos"  , 0, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif do_icon_button("emeralds-chaos"  ,  0, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local ncnt = (memory.readbyte(chaosem_off) + 1) % 8
 		memory.writebyte(chaosem_off, ncnt)
 		if plain_s3 then
@@ -445,7 +445,7 @@ function create_menu()
 				memory.writebyte(0xffffb2 + emerald, val)
 			end
 		end
-	elseif not plain_s3 and do_icon_button("emeralds-super"  ,17, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
+	elseif not plain_s3 and do_icon_button("emeralds-super"  , 17, 108, 16, 14, {32, 32, 32, 255}, {255, 189, 0, 255}, true) then
 		local scnt = (memory.readbyte(superem_off) + 1) % 8
 		memory.writebyte(superem_off, scnt)
 		local ncnt = memory.readbyte(chaosem_off)

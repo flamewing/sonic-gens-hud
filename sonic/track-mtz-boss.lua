@@ -37,15 +37,15 @@ if rom:is_sonic2() then
 		while offset < last do
 			local id = memory.readbyte(offset)
 			if id == 0x53 then
-				return offset,memory.readlong(offset + 0x34)
+				return offset, memory.readlong(offset + 0x34)
 			end
 			offset = offset + 0x40
 		end
-		return nil,nil
+		return nil, nil
 	end
 
 	local function WatchMTZBoss()
-		local orbptr,bossptr = Scan_orbs()
+		local orbptr, bossptr = Scan_orbs()
 		if orbptr ~= nil and bossptr ~= 0 then
 			local border = {0, 0, 0, 0}
 			local fill   = {255, 255, 255, 255}
@@ -59,7 +59,7 @@ if rom:is_sonic2() then
 					gui.text(266, 42, "Wait for it", fill, border)
 				end
 			else
-				local norbs,counter,orbflag = memory.readbyte(bossptr+0x2C),memory.readbyte(bossptr+0x39),memory.readbyte(bossptr+0x3A)
+				local norbs, counter, orbflag = memory.readbyte(bossptr+0x2C), memory.readbyte(bossptr+0x39), memory.readbyte(bossptr+0x3A)
 				local orbypos = memory.readwordsigned(orbptr+0x0C)
 				if counter >= 0x20 and norbs == 0 and orbflag == 0 and orbypos >= 0x4AC then
 					gui.text(266, 42, "Hit boss now", fill, border)

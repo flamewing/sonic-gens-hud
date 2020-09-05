@@ -33,7 +33,7 @@ require("sonic/common/game-info")
 
 if rom:is_sonic2() then
 	local monitor_icon = Icon_widget:new(72 + 4 * 44, 0, function()
-			local frames = AND(memory.readword(0xfffe04),7)
+			local frames = AND(memory.readword(0xfffe04), 7)
 			if frames == 0 then
 				return "sonic-normal"
 			elseif frames == 1 then

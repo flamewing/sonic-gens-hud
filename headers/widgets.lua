@@ -138,7 +138,7 @@ function Frame_widget:move(x, y)
 	local dy = y - self.y
 	self.x = x
 	self.y = y
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end
@@ -146,7 +146,7 @@ end
 --	Also draws the contained widgets.
 function Frame_widget:draw()
 	gui.box(self.x, self.y, self.x + self.w, self.y + self.h, self.fill, self.border)
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:draw()
 	end
 	return true
@@ -192,7 +192,7 @@ function Clickable_widget:draw()
 		end
 	end
 	gui.box(self.x, self.y, self.x + self.w, self.y + self.h, fill, border)
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:draw()
 	end
 	return true
@@ -233,10 +233,10 @@ function Toggle_widget:move(x, y)
 	local dy = y - self.y
 	self.x = x
 	self.y = y
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
-	for _,m in pairs(self.off_children) do
+	for _, m in pairs(self.off_children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end
@@ -255,7 +255,7 @@ function Toggle_widget:draw()
 		return true
 	end
 	gui.box(self.x, self.y, self.x + self.w, self.y + self.h, fill, border)
-	for _,m in pairs((self.active and self.children) or self.off_children) do
+	for _, m in pairs((self.active and self.children) or self.off_children) do
 		m:draw()
 	end
 	return true
@@ -317,14 +317,14 @@ function Container_widget:move(x, y)
 	if self.toggle then
 		self.toggle:move(self.toggle.x + dx, self.toggle.y + dy)
 	end
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end
 
 function Container_widget:draw()
 	if self.active then
-		for _,m in pairs(self.children) do
+		for _, m in pairs(self.children) do
 			m:draw()
 		end
 	end
@@ -359,7 +359,7 @@ function Conditional_widget:move(x, y)
 	local dy = y - self.y
 	self.x = x
 	self.y = y
-	for _,m in pairs(self.children) do
+	for _, m in pairs(self.children) do
 		m:move(m.x + dx, m.y + dy)
 	end
 end
@@ -367,7 +367,7 @@ end
 function Conditional_widget:draw()
 	self.active = self.is_active(self.obj)
 	if self.active then
-		for _,m in pairs(self.children) do
+		for _, m in pairs(self.children) do
 			m:draw()
 		end
 	end

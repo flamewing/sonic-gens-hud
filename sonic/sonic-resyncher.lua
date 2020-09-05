@@ -56,7 +56,7 @@ local function fast_forward(cond)
 	local iter = 0
 	while cond() == true do
 		sound.clear()
-		for n = 1,2 do
+		for n = 1, 2 do
 			joypad.write(n, {A=false, C=false, up=false, right=false, left=false, Y=false, X=false, Z=false, start=false, mode=false, down=false, B=false})
 		end
 		gens.emulateframeinvisible()
@@ -147,13 +147,13 @@ local function paste_level(self)
 	local level = get_level()
 	local iter = 0
 	local count = #joypads
-	for i,m in pairs(joypads) do
+	for i, m in pairs(joypads) do
 		if level ~= get_level() then
 			break
 		end
 		sound.clear()
 		repeat
-			for n = 1,2 do
+			for n = 1, 2 do
 				joypad.write(n, m[n])
 			end
 			gens.emulateframeinvisible()

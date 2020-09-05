@@ -15,27 +15,30 @@
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
---	Dynamic icon loader for widgets.
---	Written by: Marzo Junior
---------------------------------------------------------------------------------
-
-local img_path = (string.gsub(debug.getinfo(1).source, "headers/ui%-icons%.lua", "img")):sub(2)
-
-local function open_image(fname)
-	local prefix = img_path
-	local filename = prefix .. "/" .. fname
-	local file = io.open(filename, "rb") or
-		error(debug.traceback(string.format("Error: Image '%s' could not be found.", filename)), 0)
-	local retvar = file:read("*a")
-	file:close()
-	return retvar
-end
-
-ui_icons = {}
-setmetatable(ui_icons, {__index = function (self, image)
-		local v = open_image("ui-icon-" .. image .. ".luaimg")
-		self[image] = v
-		return v
-	end})
-
+keh_rom_data = {
+	Life_count = 0xfffe3d,
+    Score = 0xfffe54,
+	Perfect_rings_left = 0xfffece,
+	Timer_frames = 0xfffe3a,
+	Timer = 0xfffe50,
+	Timer_minute = 0xfffe51,
+	Timer_frame = 0xfffe52,
+    Timer_second = 0xfffe53,
+    Game_Mode = 0xfff6c2,
+    Apparent_Zone = 0xfffe46,
+	Bonus_Countdown_1 = 0xfff842,
+	Camera_X_pos = 0xfff300,
+	Camera_Y_pos = 0xfff304,
+	Camera_Min_X_pos = 0xfff476,
+	Camera_Max_X_pos = 0xfff478,
+	Camera_Min_Y_pos = 0xfff47a,
+	Camera_Max_Y_pos_now = 0xfff47c,
+	obj_control = 0x2a,
+	status = 0x22,
+    Player1 = 0xffa000,
+    Player2 = 0xffa040,
+    Tails_control_counter = 0xfff702,
+    Tails_respawn_counter = 0xfff704,
+    Tails_CPU_routine = 0xfff708,
+    GameModeID_Level = 6,
+}

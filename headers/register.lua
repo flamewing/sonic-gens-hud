@@ -41,17 +41,17 @@ function callback:call()
 		return
 	end
 	self.in_call = true
-	for _,callfun in pairs(self.callbacks) do
+	for _, callfun in pairs(self.callbacks) do
 		callfun()
 	end
-	if self.redraw then
+	if redraw then
 		gens.redraw()
 	end
 	self.in_call = false
 end
 
 function callback:remove(fun)
-	for id,callfun in pairs(self.callbacks) do
+	for id, callfun in pairs(self.callbacks) do
 		if callfun == fun then
 			table.remove(self.callbacks, id)
 			return

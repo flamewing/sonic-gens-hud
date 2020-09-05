@@ -15,27 +15,29 @@
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
---	Dynamic icon loader for widgets.
---	Written by: Marzo Junior
---------------------------------------------------------------------------------
-
-local img_path = (string.gsub(debug.getinfo(1).source, "headers/ui%-icons%.lua", "img")):sub(2)
-
-local function open_image(fname)
-	local prefix = img_path
-	local filename = prefix .. "/" .. fname
-	local file = io.open(filename, "rb") or
-		error(debug.traceback(string.format("Error: Image '%s' could not be found.", filename)), 0)
-	local retvar = file:read("*a")
-	file:close()
-	return retvar
-end
-
-ui_icons = {}
-setmetatable(ui_icons, {__index = function (self, image)
-		local v = open_image("ui-icon-" .. image .. ".luaimg")
-		self[image] = v
-		return v
-	end})
-
+sonic1_rom_data = {
+	Life_count = 0xfffe12,
+    Score = 0xfffe26,
+    Continue_count = 0xfffe18,
+	Timer_frames = 0xfffe04,
+	Timer = 0xfffe22,
+	Timer_minute = 0xfffe23,
+	Timer_frame = 0xfffe25,
+	Timer_second = 0xfffe24,
+	S1_Emerald_count = 0xfffe57,
+	Game_Mode = 0xfff600,
+	Apparent_Zone = 0xfffe10,
+	Apparent_Act = 0xfffe11,
+	Bonus_Countdown_1 = 0xfff7d2,
+	Camera_X_pos = 0xfff700,
+	Camera_Y_pos = 0xfff704,
+	Camera_Min_X_pos = 0xfff728,
+	Camera_Max_X_pos = 0xfff72a,
+	Camera_Min_Y_pos = 0xfff72c,
+	Camera_Max_Y_pos_now = 0xfff72e,
+	Current_Boss_ID = 0xfff7aa,
+    status = 0x22,
+    Player1 = 0xffd000,
+    Player2 = 0xffd040,
+    GameModeID_Level = 0xc,
+}

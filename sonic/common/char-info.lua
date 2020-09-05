@@ -240,7 +240,7 @@ if rom:is_sonic1() then
 	end
 elseif rom:is_sonic3() or rom:is_sonick() then
 	function Character:flight_time_left()
-		local dec = 1 - AND(game:get_level_frames(),1)
+		local dec = 1 - AND(game:get_level_frames(), 1)
 		return 2 * memory.readbyte(self.offset + 0x25) - dec
 	end
 
@@ -327,8 +327,8 @@ end
 
 function Character:shield()
 	local status = self:get_shield()
-	for _,m in ipairs(game.shields) do
-		if AND(status,BIT(m)) ~= 0 then
+	for _, m in ipairs(game.shields) do
+		if AND(status, BIT(m)) ~= 0 then
 			return m
 		end
 	end

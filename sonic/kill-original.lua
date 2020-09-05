@@ -38,7 +38,7 @@ if rom:is_sonic_cd() then
 	--	offscreen. We move each just enough that they are offscreen but still loaded.
 	local addr = {[0xffd080] = 32, [0xffd0c0] = 96, [0xffd140] = 88}
 	exec_kill_fun    = function()
-			for ad,val in pairs(addr) do
+			for ad, val in pairs(addr) do
 				memory.registerwrite(ad + 8, 2,
 					function(address, range)
 						if memory.readbyte(ad) == 28 and
@@ -49,19 +49,19 @@ if rom:is_sonic_cd() then
 			end
 		end
 	exec_restore_fun = function()
-			for ad,val in pairs(addr) do
+			for ad, val in pairs(addr) do
 				memory.registerwrite(ad + 8, 2, nil)
 			end
 		end
 	start_kill_fun   = function()
-			for ad,val in pairs(addr) do
+			for ad, val in pairs(addr) do
 				if memory.readbyte(ad) == 28 then
 					memory.writeword(ad + 8, val)
 				end
 			end
 		end
 	exit_restore_fun = function()
-			for ad,val in pairs(addr) do
+			for ad, val in pairs(addr) do
 				if memory.readbyte(ad) == 28 then
 					memory.registerwrite(ad + 8, 2, nil)
 					memory.writeword(ad + 8, 144)

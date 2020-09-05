@@ -73,7 +73,7 @@ function Boss_hud:draw()
 		return false
 	end
 	if self.active then
-		for _,m in pairs(self.children) do
+		for _, m in pairs(self.children) do
 			m:draw()
 		end
 	end
@@ -163,7 +163,7 @@ function Boss_widget:scan_bosses()
 		local last   = 0xffcfcb
 		while offset < last do
 			local code = memory.readlong(offset)
-			for ad,fun in pairs(self.boss_addr) do
+			for ad, fun in pairs(self.boss_addr) do
 				if code == ad then
 					self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 					break
@@ -177,7 +177,7 @@ function Boss_widget:scan_bosses()
 		while offset < last do
 			local id = memory.readbyte(offset)
 			if id ~= 0 then
-				for ad,fun in pairs(self.boss_addr) do
+				for ad, fun in pairs(self.boss_addr) do
 					if id == fun[1] then
 						self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 						break
@@ -191,11 +191,11 @@ end
 
 function Boss_widget:register()
 	-- Register all code addresses and snoop at a0 register when it runs.
-	for ad,fun in pairs(self.boss_addr) do
+	for ad, fun in pairs(self.boss_addr) do
 		memory.registerexec(ad, 8,
 			function(address, range)
 				local offset = AND(memory.getregister("a0"), 0xffffff)
-				for id,child in pairs(self.children) do
+				for id, child in pairs(self.children) do
 					if child.offset == offset then
 						-- already have it
 						return
@@ -210,7 +210,7 @@ end
 
 function Boss_widget:unregister()
 	-- Unregister all code addresses.
-	for ad,fun in pairs(self.boss_addr) do
+	for ad, fun in pairs(self.boss_addr) do
 		memory.registerexec(ad, 8, nil)
 	end
 	self.children = {}
