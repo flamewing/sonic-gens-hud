@@ -201,6 +201,10 @@ function rom_info:is_sonic3()
 	return self.engine == eng.s3 or self.engine == eng.s3k
 end
 
+function rom_info:is_sonic3alone()
+	return self.engine == eng.s3
+end
+
 function rom_info:is_sonick()
 	return self.engine == eng.sk
 end

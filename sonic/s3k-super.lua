@@ -29,7 +29,7 @@ elseif not rom:is_sonick() and not rom:is_sonic3k() then
 	error("This script is for Sonic & Knuckles or Sonic 3 & Knuckles only.")
 end
 
-local plain_s3 = checksum == 0xa8f2
+local plain_s3 = rom:is_sonic3alone()
 -- Set this to true to allow "Turbo Tails".
 local allow_turbotails = false
 
