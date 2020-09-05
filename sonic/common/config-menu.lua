@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
---	
+--
 --	This program is free software: you can redistribute it and/or modify
---	it under the terms of the GNU Lesser General Public License as 
---	published by the Free Software Foundation, either version 3 of the 
+--	it under the terms of the GNU Lesser General Public License as
+--	published by the Free Software Foundation, either version 3 of the
 --	License, or (at your option) any later version.
---	
+--
 --	This program is distributed in the hope that it will be useful,
 --	but WITHOUT ANY WARRANTY; without even the implied warranty of
 --	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --	GNU General Public License for more details.
---	
+--
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 	self:super(x, y, w, h, nil, {0, 0, 0, 225})
 	self.showing_menu = false
 	self.draw_fun = draw_fun
-	
+
 	self:add(make_button(function(self) self.showing_menu = false end, self, "Close" , 30, 8), math.floor((w - 30)/2), h - 10)
 	self:add(Icon_widget:new(0, 0, "warning"), math.floor((w + 30 + 1)/2) + 10, h - 10)
 	self:add(Text_widget:new(0, 0, "May cause desynchs"), 2 + 11 + math.floor((w + 30 + 1)/2) + 11, h - 8)

@@ -15,7 +15,7 @@ function check_run()
 	if [[ (! -f "sonic/common/$2") || ("sonic/common/$2" -ot "$1") ]]; then
 		echo "$3"
 		./$1
-	fi 
+	fi
 }
 
 find . -iname '*~' -delete

@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
---	
+--
 --	This program is free software: you can redistribute it and/or modify
---	it under the terms of the GNU Lesser General Public License as 
---	published by the Free Software Foundation, either version 3 of the 
+--	it under the terms of the GNU Lesser General Public License as
+--	published by the Free Software Foundation, either version 3 of the
 --	License, or (at your option) any later version.
---	
+--
 --	This program is distributed in the hope that it will be useful,
 --	but WITHOUT ANY WARRANTY; without even the implied warranty of
 --	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --	GNU General Public License for more details.
---	
+--
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ if rom:is_sonic_cd() then
 							 memory.readbyte(0xff1516),
 							 math.floor(memory.readbyte(0xff1517) * 10/6))
 	end
-	
+
 	function game:get_level_frames()
 		return 0    --	Not used.
 	end
@@ -43,11 +43,11 @@ if rom:is_sonic_cd() then
 	function game:get_lives()
 		return string.format("x%2d", memory.readbyte(0xff1508))
 	end
-	
+
 	function game:get_continues()
 		return string.format("x%2d", memory.readbyte(0xff150e))
 	end
-	
+
 	function game:get_score()
 		return string.format("%11d", 10 * memory.readlong(0xff1518))
 	end
@@ -56,7 +56,7 @@ elseif rom:is_keh() then
 		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe51),
 							 memory.readbyte(0xfffe52), memory.readbyte(0xfffe53))
 	end
-	
+
 	function game:get_level_frames()
 		return memory.readbyte(0xfffe3a)
 	end
@@ -64,11 +64,11 @@ elseif rom:is_keh() then
 	function game:get_lives()
 		return string.format("x%2d", memory.readbyte(0xfffe3d))
 	end
-	
+
 	function game:get_continues()
 		return string.format("x%2d", 0)
 	end
-	
+
 	function game:get_score()
 		return string.format("%11d", 10 * memory.readlong(0xfffe54))
 	end
@@ -77,7 +77,7 @@ else
 		return string.format("  %2d:%02d::%02d", memory.readbyte(0xfffe23),
 							 memory.readbyte(0xfffe24), memory.readbyte(0xfffe25))
 	end
-	
+
 	function game:get_level_frames()
 		return memory.readbyte(0xfffe05)
 	end
@@ -85,11 +85,11 @@ else
 	function game:get_lives()
 		return string.format("x%2d", memory.readbyte(0xfffe12))
 	end
-	
+
 	function game:get_continues()
 		return string.format("x%2d", memory.readbyte(0xfffe18))
 	end
-	
+
 	function game:get_score()
 		return string.format("%11d", 10 * memory.readlong(0xfffe26))
 	end
@@ -268,15 +268,15 @@ if rom:is_sonic_cd() then
 	function game:in_score_tally()
 		return memory.readlong(0xfff7d2) ~= 0
 	end
-	
+
 	function game:get_zone()
 		return memory.readbyte(0xff1506)
 	end
-	
+
 	function game:get_act()
 		return memory.readbyte(0xff1507)
 	end
-	
+
 	function game:get_level()
 		return memory.readword(0xff1506)
 	end
@@ -291,19 +291,19 @@ elseif rom:is_sonic3() or rom:is_sonick() then
 		-- Endgame.
 		return memory.readword(0xffef72) == 0xff00
 	end
-	
+
 	function game:in_score_tally()
 		return memory.readlong(0xfff7d2) ~= 0
 	end
-	
+
 	function game:get_zone()
 		return memory.readbyte(0xffee4e)
 	end
-	
+
 	function game:get_act()
 		return memory.readbyte(0xffee4f)
 	end
-	
+
 	function game:get_level()
 		return memory.readword(0xffee4e)
 	end
@@ -321,15 +321,15 @@ elseif rom:is_keh() then
 		end
 		return false
 	end
-	
+
 	function game:get_zone()
 		return memory.readbyte(0xfffe46)
 	end
-	
+
 	function game:get_act()
 		return 0
 	end
-	
+
 	function game:get_level()
 		return memory.readbyte(0xfffe46)
 	end
@@ -350,15 +350,15 @@ else
 		end
 		return false
 	end
-	
+
 	function game:get_zone()
 		return memory.readbyte(0xfffe10)
 	end
-	
+
 	function game:get_act()
 		return memory.readbyte(0xfffe11)
 	end
-	
+
 	function game:get_level()
 		return memory.readword(0xfffe10)
 	end
@@ -477,11 +477,11 @@ if rom:is_sonic1() then
 		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
 		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
 	end
-	
+
 	function game:extend_screen_bounds()
 		return memory.readbyte(0xFFFFF7AA) == 0
 	end
-	
+
 	function game:bounds_deltas()
 		return 0x10, 0x128, 0x40, 0xE0
 	end
@@ -494,11 +494,11 @@ elseif rom:is_sonic2() then
 		return memory.readword(0xFFFFEEC8), memory.readword(0xFFFFEECA),
 		       memory.readword(0xFFFFEECC), memory.readword(0xFFFFEECE)
 	end
-	
+
 	function game:extend_screen_bounds()
 		return memory.readbyte(0xFFFFF7AA) == 0
 	end
-	
+
 	function game:bounds_deltas()
 		return 0x10, 0x128, 0x40, 0xE0
 	end
@@ -511,11 +511,11 @@ elseif rom:is_keh() then
 		return memory.readword(0xFFFFF476), memory.readword(0xFFFFF47A),
 		       memory.readword(0xFFFFF478), memory.readword(0xFFFFF47C)
 	end
-	
+
 	function game:extend_screen_bounds()
 		return false
 	end
-	
+
 	function game:bounds_deltas()
 		return 0x10, 0x128, 0x40, 0xE0
 	end
@@ -528,11 +528,11 @@ elseif rom:is_sonic3() or rom:is_sonick() then
 		return memory.readword(0xFFFFEE14), memory.readword(0xFFFFEE16),
 		       memory.readword(0xFFFFEE18), memory.readword(0xFFFFEE1A)
 	end
-	
+
 	function game:extend_screen_bounds()
 		return false
 	end
-	
+
 	function game:bounds_deltas()
 		return 0x10, 0x128, 0x40, 0xE0
 	end
@@ -545,11 +545,11 @@ elseif rom:is_sonic_cd() then
 		return memory.readword(0xFFFFF728), memory.readword(0xFFFFF72A),
 		       memory.readword(0xFFFFF72C), memory.readword(0xFFFFF72E)
 	end
-	
+
 	function game:extend_screen_bounds()
 		return memory.readbyte(0xFFFFF7AA) == 0
 	end
-	
+
 	function game:bounds_deltas()
 		return 0x10, 0x130, 0x38, 0xE0
 	end

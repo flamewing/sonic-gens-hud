@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --	This file is part of the Sonic & Knuckles and Sonic 3 & Knuckles cheat pack.
---	
+--
 --	This program is free software: you can redistribute it and/or modify
---	it under the terms of the GNU Lesser General Public License as 
---	published by the Free Software Foundation, either version 3 of the 
+--	it under the terms of the GNU Lesser General Public License as
+--	published by the Free Software Foundation, either version 3 of the
 --	License, or (at your option) any later version.
---	
+--
 --	This program is distributed in the hope that it will be useful,
 --	but WITHOUT ANY WARRANTY; without even the implied warranty of
 --	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --	GNU General Public License for more details.
---	
+--
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
@@ -110,17 +110,17 @@ end
 
 function do_button(text, x, y, width, height, fill_color, outline_color)
 	local return_value
-	
+
 	if (xmouse >= x and ymouse >= y) and
 		(xmouse <= x + width and ymouse <= y + height) then
 		outline_color = {255, 255, 255, 255}
-		
+
 		if input_state.leftclick then
 			if not leftclickdown then
 				return_value = true
 				leftclickdown = true
 			end
-			
+
 			fill_color = {127, 0, 0, 255}
 		else
 			leftclickdown = false
@@ -130,7 +130,7 @@ function do_button(text, x, y, width, height, fill_color, outline_color)
 		if fill_color == nil then
 			fill_color = {0, 0, 127, 255}
 		end
-		
+
 		if outline_color == nil then
 			outline_color = {0, 0, 255, 255}
 		end
@@ -144,7 +144,7 @@ end
 
 function do_icon_button(gdimage, x, y, width, height, fill_color, outline_color, skip_corners)
 	local return_value
-	
+
 	if (xmouse >= x and ymouse >= y) and
 		(xmouse <= x + width and ymouse <= y + height) then
 
@@ -165,7 +165,7 @@ function do_icon_button(gdimage, x, y, width, height, fill_color, outline_color,
 			table.insert(draw_queue, function() gui.box(x, y, x + width, y + height, fill_color, outline_color) end)
 		end
 	end
-	
+
     table.insert(draw_queue, function() gui.drawimage(x, y, ui_icons[gdimage]) end)
 	if outline_color ~= nil then
 	    if skip_corners then
@@ -197,7 +197,7 @@ function call_func(address)
 
 	memory.setregister("a7", memory.getregister("a7") - 4)
 	memory.writedword(memory.getregister("a7"), memory.getregister("pc"))
-	
+
 	memory.setregister("pc", address)
 end
 
@@ -229,7 +229,7 @@ function give_rings(cnt)
 		curcnt = 0
 	end
 	memory.writeword(rings_off, curcnt)
-	
+
 	-- Update in-game HUD:
 	memory.writebyte(rings_upd, (cnt > 0 and 1) or -1)
 

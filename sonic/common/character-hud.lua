@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
---	
+--
 --	This program is free software: you can redistribute it and/or modify
---	it under the terms of the GNU Lesser General Public License as 
---	published by the Free Software Foundation, either version 3 of the 
+--	it under the terms of the GNU Lesser General Public License as
+--	published by the Free Software Foundation, either version 3 of the
 --	License, or (at your option) any later version.
---	
+--
 --	This program is distributed in the hope that it will be useful,
 --	but WITHOUT ANY WARRANTY; without even the implied warranty of
 --	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --	GNU General Public License for more details.
---	
+--
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ function Character_hud:construct(char, x, y, active)
 	char_hud:add(Text_widget:new(0, 0, bind(char.get_speed   , char)), 36 + pad, 10)
 
 	--	Jump prediction
-	char_hud:add(Text_widget:new(0, 0, 
+	char_hud:add(Text_widget:new(0, 0,
 			function()
 				if want_prediction() then
 					return char.jump_speed
@@ -83,7 +83,7 @@ function Character_hud:construct(char, x, y, active)
 	--	Angle
 	char_hud:add(Icon_widget:new(0, 0, "angle"                   ), 21 + pad, 24)
 	char_hud:add(Text_widget:new(0, 0, bind(char.get_slope, char)), 36 + pad, 26)
-	
+
 	--	Move lock
 	local cond = Conditional_widget:new(0, 0, true, Character.move_lock_active, char)
 	cond:add(Icon_widget:new(0, 0, "move-lock"                    ),  0, 0)

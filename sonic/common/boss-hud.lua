@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --	This file is part of the Lua HUD for TASing Sega Genesis Sonic games.
---	
+--
 --	This program is free software: you can redistribute it and/or modify
---	it under the terms of the GNU Lesser General Public License as 
---	published by the Free Software Foundation, either version 3 of the 
+--	it under the terms of the GNU Lesser General Public License as
+--	published by the Free Software Foundation, either version 3 of the
 --	License, or (at your option) any later version.
---	
+--
 --	This program is distributed in the hope that it will be useful,
 --	but WITHOUT ANY WARRANTY; without even the implied warranty of
 --	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --	GNU General Public License for more details.
---	
+--
 --	You should have received a copy of the GNU Lesser General Public License
 --	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ if rom:is_sonic3() or rom:is_sonick() then
 		local ypospix   = memory.readwordsigned(self.offset + 0x14)
 		return string.format("%5d, %5d", xpospix, ypospix)
 	end
-	
+
 	function Boss_hud:loaded()
 		return memory.readlong(self.offset) ~= 0
 	end
@@ -50,7 +50,7 @@ else
 		local ypospix   = memory.readwordsigned(self.offset + 0x0c)
 		return string.format("%5d, %5d", xpospix, ypospix)
 	end
-	
+
 	function Boss_hud:loaded()
 		return memory.readbyte(self.offset) ~= 0
 	end
@@ -151,7 +151,7 @@ function Boss_widget:construct(x, y, active)
 	self.cleanfun = function()
 			self:scan_bosses()
 		end
-	
+
 	return self
 end
 
@@ -228,7 +228,7 @@ function Boss_widget:draw()
 			n = n - 2
 			return 3 + (n%2) * 247
 		end
-	
+
 		local function boss_huds_y(n)
 			if n == 0 then
 				return 191
@@ -238,7 +238,7 @@ function Boss_widget:draw()
 			n = n - 2
 			return 60 + math.floor(n/2) * 31
 		end
-		
+
 		if #self.children == 0 then
 			self:scan_bosses()
 		end
@@ -251,7 +251,7 @@ function Boss_widget:draw()
 				table.insert(remove_queue, 1, n)
 			end
 		end
-	
+
 		local todel = remove_queue[1]
 		while todel do
 			table.remove(remove_queue, 1)
