@@ -18,9 +18,9 @@
 --------------------------------------------------------------------------------
 
 -- Edit these directories (after the 'or') to match your setup.
-romdir  = os.getenv("ROMDIR")  or homedir .. "/.wine/drive_c/games/gens/ROMS/GenRen/"
-hackdir = os.getenv("HACKDIR") or homedir .. "/.wine/drive_c/games/gens/ROMS/"
-cddir   = os.getenv("CDDIR")   or homedir .. "/.wine/drive_c/games/gens/ROMS/"
+romdir  = os.getenv("ROMDIR")  or os.getenv("HOME") .. "/.wine/drive_c/games/gens/ROMS/GenRen/"
+hackdir = os.getenv("HACKDIR") or os.getenv("HOME") .. "/.wine/drive_c/games/gens/ROMS/"
+cddir   = os.getenv("CDDIR")   or os.getenv("HOME") .. "/.wine/drive_c/games/gens/ROMS/"
 
 outfile = io.open("sonic/common/boss-tables.lua", "wb")
 outfile:write("-------------------------------------------------------------------------------\n")
