@@ -78,6 +78,7 @@ sonic3_rom_data = {
 	control_counter = 0xfff702,
 	respawn_counter = 0xfff704,
 	CPU_routine = 0xfff708,
+	Player_option = 0xffff08,
 	GameModeID_Demo = 0x8,
 	GameModeID_Level = 0xc,
 }

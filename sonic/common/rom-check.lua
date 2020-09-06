@@ -248,7 +248,7 @@ function rom_info:construct(checksum, engine, air_cap, tails_flies, cream_flies,
 	elseif AND(get_char, 0xff0000) ~= 0 then	-- RAM address
 		self.get_char = function() return memory.readword(get_char) end
 	else
-		self.get_char = function() return get_char end
+		self.get_char = function() return {get_char} end
 	end
 	self.boss_array   = boss_array or {}
 	self.ring_offset  = ring_offset or 0xfffe20
@@ -292,18 +292,59 @@ local function scheroes_check(self, val)
 	return true
 end
 
+--	We remap the value read from memory in S2/S3/S&K/S3&K to the internal IDs
+--	defined in the enums file.
+local s23k_char_table = {
+	[0] = {charids.sonic, charids.tails},
+	[1] = {charids.sonic},
+	[2] = {charids.tails},
+	[3] = {charids.knuckles},
+}
+
+local function s2_char()
+	return s23k_char_table[memory.readword(sonic2_rom_data.Player_option)]
+end
+
+local function s3k_char()
+	return s23k_char_table[memory.readword(sonic3_rom_data.Player_option)]
+end
+
+--	We remap the value read from memory in S2Amy/S3Amy to the internal IDs
+--	defined in the enums file.
+local s23kamy_char_table = {
+	[0] = {charids.amy_rose, charids.tails},
+	[1] = {charids.amy_rose},
+	[2] = {charids.tails},
+	[3] = {charids.knuckles},
+}
+
 --	We remap the value read from memory in Amy in S2 to the internal IDs
 --	defined in the enums file.
 local function s2amy_char()
-	local char = memory.readword(0xffff72)
-	return (char == 2 and charids.tails) or (char + charids.amy_tails)
+	return s23kamy_char_table[memory.readword(sonic2_rom_data.Player_option)]
 end
 
---	We remap the value read from memory in S3Amy to the internal IDs
---	defined in the enums file.
 local function s3kamy_char()
-	local char = memory.readword(0xffff08)
-	return (char >= 2 and char) or (char + charids.amy_tails)
+	return s23kamy_char_table[memory.readword(sonic3_rom_data.Player_option)]
+end
+
+--	We remap the value read from memory in Sonic Classic Heroes to the internal IDs
+--	defined in the enums file.
+local scheroes_char_table = {
+	[0] = {},
+	[1] = {charids.sonic},
+	[2] = {charids.tails},
+	[3] = {charids.sonic, charids.tails},
+	[4] = {charids.knuckles},
+	[5] = {charids.sonic, charids.knuckles},
+	[6] = {charids.tails, charids.knuckles},
+	[7] = {charids.sonic, charids.tails, charids.knuckles},
+}
+
+--	We remap the value read from memory in Amy in S2 to the internal IDs
+--	defined in the enums file.
+local function scheroes_char()
+	return scheroes_char_table[memory.readbyte(sch_rom_data.Player_set)]
 end
 
 --	Check for plain S&K.
@@ -338,23 +379,23 @@ local supported_games = {
 	s1tnl    = rom_info:new(sums.s1tnl    , eng.s1 , true , false, false, charids.sonic   , bosses.s1tnl   , 0xfffe20               , nil                          , nil        , nil                    , sonic1_rom_data ),
 	scd      = rom_info:new(sums.scd      , eng.scd, true , false, false, charids.sonic   , bosses.scd     , 0xff1512               , nil                          , nil        , nil                    , soniccd_rom_data),
 	scdjp    = rom_info:new(sums.scdjp    , eng.scd, true , false, false, charids.sonic   , bosses.scd     , 0xff1512               , nil                          , nil        , nil                    , soniccd_rom_data),
-	s2       = rom_info:new(sums.s2       , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20               , 0xffeed0                     , huds.s2    , nil                    , sonic2_rom_data ),
+	s2       = rom_info:new(sums.s2       , eng.s2 , true , false, false, s2_char         , bosses.s2      , 0xfffe20               , 0xffeed0                     , huds.s2    , nil                    , sonic2_rom_data ),
 	s2knux   = rom_info:new(sums.sk       , eng.s2 , false, false, false, charids.knuckles, bosses.s2knux  , 0xfffe20               , 0xffeed0                     , huds.s2knux, sklockon_check(sums.s2), sonic2_rom_data ),
 	s2amy    = rom_info:new(sums.s2amy    , eng.s2 , false, false, false, s2amy_char      , bosses.s2amy   , 0xfffe20               , 0xffeed0                     , huds.s2amy , nil                    , sonic2_rom_data ),
 	s2boom   = rom_info:new(sums.s2boom   , eng.s2 , false, false, false, charids.sonic   , bosses.s2boom  , 0xfffe02               , 0xffeed0                     , huds.s2boom, nil                    , sonic2_rom_data ),
-	s2rob    = rom_info:new(sums.s2rob    , eng.s2 , true , false, false, 0xffff72        , bosses.s2rob   , 0xfffe20               , 0xffeed0                     , huds.s2rob , nil                    , sonic2_rom_data ),
+	s2rob    = rom_info:new(sums.s2rob    , eng.s2 , true , false, false, s2_char         , bosses.s2rob   , 0xfffe20               , 0xffeed0                     , huds.s2rob , nil                    , sonic2_rom_data ),
 	s2vr     = rom_info:new(sums.s2vr     , eng.s2 , true , false, false, charids.sonic   , bosses.s2      , 0xfffe02               , 0xffeed0                     , huds.s2    , nil                    , sonic2_rom_data ),
-	s2hrtw   = rom_info:new(sums.s2hrtw   , eng.s2 , true , false, false, 0xffff72        , bosses.s2      , 0xfffe20               , 0xffeed0                     , huds.s2    , nil                    , sonic2_rom_data ),
+	s2hrtw   = rom_info:new(sums.s2hrtw   , eng.s2 , true , false, false, s2_char         , bosses.s2      , 0xfffe20               , 0xffeed0                     , huds.s2    , nil                    , sonic2_rom_data ),
 	s2keh    = rom_info:new(sums.s2keh    , eng.keh, false, false, false, charids.knuckles, bosses.s2keh   , 0xfffefc               , 0xfff47e                     , huds.s2keh , nil                    , keh_rom_data    ),
-	s1and2   = rom_info:new(sums.s1and2   , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20               , 0xffeed0                     , huds.s1and2, nil                    , sonic2_rom_data ),
-	s1and2b  = rom_info:new(sums.s1and2b  , eng.s2 , true , false, false, 0xffff72        , bosses.s1and2  , 0xfffe20               , 0xffeed0                     , huds.s1and2, nil                    , sonic2_rom_data ),
-	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, 0xffff08        , bosses.s3      , 0xfffe20               , 0xffee24                     , huds.s3    , nil                    , sonic3_rom_data ),
-	sk       = rom_info:new(sums.sk       , eng.sk , false, true , false, 0xffff08        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , sknolockon_check       , sonic3_rom_data ),
-	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , sklockon_check(sums.s3), sonic3_rom_data ),
-	s3kmaster= rom_info:new(sums.s3kmaster, eng.s3k, false, true , false, 0xffff08        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , nil                    , sonic3_rom_data ),
+	s1and2   = rom_info:new(sums.s1and2   , eng.s2 , true , false, false, s2_char         , bosses.s1and2  , 0xfffe20               , 0xffeed0                     , huds.s1and2, nil                    , sonic2_rom_data ),
+	s1and2b  = rom_info:new(sums.s1and2b  , eng.s2 , true , false, false, s2_char         , bosses.s1and2  , 0xfffe20               , 0xffeed0                     , huds.s1and2, nil                    , sonic2_rom_data ),
+	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, s3k_char        , bosses.s3      , 0xfffe20               , 0xffee24                     , huds.s3    , nil                    , sonic3_rom_data ),
+	sk       = rom_info:new(sums.sk       , eng.sk , false, true , false, s3k_char        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , sknolockon_check       , sonic3_rom_data ),
+	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, s3k_char        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , sklockon_check(sums.s3), sonic3_rom_data ),
+	s3kmaster= rom_info:new(sums.s3kmaster, eng.s3k, false, true , false, s3k_char        , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.sk    , nil                    , sonic3_rom_data ),
 	s3kamy   = rom_info:new(sums.s3kamy   , eng.s3k, false, true , false, s3kamy_char     , bosses.sk      , 0xfffe20               , 0xffee24                     , huds.s3kamy, nil                    , sonic3_rom_data ),
 	s4cyb    = rom_info:new(sums.s4cyb    , eng.s3k, false, true , false, charids.sonic   , bosses.s4cyb   , 0xfffe20               , 0xffee24                     , nil        , nil                    , sonic3_rom_data ),
-	scheroes = rom_info:new(sums.scheroes , eng.sch, false, true , false, charids.sonic   , bosses.scheroes, sch_rom_data.Ring_count, sch_rom_data.Camera_delay_ptr, nil        , scheroes_check         , sch_rom_data    ),
+	scheroes = rom_info:new(sums.scheroes , eng.sch, false, true , false, scheroes_char   , bosses.scheroes, sch_rom_data.Ring_count, sch_rom_data.Camera_delay_ptr, nil        , scheroes_check         , sch_rom_data    ),
 }
 
 --	These two variables will hold info on the currently loaded ROM.

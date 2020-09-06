@@ -39,14 +39,18 @@ local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.lightning_shield] = "shield-lightning",
                       [shieldids.bubble_shield]    = "shield-bubble"}
 
-function Character_hud:construct(char, index, x, y, active)
+function Character_hud:construct(char, x, y, active)
 	self:super(x, y, active)
 	self.character = char
 
 	local pad = (char.is_p1 and 15) or 1
-	local char_hud = Frame_widget:new(0, 0, 99, 51)
+	local char_hud = Frame_widget:new(0, 0, (char.is_p1 and 99) or 101, 51)
 
-	self:add_toggle(make_toggle(99, true, Container_widget.toggled, self, active), 0, 52)
+	if char.is_p1 then
+		self:add_toggle(make_toggle(51, false, Container_widget.toggled, self, active), -3, 0)
+	else
+		self:add_toggle(make_toggle(51, false, Container_widget.toggled, self, active), 102, 0)
+	end
 	char_hud:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 2, 2)
 	if char.is_p1 then
 		local lives_delta = (game.get_continues == nil and 4) or 0

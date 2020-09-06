@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 
 sch_rom_data = {
-	Revision = 0x2a0,
+	Revision = 0x2a4,
 	Leader_ptr = 0xfffe2e,
 	Sidekick1_ptr = 0xfffe30,
 	Sidekick2_ptr = 0xfffe32,
@@ -38,6 +38,7 @@ sch_rom_data = {
 	control_counter = 0x56,
 	respawn_counter = 0x58,
 	CPU_routine = 0x5a,
+	Player_set = 0xffffb1,
 	code = 0x4,
 	x_pos = 0x10,
 	x_sub = 0x12,
@@ -66,6 +67,8 @@ sch_rom_data = {
 	shield = 0x7c,
 	bubbles = 0x82,
 	carry_delay = 0x8f,
+	dropdash_flag = 0x96,
+	dropdash_delay = 0x97,
 	air_frames = 0x40,
 	GameModeID_SegaScreen = 0x0,
 	GameModeID_TitleScreen = 0x4,

@@ -26,7 +26,7 @@ end
 gens.persistglobalvariables({
 	-- Enabled HUDs
 	game_hud = true,
-	active_char_huds = {[1]=true, [2]=true},
+	active_char_huds = {[1]=true, [2]=true, [3] = true},
 	stat_hud = true,
 	boss_hud_active = true,
 	menu_active = true,	-- ignores disable_lua_hud
@@ -94,6 +94,20 @@ main_hud:add_toggle(make_toggle(58, false, Container_widget.toggled, main_hud, g
 --	Main workhorse function
 --------------------------------------------------------------------------------
 local flash_nomovie = false
+local char_hud_xy = {
+	[1] = {
+		[1] = {3, 172}
+	},
+	[2] = {
+		[1] = {3, 172},
+		[2] = {214, 172},
+	},
+	[3] = {
+		[1] = {3, 172},
+		[2] = {214, 172},
+		[3] = {214, 120},
+	},
+}
 
 --	Reads mem values, emulates a couple of frames, displays everything
 draw_hud = function ()
@@ -103,9 +117,11 @@ draw_hud = function ()
 		set_chardata(selchar)
 		char_huds = {}
 		levelbounds = {}
-		for i, char in pairs(characters) do
-			table.insert(char_huds, Character_hud:new(char, i, (i == 2 and 214) or 0, 169, active_char_huds[i]))
-			table.insert(levelbounds, Level_bounds:new(char, i, (char.is_p1 and {255, 255, 0, 255}) or {255, 0, 255, 255}))
+		local pos_tables = char_hud_xy[#characters]
+		for i, char in ipairs(characters) do
+			local xy = pos_tables[i]
+			table.insert(char_huds, Character_hud:new(char, xy[1], xy[2], active_char_huds[i]))
+			table.insert(levelbounds, Level_bounds:new(char, (char.is_p1 and {255, 255, 0, 255}) or {255, 0, 255, 255}))
 		end
 	end
 
@@ -193,7 +209,7 @@ end
 
 local function reset_config()
 	game_hud = true
-	active_char_huds = {[1]=true, [2]=true}
+	active_char_huds = {[1]=true, [2]=true, [3] = true}
 	stat_hud = true
 	boss_hud_active = true
 	menu_active = true

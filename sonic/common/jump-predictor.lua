@@ -64,12 +64,18 @@ function want_prediction()
 	return enable_predictor and prediction_wanted() and (movie.recording() or not movie.playing())
 end
 
+local joypad_table = {
+	[1] = 1,
+	[2] = 2,
+	[3] = '1B',
+	[4] = '1C'
+}
 function predict_jumps()
 	savestate.save(state)
 	for n=1, 2 do
 		repeat
 			for i, _ in pairs(characters) do
-				joypad.set(i, buttons)
+				joypad.set(joypad_table[i], buttons)
 			end
 			gens.emulateframeinvisible()
 		until not gens.lagged()

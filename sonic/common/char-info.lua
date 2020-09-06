@@ -412,7 +412,6 @@ if rom:is_sonic_cd() then
 		return string.format("%s%3d%%", (val >= max and "Y") or "N", math.floor((100 * absinertia) / maxcharge))
 	end
 
-	-- Standard spindash.
 	function Character:is_peelout()
 		return not self:is_rolling()
 	end
@@ -434,7 +433,6 @@ else
 		return memory.readbytesigned(self.offset + curr_data.spindash_flag) ~= 0
 	end
 
-	-- Standard spindash.
 	function Character:is_peelout()
 		return memory.readbytesigned(self.offset + curr_data.spindash_flag) < 0
 	end
@@ -449,6 +447,29 @@ else
 
 	function Character:no_peelout_value()
 		return ""
+	end
+end
+
+if curr_data.dropdash_flag ~= nil then
+	function Character:dropdash_active()
+		return self.charid == charids.sonic and memory.readbyte(self.offset + curr_data.dropdash_flag) > 0
+	end
+
+	function Character:dropdash_timer()
+		local timer = memory.readbytesigned(self.offset + curr_data.dropdash_delay)
+		if timer < 0 then
+			return "Ready"
+		else
+			return string.format("%5d", memory.readbytesigned(self.offset + curr_data.dropdash_delay) + 1)
+		end
+	end
+else
+	function Character:dropdash_active()
+		return false
+	end
+
+	function Character:dropdash_timer()
+		return string.format("%5d", 0)
 	end
 end
 
@@ -576,12 +597,12 @@ else
 end
 
 function Character:cputime_active()
-	local cputime = self.cputime_time_left()
+	local cputime = self:cputime_time_left()
 	return cputime ~= 0 and cputime < 599
 end
 
 function Character:cputime_timer()
-	return string.format("%3d", self.cputime_time_left())
+	return string.format("%3d", self:cputime_time_left())
 end
 
 if curr_data.respawn_counter == nil then
@@ -607,7 +628,7 @@ function Character:despawn_timer()
 end
 
 function Character:respawn_time_left()
-	return (64 - AND(self:get_level_frames(), 0x3f)) % 64
+	return (64 - AND(game:get_level_frames(), 0x3f)) % 64
 end
 
 if curr_data.CPU_routine ~= nil and curr_data.obj_control ~= nil then
@@ -711,6 +732,7 @@ function Character:init(id, index, port)
 	--	the common icons. To add new ones, just copy and modify accordingly.
 	self.status_huds = {
 		Create_HUD(self, self.spindash_active  , self.spindash_charge , self.spindash_icon),
+		Create_HUD(self, self.dropdash_active  , self.dropdash_timer  , self.spindash_icon),
 		Create_HUD(self, self.hit_active       , self.hit_timer       , self.wounded_icon ),
 	}
 
@@ -757,48 +779,21 @@ end
 characters = nil
 
 --	Set character data
+local portrait_data = {
+	[charids.sonic   ] = portraits.sonic,
+	[charids.tails   ] = portraits.tails,
+	[charids.knuckles] = portraits.knuckles,
+	[charids.amy_rose] = portraits.amy_rose,
+	[charids.charmy  ] = portraits.charmy,
+	[charids.bunnie  ] = portraits.bunnie,
+	[charids.espio   ] = portraits.sonic,		-- TODO: Fix this
+	[charids.vector  ] = portraits.knuckles,	-- TODO: Fix this
+}
+
 function set_chardata(selchar)
 	game.curr_char   = selchar
-	if selchar == charids.sonic_tails then          --	Sonic + Tails
-		characters = {
-			Character:new(charids.sonic   , 0, portraits.sonic),
-			Character:new(charids.tails   , 1, portraits.tails)
-		}
-	elseif selchar == charids.sonic then            --	Sonic solo
-		characters = {
-			Character:new(charids.sonic   , 0, portraits.sonic)
-		}
-	elseif selchar == charids.tails then            --	Tails
-		characters = {
-			Character:new(charids.tails   , 0, portraits.tails)
-		}
-	elseif selchar == charids.knuckles then         --	Knuckles
-		characters = {
-			Character:new(charids.knuckles, 0, portraits.knuckles)
-		}
-	elseif selchar == charids.amy_tails then        --	Amy + Tails
-		characters = {
-			Character:new(charids.amy_rose, 0, portraits.amy_rose),
-			Character:new(charids.tails   , 1, portraits.tails)
-		}
-	elseif selchar == charids.amy_rose then			--	Amy
-		characters = {
-			Character:new(charids.amy_rose, 0, portraits.amy_rose)
-		}
-	--[[
-	elseif selchar == charids.cream then			--	Cream
-		characters = {
-			Character:new(charids.cream   , 0, portraits.cream   )
-		}
-	--]]
-	elseif selchar == charids.charmy then			--	charmy
-		characters = {
-			Character:new(charids.charmy  , 0, portraits.charmy  )
-		}
-	elseif selchar == charids.bunnie then			--	Bunnie
-		characters = {
-			Character:new(charids.bunnie  , 0, portraits.bunnie  )
-		}
+	characters = {}
+	for i, char in ipairs(selchar) do
+		table.insert(characters, Character:new(char, i - 1, portrait_data[char]))
 	end
 end
-
