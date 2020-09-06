@@ -31,6 +31,8 @@ else
 	buttons = {C=true}
 end
 
+local curr_data = rom.data
+
 --	Functions to determine if jump prediction is desirable
 prediction_wanted = nil
 if rom:is_sonic_cd() then
@@ -40,32 +42,19 @@ if rom:is_sonic_cd() then
 			end
 elseif rom:is_sonic3() or rom:is_sonick() then
 	prediction_wanted = function ()
-				local mode = memory.readbyte(0xfff600)
-				return mode == 0xc or mode == 0x10
-			end
-elseif rom:is_keh() then
-	local function check_bound(val, min, max)
-		return val > min and val < max
-	end
-	prediction_wanted = function ()
-				local mode = memory.readbyte(0xfff6c2)
-				if mode == 3 then
-					return true
-				elseif mode == 0x83 then
-					return not check_bound(memory.readlong(0xfffe50), 0, 4)
-				end
-				return false
+				local mode = memory.readbyte(curr_data.Game_Mode)
+				return mode == curr_data.GameModeID_Demo or mode == curr_data.GameModeID_Level
 			end
 else
 	local function check_bound(val, min, max)
 		return val > min and val < max
 	end
 	prediction_wanted = function ()
-				local mode = memory.readbyte(0xfff600)
-				if mode == 0xc or mode == 0x10 then
+				local mode = memory.readbyte(curr_data.Game_Mode)
+				if mode == curr_data.GameModeID_Demo or mode == curr_data.GameModeID_Level then
 					return true
-				elseif mode == 0x8c then
-					return not check_bound(memory.readlong(0xfffe22), 0, 4)
+				elseif mode == 0x80 + curr_data.GameModeID_Level then
+					return not check_bound(memory.readlong(curr_data.Timer), 0, 4)
 				end
 				return false
 			end

@@ -39,7 +39,7 @@ local shield_icons = {[shieldids.no_shield]        = "blank",
                       [shieldids.lightning_shield] = "shield-lightning",
                       [shieldids.bubble_shield]    = "shield-bubble"}
 
-function Character_hud:construct(char, x, y, active)
+function Character_hud:construct(char, index, x, y, active)
 	self:super(x, y, active)
 	self.character = char
 
@@ -49,21 +49,50 @@ function Character_hud:construct(char, x, y, active)
 	self:add_toggle(make_toggle(99, true, Container_widget.toggled, self, active), 0, 52)
 	char_hud:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 2, 2)
 	if char.is_p1 then
-		char_hud:add(Text_widget:new(0, 0, bind(game.get_lives, game)), 20, 2)
+		local lives_delta = (game.get_continues == nil and 4) or 0
+		char_hud:add(Text_widget:new(0, 0, bind(game.get_lives, game)), 20, 2 + lives_delta)
 		if game.get_continues ~= nil then
 			char_hud:add(Text_widget:new(0, 0, bind(game.get_continues, game)), 20, 9)
 		end
 	else
 		char_hud:add(Icon_widget:new(0, 0,
 		function()
-			return (game:cputime_time_left() == 0 and "cpu-2p") or "tails-player"
+			return (char:cputime_time_left() == 0 and "cpu-2p") or "tails-player"
 		end), 79, 2)
 		pad = 0
 	end
+
 	char_hud:add(Icon_widget:new(0, 0,
-			function()
-				return shield_icons[char:shield()]
-			end) , 20 + pad, 2)
+	function()
+		return shield_icons[char:shield()]
+	end) , 20 + pad, 2)
+
+	-- Drowning timer
+	local drown = Conditional_widget:new(0, 0, false, char.is_drowning, char)
+	drown:add(Icon_widget:new(0, 0, "bubbles"), 0, 0)
+	drown:add(Text_widget:new(0, 0, bind(char.drowning_timer, char), {0, 0, 0, 255}), 1, 10)
+	char_hud:add(drown, 40 + pad, 2)
+
+	if not char.is_p1 then
+		-- CPU Despawn timer
+		local despawn = Conditional_widget:new(0, 0, false, char.despawn_active, char)
+		despawn:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 0, 0)
+		despawn:add(Icon_widget:new(0, 0, "forbidden"), 0, 0)
+		despawn:add(Text_widget:new(0, 0, bind(char.despawn_timer, char), {0, 0, 0, 255}), 3, 10)
+		char_hud:add(despawn, 60 + pad, 2)
+
+		-- CPU Respawn timer
+		local respawn = Conditional_widget:new(0, 0, false, char.respawn_active, char)
+		respawn:add(Icon_widget:new(0, 0, bind(char.get_face, char)), 0, 0)
+		respawn:add(Text_widget:new(0, 0, bind(char.respawn_timer, char), {0, 0, 0, 255}), 3, 10)
+		char_hud:add(respawn, 60 + pad, 2)
+
+		-- CPU control timer
+		local cpuctrl = Conditional_widget:new(0, 0, false, char.cputime_active, char)
+		cpuctrl:add(Text_widget:new(0, 0, bind(char.cputime_timer, char), {0, 0, 0, 255}), 3, 10)
+		char_hud:add(cpuctrl, 79 + pad, 2)
+	end
+
 	--	Position
 	char_hud:add(Icon_widget:new(0, 0, "location"                   ),  4, 20)
 	char_hud:add(Text_widget:new(0, 0, bind(char.get_position, char)), 20, 20)
@@ -106,6 +135,7 @@ Level_bounds = class{
 
 --	Also draws the contained widgets.
 function Level_bounds:draw()
+	self.character:update_offset()
 	local w, h = self.character:get_dimensions()
 	local l, r, t, b = game:get_camera_rect()
 	local dl, dr, dw, dh = game:bounds_deltas()

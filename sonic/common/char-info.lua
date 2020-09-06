@@ -22,14 +22,16 @@
 --------------------------------------------------------------------------------
 
 require("headers/lua-oo")
+require("sonic/common/enums")
 require("sonic/common/rom-check")
 require("sonic/common/game-info")
+require("sonic/common/portraits")
 
 Character = class{
 	is_p1          = false,
+	base_offset    = 0,
 	offset         = 0,
 	charid         = charids.sonic,
-	flies          = false,
 	portraits      = {},       --	Character portait sets
 	curr_set       = {},       --	Current portrait set
 	curr_face      = false,    --	Currently selected face
@@ -39,99 +41,124 @@ Character = class{
 	super_frame    = 0,        --	Frame in which portrait will be swapped
 	jump_speed     = "",       --	String value for jump prediction
 	drowning_timer = function (self) return "" end,
-	drown_icon     = "blank",
 	status_huds    = {},
 }
 
-function Character:get_slope()
-	return string.format("%+5d", memory.readbytesigned(self.offset + 0x26))
-end
+local curr_data = rom.data
 
-if rom:is_sonic3() or rom:is_sonick() then
-	function Character:get_position()
-		local xpospix   = memory.readword      (self.offset + 0x10)
-		local xpossub   = memory.readbyte      (self.offset + 0x12)
-		local ypospix   = memory.readwordsigned(self.offset + 0x14)
-		local ypossub   = memory.readbyte      (self.offset + 0x16)
-		return string.format("%5d:%-3d,%5d:%-3d", xpospix, xpossub, ypospix, ypossub)
-	end
-
-	function Character:get_speed()
-		local xvel      = memory.readwordsigned(self.offset + 0x18)
-		local yvel      = memory.readwordsigned(self.offset + 0x1a)
-		local speed     = memory.readwordsigned(self.offset + 0x1c)
-		return string.format("%+5d, %+5d, %+5d", xvel, yvel, speed)
-	end
-
-	function Character:get_yvel()
-		return memory.readwordsigned(self.offset + 0x1a)
-	end
-
-	function Character:get_flags()
-		return memory.readbyte(self.offset + 0x2a)
-	end
-
-	function Character:hit_time_left()
-		return memory.readbyte(self.offset + 0x34)
-	end
-
-	function Character:hit_timer()
-		return string.format("%5d", self:hit_time_left())
-	end
-
-	function Character:stars_timer()
-		return string.format("%5d", 8 * memory.readbyte(self.offset + 0x35) - game:get_level_frames() % 8)
-	end
-
-	function Character:shoes_timer()
-		return string.format("%5d", 8 * memory.readbyte(self.offset + 0x36) - game:get_level_frames() % 8)
-	end
-
-	function Character:get_dimensions()
-		return memory.readbyte(self.offset + 0x1F), memory.readbyte(self.offset + 0x1E)
+if curr_data.Leader_ptr ~= nil then
+	local charidmap = {
+		[curr_data.ObjID_Sonic]    = charids.sonic,
+		[curr_data.ObjID_Tails]    = charids.tails,
+		[curr_data.ObjID_Knuckles] = charids.knuckles,
+		[curr_data.ObjID_Espio]    = charids.espio,
+		[curr_data.ObjID_Charmy]   = charids.charmy,
+		[curr_data.ObjID_Vector]   = charids.vector,
+	}
+	local portraitmap = {
+		[curr_data.ObjID_Sonic]    = portraits.sonic,
+		[curr_data.ObjID_Tails]    = portraits.tails,
+		[curr_data.ObjID_Knuckles] = portraits.knuckles,
+		[curr_data.ObjID_Espio]    = portraits.espio,
+		[curr_data.ObjID_Charmy]   = portraits.charmy,
+		[curr_data.ObjID_Vector]   = portraits.vector,
+	}
+	function Character:update_offset()
+		self.offset = 0xff0000 + memory.readword(self.base_offset)
+		local id = memory.readbyte(self.offset + curr_data.player_id)
+		self.charid = charidmap[id]
+		self.portraits = portraitmap[id]
 	end
 else
-	function Character:get_position()
-		local xpospix   = memory.readword      (self.offset + 0x08)
-		local xpossub   = memory.readbyte      (self.offset + 0x0a)
-		local ypospix   = memory.readwordsigned(self.offset + 0x0c)
-		local ypossub   = memory.readbyte      (self.offset + 0x0e)
-		return string.format("%5d:%-3d,%5d:%-3d", xpospix, xpossub, ypospix, ypossub)
+	function Character:update_offset()
+		self.offset = self.base_offset
 	end
+end
 
-	function Character:get_speed()
-		local xvel      = memory.readwordsigned(self.offset + 0x10)
-		local yvel      = memory.readwordsigned(self.offset + 0x12)
-		local speed     = memory.readwordsigned(self.offset + 0x14)
-		return string.format("%+5d, %+5d, %+5d", xvel, yvel, speed)
-	end
+function Character:get_slope()
+	return string.format("%+5d", memory.readbytesigned(self.offset + curr_data.angle))
+end
 
-	function Character:get_yvel()
-		return memory.readwordsigned(self.offset + 0x12)
-	end
+function Character:get_position()
+	local xpospix   = memory.readword      (self.offset + curr_data.x_pos)
+	local xpossub   = memory.readbyte      (self.offset + curr_data.x_sub)
+	local ypospix   = memory.readwordsigned(self.offset + curr_data.y_pos)
+	local ypossub   = memory.readbyte      (self.offset + curr_data.y_sub)
+	return string.format("%5d:%-3d,%5d:%-3d", xpospix, xpossub, ypospix, ypossub)
+end
 
-	function Character:get_flags()
-		return memory.readbyte(self.offset + 0x22)
-	end
+function Character:get_speed()
+	local xvel      = memory.readwordsigned(self.offset + curr_data.x_vel)
+	local yvel      = memory.readwordsigned(self.offset + curr_data.y_vel)
+	local speed     = memory.readwordsigned(self.offset + curr_data.inertia)
+	return string.format("%+5d, %+5d, %+5d", xvel, yvel, speed)
+end
 
+function Character:get_ypos()
+	return memory.readwordsigned(self.offset + curr_data.y_pos)
+end
+
+function Character:get_ysub()
+	return memory.readbyte(self.offset + curr_data.y_sub)
+end
+
+function Character:get_yvel()
+	return memory.readwordsigned(self.offset + curr_data.y_vel)
+end
+
+function Character:get_inertia()
+	return memory.readwordsigned(self.offset + curr_data.inertia)
+end
+
+function Character:get_flags()
+	return memory.readbyte(self.offset + curr_data.status)
+end
+
+function Character:get_dimensions()
+	return memory.readbyte(self.offset + curr_data.y_radius), memory.readbyte(self.offset + curr_data.x_radius)
+end
+
+if rom:is_sonic3() or rom:is_sonick() or rom:is_scheroes() then
 	function Character:hit_time_left()
-		return memory.readword(self.offset + 0x30)
+		return memory.readbyte(self.offset + curr_data.invulnerable_time)
 	end
-
-	function Character:hit_timer()
-		return string.format("%5d", self:hit_time_left())
+else
+	function Character:hit_time_left()
+		return memory.readword(self.offset + curr_data.invulnerable_time)
 	end
+end
 
+function Character:hit_timer()
+	return string.format("%5d", self:hit_time_left())
+end
+
+if curr_data.Invincibility_time >= 0xff0000 then
+	-- Raw RAM address
 	function Character:stars_timer()
-		return string.format("%5d", memory.readword(self.offset + 0x32))
+		return string.format("%5d", 8 * memory.readword(curr_data.Invincibility_time))
 	end
+elseif rom:is_sonic3() or rom:is_sonick() then
+	function Character:stars_timer()
+		return string.format("%5d", 8 * memory.readbyte(self.offset + curr_data.Invincibility_time) - game:get_level_frames() % 8)
+	end
+else
+	function Character:stars_timer()
+		return string.format("%5d", memory.readword(self.offset + curr_data.Invincibility_time))
+	end
+end
 
+if curr_data.Speedshoes_time >= 0xff0000 then
+	-- Raw RAM address
+	function Character:stars_timer()
+		return string.format("%5d", 8 * memory.readword(curr_data.Speedshoes_time))
+	end
+elseif rom:is_sonic3() or rom:is_sonick() then
 	function Character:shoes_timer()
-		return string.format("%5d", memory.readword(self.offset + 0x34))
+		return string.format("%5d", 8 * memory.readbyte(self.offset + curr_data.Speedshoes_time) - game:get_level_frames() % 8)
 	end
-
-	function Character:get_dimensions()
-		return memory.readbyte(self.offset + 0x17), memory.readbyte(self.offset + 0x16)
+else
+	function Character:shoes_timer()
+		return string.format("%5d", memory.readword(self.offset + curr_data.Speedshoes_time))
 	end
 end
 
@@ -147,33 +174,9 @@ function Character:hit_active()
 	return self:hit_time_left() ~= 0
 end
 
-if rom:is_sonic1() then
-	function Character:stars_active()
-		return memory.readbyte(0xfffe2d) ~= 0
-	end
-
-	function Character:shoes_active()
-		return memory.readbyte(0xfffe2e) ~= 0
-	end
-
-	function Character:get_shield()
-		return memory.readbyte(0xfffe2c)
-	end
-elseif rom:is_sonic_cd() then
-	function Character:stars_active()
-		return memory.readbyte(0xff151f) ~= 0
-	end
-
-	function Character:shoes_active()
-		return memory.readbyte(0xff1520) ~= 0
-	end
-
-	function Character:get_shield()
-		return memory.readbyte(0xff151e)
-	end
-else
+if curr_data.status_secondary ~= nil then
 	function Character:get_status()
-		return memory.readbyte(self.offset + 0x2b)
+		return memory.readbyte(self.offset + curr_data.status_secondary)
 	end
 
 	function Character:stars_active()
@@ -188,125 +191,121 @@ else
 	function Character:get_shield()
 		return self:get_status()
 	end
+else
+	if curr_data.Invincibility_active == nil then
+		function Character:stars_active()
+			return false
+		end
+	else
+		function Character:stars_active()
+			return memory.readbyte(curr_data.Invincibility_active) ~= 0
+		end
+	end
+
+	if curr_data.Speedshoes_active == nil then
+		function Character:shoes_active()
+			return false
+		end
+	else
+		function Character:shoes_active()
+			return memory.readbyte(curr_data.Speedshoes_active) ~= 0
+		end
+	end
+
+	if curr_data.Shield_active == nil then
+		function Character:get_shield()
+			return 0
+		end
+	else
+		function Character:get_shield()
+			return memory.readbyte(curr_data.Shield_active)
+		end
+	end
 end
 
-if rom:is_sonic1() then
+if curr_data.double_jump_data == nil then
 	function Character:flight_time_left()
-		return memory.readword(self.offset + 0x20)
-	end
-
-	function Character:flight_active()
-		return memory.readbyte(self.offset + 0x2f) ~= 0 and self:flight_time_left() > 0
-	end
-
-	function Character:flight_value()
-		return memory.readbyte(self.offset + 0x2f)
-	end
-
-	function Character:flight_no_pickup_time_left()
 		return 0
 	end
-
-	function Character:flight_boost_timer()
-		-- Frames left in the boost counter
-		local fval = 32 - self:flight_value()
-		-- Vertical position
-		local ypos = memory.readwordsigned(self.offset + 0xc)
-		-- Vertical limit for flight
-		local ylim = memory.readwordsigned(0xfff724) + 0x10 -- need to check this!
-		-- Above this position, Tails can't have negative vertical speed
-		if ypos > ylim then
-			-- Velocity
-			local yvel = self:get_yvel()
-			-- Predividing initial velocity by acceleration
-			local vy_0 = -yvel / 32
-			-- Distance, in subpixels, before Tails reaches the flight limit,
-			-- predivided by absolute value of acceleration (we will only need
-			-- the square of this term).
-			local dy_0 = 2 * ((ylim - ypos) * 256 - memory.readbyte(self.offset + 0xe)) / 32
-			-- How many frames (including fractions) until Tails reaches
-			-- the flight limit
-			local nfra = (dy_0 * dy_0 + vy_0 * vy_0) ^ (0.5) - vy_0
-			-- How many frames until Tails reaches flight speed limit
-			local vlim = (yvel + 288)/32
-			-- Pick lowest of the 3.
-			if nfra < fval and nfra < vlim then
-				return string.format("%5d", nfra)
-			elseif nfra < fval or vlim < fval then
-				return string.format("%5d", vlim)
-			end
-		end
-		return string.format("%5d", fval)
-	end
-elseif rom:is_sonic3() or rom:is_sonick() then
+elseif rom:is_sonic1() then
 	function Character:flight_time_left()
-		local dec = 1 - AND(game:get_level_frames(), 1)
-		return 2 * memory.readbyte(self.offset + 0x25) - dec
-	end
-
-	function Character:flight_active()
-		return memory.readbyte(self.offset + 0x2f) ~= 0 and self:flight_time_left() > 0
-	end
-
-	function Character:flight_value()
-		return memory.readbyte(self.offset + 0x2f)
-	end
-
-	function Character:flight_no_pickup_time_left()
-		return memory.readbyte(0xfffff73f)
-	end
-
-	function Character:flight_boost_timer()
-		-- Frames left in the boost counter
-		local fval = 32 - self:flight_value()
-		-- Vertical position
-		local ypos = memory.readwordsigned(self.offset + 0xc)
-		-- Vertical limit for flight
-		local ylim = memory.readwordsigned(0xffee18) + 0x10
-		-- Above this position, Tails can't have negative vertical speed
-		if ypos > ylim then
-			-- Velocity
-			local yvel = self:get_yvel()
-			-- Predividing initial velocity by acceleration
-			local vy_0 = -yvel / 32
-			-- Distance, in subpixels, before Tails reaches the flight limit,
-			-- predivided by absolute value of acceleration (we will only need
-			-- the square of this term).
-			local dy_0 = 2 * ((ylim - ypos) * 256 - memory.readbyte(self.offset + 0xe)) / 32
-			-- How many frames (including fractions) until Tails reaches
-			-- the flight limit
-			local nfra = (dy_0 * dy_0 + vy_0 * vy_0) ^ (0.5) - vy_0
-			-- How many frames until Tails reaches flight speed limit
-			local vlim = (yvel + 288)/32
-			-- Pick lowest of the 3.
-			if nfra < fval and nfra < vlim then
-				return string.format("%5d", nfra)
-			elseif nfra < fval or vlim < fval then
-				return string.format("%5d", vlim)
-			end
-		end
-		return string.format("%5d", fval)
+		return memory.readword(self.offset + curr_data.double_jump_data)
 	end
 else
 	function Character:flight_time_left()
-		return 0
+		local dec = 1 - AND(game:get_level_frames(), 1)
+		return 2 * memory.readbyte(self.offset + curr_data.double_jump_data) - dec
 	end
+end
 
-	function Character:flight_active()
-		return false
-	end
-
+if curr_data.double_jump_data == nil then
 	function Character:flight_value()
 		return 0
 	end
+else
+	function Character:flight_value()
+		return memory.readbyte(self.offset + curr_data.double_jump_flag)
+	end
+end
 
+function Character:can_fly()
+	if self.charid == charids.tails then
+		return rom.tails_flies
+	elseif self.charid == charids.cream then
+		return rom.cream_flies
+	else
+		return false
+	end
+end
+
+function Character:flight_active()
+	return self:can_fly() and self:flight_value() ~= 0 and self:flight_time_left() > 0
+end
+
+if curr_data.carry_delay == nil then
 	function Character:flight_no_pickup_time_left()
 		return 0
 	end
-
-	function Character:flight_boost_timer()
-		return "0"
+elseif curr_data.carry_delay >= 0xff0000 then
+	function Character:flight_no_pickup_time_left()
+		return memory.readbyte(curr_data.carry_delay)
 	end
+else
+	function Character:flight_no_pickup_time_left()
+		return memory.readbyte(self.offset + curr_data.carry_delay)
+	end
+end
+
+function Character:flight_boost_timer()
+	-- Frames left in the boost counter
+	local fval = 32 - self:flight_value()
+	-- Vertical position
+	local ypos = self:get_ypos()
+	-- Vertical limit for flight
+	local ylim = game:min_camera_y() + 0x10
+	-- Above this position, Tails can't have negative vertical speed
+	if ypos > ylim then
+		-- Velocity
+		local yvel = self:get_yvel()
+		-- Predividing initial velocity by acceleration
+		local vy_0 = -yvel / 32
+		-- Distance, in subpixels, before Tails reaches the flight limit,
+		-- predivided by absolute value of acceleration (we will only need
+		-- the square of this term).
+		local dy_0 = 2 * ((ylim - ypos) * 256 - self:get_ysub()) / 32
+		-- How many frames (including fractions) until Tails reaches
+		-- the flight limit
+		local nfra = (dy_0 * dy_0 + vy_0 * vy_0) ^ (0.5) - vy_0
+		-- How many frames until Tails reaches flight speed limit
+		local vlim = (yvel + 288)/32
+		-- Pick lowest of the 3.
+		if nfra < fval and nfra < vlim then
+			return string.format("%5d", nfra)
+		elseif nfra < fval or vlim < fval then
+			return string.format("%5d", vlim)
+		end
+	end
+	return string.format("%5d", fval)
 end
 
 function Character:flight_timer()
@@ -314,7 +313,7 @@ function Character:flight_timer()
 end
 
 function Character:flight_boosting()
-	return self:flight_value() > 1 and self:get_yvel() >= -256
+	return self:can_fly() and self:flight_value() > 1 and self:get_yvel() >= -256
 end
 
 function Character:flight_no_pickup_timer()
@@ -322,7 +321,17 @@ function Character:flight_no_pickup_timer()
 end
 
 function Character:flight_no_pickup_active()
-	return self:flight_no_pickup_time_left() > 0
+	return self:can_fly() and self:flight_no_pickup_time_left() > 0
+end
+
+function Character:flight_icon()
+	if self.charid == charids.tails then
+		return "tails-flight"
+	elseif self.charid == charids.cream then
+		return "cream-flight"
+	else
+		return "blank"
+	end
 end
 
 function Character:shield()
@@ -341,31 +350,54 @@ function Character:is_drowning()
 	       not game:hyper_form() and self:is_underwater()
 end
 
-if rom:is_sonic3() or rom:is_sonick() then
-	--	Filtered by Sonic elsewhere.
-	function Character:doing_instashield()
-		return self:shield() == shieldids.no_shield and
-		       game:super_status() ~= 1 and game:super_status() ~= -1 and
-		       memory.readbyte(self.offset + 0x2f) == 1 and
-		       memory.readbyte(0xffcce8 + 0x23) >= 0
+if curr_data.shield >= 0xff0000 then
+	function Character:get_shield_object()
+		return curr_data.shield
 	end
+else
+	function Character:get_shield_object()
+		return 0xff0000 + memory.readword(self.offset + curr_data.shield)
+	end
+end
+
+if rom:is_sonic3() or rom:is_sonick() or rom:is_scheroes() then
+	function Character:doing_instashield()
+		return self.charid == charids.sonic and self:shield() == shieldids.no_shield and
+			   game:super_status() ~= 1 and game:super_status() ~= -1 and
+			   not self:stars_active() and
+		       memory.readbyte(self.offset + curr_data.double_jump_flag) == 1
+	end
+
 	function Character:instashield_time()
-		return string.format("%5d", 15 - memory.readbyte(0xffcce8 + 0x21) - memory.readbyte(0xffcce8 + 0x23))
+		local shield = self:get_shield_object()
+		return string.format("%5d", 15 - memory.readbyte(shield + curr_data.next_anim) - memory.readbyte(shield + curr_data.anim_frame))
 	end
 else
 	function Character:doing_instashield()
 		return false
 	end
+
 	function Character:instashield_time()
 		return 0
+	end
+end
+
+if curr_data.top_speed >= 0xff0000 then
+	function Character:get_top_speed()
+		return memory.readword(curr_data.top_speed)
+	end
+else
+	function Character:get_top_speed()
+		return memory.readword(self.offset + curr_data.top_speed)
 	end
 end
 
 if rom:is_sonic_cd() then
 	--	Spindash and super peelout use essentially the same mechanism in SCD.
 	function Character:spindash_time()
-		return memory.readbyte(self.offset + 0x2a)
+		return memory.readbyte(self.offset + curr_data.spindash_counter)
 	end
+
 	function Character:spindash_active()
 		return self:spindash_time() ~= 0
 	end
@@ -374,22 +406,23 @@ if rom:is_sonic_cd() then
 		-- You can release it a frame earlier than this, but it will be slower.
 		local max = (self:is_rolling() and 45-1) or 30-1
 		local val = self:spindash_time()
-		local sonicspd = memory.readword(0xfff760)
-		local absinertia = math.abs(memory.readwordsigned(self.offset + 0x14))
+		local sonicspd = self:get_top_speed()
+		local absinertia = math.abs(self:get_inertia())
 		local maxcharge = (Character:shoes_active() and (sonicspd * 3 / 2)) or (sonicspd * 2)
 		return string.format("%s%3d%%", (val >= max and "Y") or "N", math.floor((100 * absinertia) / maxcharge))
 	end
 
-	function Character:spindash_icon()
-		return (self:is_rolling() and self.curr_set.spindash) or "sonic-peelout"
+	-- Standard spindash.
+	function Character:is_peelout()
+		return not self:is_rolling()
 	end
 
 	function Character:no_peelout_time()
-		return AND(memory.readbyte(0xfff788), 0xf)
+		return AND(memory.readbyte(curr_data.Charge_Delay), 0xf)
 	end
 
 	function Character:no_peelout_active()
-		return self:no_peelout_time() ~= 0
+		return self.charid == charids.sonic and self:no_peelout_time() ~= 0
 	end
 
 	function Character:no_peelout_value()
@@ -397,26 +430,17 @@ if rom:is_sonic_cd() then
 	end
 else
 	-- Standard spindash.
-	local flag   = nil --	byte; set for spindash
-	local charge = nil --	word; spindash charge
-	if rom:is_sonic3() or rom:is_sonick() then
-		flag     = 0x3d
-		charge   = 0x3e
-	else
-		flag     = 0x39
-		charge   = 0x3a
+	function Character:spindash_active()
+		return memory.readbytesigned(self.offset + curr_data.spindash_flag) ~= 0
 	end
 
-	function Character:spindash_active()
-		return memory.readbytesigned(self.offset + flag) ~= 0
+	-- Standard spindash.
+	function Character:is_peelout()
+		return memory.readbytesigned(self.offset + curr_data.spindash_flag) < 0
 	end
 
 	function Character:spindash_charge()
-		return string.format("%4d%%", SHIFT(100 * memory.readword(self.offset + charge), 11))
-	end
-
-	function Character:spindash_icon()
-		return self.curr_set.spindash
+		return string.format("%4d%%", SHIFT(100 * memory.readword(self.offset + curr_data.spindash_counter), 11))
 	end
 
 	function Character:no_peelout_active()
@@ -428,22 +452,16 @@ else
 	end
 end
 
+function Character:spindash_icon()
+	return (self:is_peelout() and "sonic-peelout") or self.curr_set.spindash
+end
+
 function Character:wounded_icon()
 	return self.curr_set.wounded
 end
 
-if rom:is_sonic3() or rom:is_sonick() then
-	function Character:move_lock_timer()
-		return memory.readword(self.offset + 0x32)
-	end
-elseif rom:is_sonic2() then
-	function Character:move_lock_timer()
-		return memory.readword(self.offset + 0x2e)
-	end
-else
-	function Character:move_lock_timer()
-		return memory.readword(self.offset + 0x3e)
-	end
+function Character:move_lock_timer()
+	return memory.readword(self.offset + curr_data.move_lock)
 end
 
 function Character:move_lock_active()
@@ -453,7 +471,6 @@ end
 function Character:move_lock_text()
 	return string.format("%4d", self:move_lock_timer())
 end
-
 
 function Character:get_face()
 	--	Only for player 1
@@ -497,104 +514,193 @@ function Character:get_face()
 	return self.curr_face
 end
 
-if rom:is_sonic3() or rom:is_sonick() then
+if curr_data.code ~= nil then
 	function Character:in_game()
-		return memory.readlong(self.offset) ~= 0
+		return memory.readlong(self.offset + curr_data.code) ~= 0
+	end
+elseif curr_data.id ~= nil then
+	function Character:in_game()
+		return memory.readbyte(self.offset + curr_data.id) ~= 0
 	end
 else
 	function Character:in_game()
-		return memory.readbyte(self.offset) ~= 0
+		return false
 	end
 end
 
-function Character:init(id, p1, port)
-	self.charid      = id
-	self.is_p1       = p1
-
-	--	Character offsets
-	local p1_off        = nil
-	local p2_off        = nil
-	if rom:is_sonic1() or rom:is_sonic_cd() then
-		p1_off        = 0xffd000
-		p2_off        = 0xffd040
-	elseif rom:is_sonic2() then
-		p1_off        = 0xffb000
-		p2_off        = 0xffb040
-	else
-		p1_off        = 0xffb000
-		p2_off        = 0xffb04a
+if curr_data.air_left >= 0xff0000 then
+	function Character:get_drowning_seconds()
+		return memory.readbyte(curr_data.air_left)
 	end
-	if p1 then
-		self.offset       = p1_off
-		self.drown_icon   = "bubbles"
-	else
-		self.offset       = p2_off
-		if self.charid == charids.tails then
-			self.drown_icon   = "bubbles-tails"
-		elseif self.charid == charids.cream then
-			self.drown_icon   = "bubbles-cream"
+else
+	function Character:get_drowning_seconds()
+		return memory.readbyte(self.offset + curr_data.air_left)
+	end
+end
+
+if curr_data.bubbles ~= nil then
+	function Character:get_drowning_frames()
+		return memory.readword(0xff0000 + memory.readword(self.offset + curr_data.bubbles) + curr_data.air_frames)
+	end
+elseif curr_data.bubbles_P2 ~= nil then
+	function Character:get_drowning_frames()
+		--	Tails and Cream drown differently in S2, S3 and S3K, even if solo.
+		if self.charid == charids.tails or self.charid == charids.cream then
+			return memory.readword(curr_data.bubbles_P2 + curr_data.air_frames)
+		else
+			return memory.readword(curr_data.bubbles_P1 + curr_data.air_frames)
 		end
 	end
+else
+	function Character:get_drowning_frames()
+		return memory.readword(curr_data.bubbles_P1 + curr_data.air_frames)
+	end
+end
+
+function Character:drowning_timer()
+	return string.format("%4d", 60 * self:get_drowning_seconds() + self:get_drowning_frames())
+end
+
+if curr_data.control_counter == nil then
+	function Character:cputime_time_left()
+		return 0
+	end
+elseif curr_data.control_counter >= 0xff0000 then
+	function Character:cputime_time_left()
+		return memory.readword(curr_data.control_counter)
+	end
+else
+	function Character:cputime_time_left()
+		return memory.readword(self.offset + curr_data.control_counter)
+	end
+end
+
+function Character:cputime_active()
+	local cputime = self.cputime_time_left()
+	return cputime ~= 0 and cputime < 599
+end
+
+function Character:cputime_timer()
+	return string.format("%3d", self.cputime_time_left())
+end
+
+if curr_data.respawn_counter == nil then
+	function Character:despawn_time_left()
+		return 0
+	end
+elseif curr_data.respawn_counter >= 0xff0000 then
+	function Character:despawn_time_left()
+		return memory.readword(curr_data.respawn_counter)
+	end
+else
+	function Character:despawn_time_left()
+		return memory.readword(self.offset + curr_data.respawn_counter)
+	end
+end
+
+function Character:despawn_active()
+	return self:despawn_time_left() ~= 0
+end
+
+function Character:despawn_timer()
+	return string.format("%3d", 300 - self:despawn_time_left())
+end
+
+function Character:respawn_time_left()
+	return (64 - AND(self:get_level_frames(), 0x3f)) % 64
+end
+
+if curr_data.CPU_routine ~= nil and curr_data.obj_control ~= nil then
+	local status_mask;
+	local obj_control_mask;
+	if rom:is_sonic2() then
+		status_mask = 0xd2
+		obj_control_mask = 0xff
+	else
+		status_mask = 0x80
+		obj_control_mask = 0x80
+	end
+
+	if curr_data.CPU_routine >= 0xff0000 then
+		function Character:get_CPU_routine()
+			return memory.readword(curr_data.CPU_routine)
+		end
+	else
+		function Character:get_CPU_routine()
+			return memory.readword(self.offset + curr_data.CPU_routine)
+		end
+	end
+
+	if rom:is_scheroes() then
+		function Character:respawn_active()
+			if self:get_CPU_routine() == 2 then
+				local leader_ptr = 0xff0000 + memory.readword(curr_data.Leader_ptr)
+				return self:respawn_time_left() ~= 0
+					   and AND(memory.readbytesigned(leader_ptr + curr_data.obj_control), obj_control_mask) == 0
+					   and AND(memory.readbyte(leader_ptr + curr_data.status), status_mask) == 0
+			end
+			return false
+		end
+	else
+		function Character:respawn_active()
+			if self:get_CPU_routine() == 2 then
+				return self:respawn_time_left() ~= 0
+					   and AND(memory.readbytesigned(curr_data.Player1 + curr_data.obj_control), obj_control_mask) == 0
+					   and AND(memory.readbyte(curr_data.Player1 + curr_data.status), status_mask) == 0
+			end
+			return false
+		end
+	end
+else
+	function Character:respawn_active()
+		return false
+	end
+end
+
+function Character:respawn_timer()
+	return string.format("%3d", self:respawn_time_left())
+end
+
+function Character:init(id, index, port)
+	self.charid      = id
+	self.is_p1       = index == 0
+
+	--	Character offsets
+	local player_offsets = {
+		[0] = curr_data.Player1 or curr_data.Leader_ptr,
+		[1] = curr_data.Player2 or curr_data.Sidekick1_ptr,
+		[2] = curr_data.Player3 or curr_data.Sidekick2_ptr,
+	}
+
+	self.base_offset  = player_offsets[index]
+	self:update_offset()
 
 	self.portraits   = port
 	self.curr_set    = port.normal
 	self.curr_face   = false
 	self.super_frame = 0
 	self.jump_speed  = ""
-	local dso = nil
-	local dfo = nil
-	if rom:is_sonic_cd() then
-		dso = 0xff150b
-		dfo = 0xffd1f8
-	elseif rom:is_sonic1() then
-		dso = 0xfffe15
-		dfo = 0xffd378
-	elseif rom:is_sonic2() then
-		dso = self.offset + 0x28
-		dfo = 0xffd0b8
-	elseif rom:is_sonic3() or rom:is_sonick() then
-		dso = self.offset + 0x2c
-		dfo = 0xffcb68
-	end
 
-	if self.charid == charids.tails then
-		--	Tails is different.
-		if not rom:is_sonic1() then
-			--	Tails drowns differently in S2, S3 and S3K, even if solo.
-			dfo = dfo + p2_off - p1_off
-		end
+	if self.charid == charids.tails or self.charid == charids.cream then
 		--	You can hack Tails in Sonic & Knuckles, so lets leave him here.
-		self.flies       = rom.tails_flies
-		self.swap_delay  = 4
-		self.super_pal   = 0xfff668
-		self.super_swap  = 0xfff669
-	elseif self.charid == charids.cream then
-		--	As is Cream in S2.
-		if not rom:is_sonic1() then
-			--	Cream drowns differently in S2, even if solo.
-			dfo = dfo + p2_off - p1_off
-		end
-		self.flies       = rom.cream_flies
-		--	Copying Tails' super stuff from S3&K.
+		-- For Cream, just copying Tails stuff.
 		self.swap_delay  = 4
 		self.super_pal   = 0xfff668
 		self.super_swap  = 0xfff669
 	else
-		self.flies       = false
 		self.swap_delay  = (rom:is_sonic2() and 2) or 3
 		self.super_pal   = 0xfff65d
 		self.super_swap  = 0xfff65e
 	end
-
-	self.drowning_timer = function(self)
-				return string.format("%5d", 60 * memory.readbyte(dso) + memory.readword(dfo))
-			end
 
 	--	This manufactures a HUD icon monitor given the adequate functions.
 	--	'Icon' can be either a function or a gdimage.
 	local function Create_HUD(this, active_fun, timer_fun, icon)
 		local cond = Conditional_widget:new(0, 0, false, active_fun, this)
 		local hud  = Frame_widget:new(0, 0, 42, 17)
+		if type(icon) == "function" then
+			icon = bind(icon, this)
+		end
 		hud:add_status_icon(2, 2, icon, bind(timer_fun, this))
 		cond:add(hud, 0, 0)
 
@@ -604,34 +710,20 @@ function Character:init(id, p1, port)
 	--	Here we generate the list of status monitor icons for each character, starting with
 	--	the common icons. To add new ones, just copy and modify accordingly.
 	self.status_huds = {
-		Create_HUD(self, self.spindash_active  , self.spindash_charge , bind(self.spindash_icon, self)),
-		Create_HUD(self, self.hit_active       , self.hit_timer       , bind(self.wounded_icon , self)),
-		Create_HUD(self, self.is_drowning      , self.drowning_timer  , self.drown_icon               ),
+		Create_HUD(self, self.spindash_active  , self.spindash_charge , self.spindash_icon),
+		Create_HUD(self, self.hit_active       , self.hit_timer       , self.wounded_icon ),
 	}
 
-	if self.charid == charids.sonic then
-	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.doing_instashield , self.instashield_time , "sonic-instashield"))
-	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.no_peelout_active , self.no_peelout_value , "sonic-no-peelout" ))
-	end
-
-	if self.flies then
-		local ficon = "blank"
-		if self.charid == charids.tails then
-			ficon = "tails-flight"
-			if rom:is_sonic3() or rom:is_sonick() then
-			 	table.insert(self.status_huds, 1,
-					Create_HUD(self, self.flight_no_pickup_active, self.flight_no_pickup_timer, "tails-flight-no-pickup"))
-			end
-		elseif self.charid == charids.cream then
-		 	ficon = "cream-flight"
-		end
-	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.flight_active  , self.flight_timer      , ficon         ))
-	 	table.insert(self.status_huds, 1,
-			Create_HUD(self, self.flight_boosting, self.flight_boost_timer, "flight-boost"))
-	end
+	table.insert(self.status_huds, 1,
+		Create_HUD(self, self.doing_instashield      , self.instashield_time      , "sonic-instashield"))
+	table.insert(self.status_huds, 1,
+		Create_HUD(self, self.no_peelout_active      , self.no_peelout_value      , "sonic-no-peelout" ))
+	table.insert(self.status_huds, 1,
+		Create_HUD(self, self.flight_no_pickup_active, self.flight_no_pickup_timer, "tails-flight-no-pickup"))
+	table.insert(self.status_huds, 1,
+		Create_HUD(self, self.flight_active          , self.flight_timer          , self.flight_icon))
+	table.insert(self.status_huds, 1,
+		Create_HUD(self, self.flight_boosting        , self.flight_boost_timer    , "flight-boost"  ))
 
 	if self.is_p1 then
 	 	--	Status icons specific to player 1 (whoever he is).
@@ -650,27 +742,11 @@ function Character:init(id, p1, port)
 			Create_HUD(game, game.warp_active        , game.warp_timer         , "clock"        ))
 		table.insert(self.status_huds,
 			Create_HUD(game, game.scroll_delay_active, game.scroll_delay_timer , "camera-lock"  ))
-	elseif self.charid == charids.tails then
-		--	Status icons specific to player 2 Tails.
-		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active     , game.cputime_timer      , "cpu-2p"       ))
-		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active     , game.despawn_timer      , "tails-despawn"))
-		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active     , game.respawn_timer      , "tails-normal" ))
-	elseif self.charid == charids.cream then
-		--	Status icons specific to player 2 Cream.
-		table.insert(self.status_huds,
-			Create_HUD(game, game.cputime_active     , game.cputime_timer      , "cpu-2p"       ))
-		table.insert(self.status_huds,
-			Create_HUD(game, game.despawn_active     , game.despawn_timer      , "cream-despawn"))
-		table.insert(self.status_huds,
-			Create_HUD(game, game.respawn_active     , game.respawn_timer      , "cream-normal" ))
 	end
 end
 
-function Character:construct(id, p1, port)
-	self:init(id, p1, port)
+function Character:construct(id, index, port)
+	self:init(id, index, port)
 	return self
 end
 
@@ -685,43 +761,43 @@ function set_chardata(selchar)
 	game.curr_char   = selchar
 	if selchar == charids.sonic_tails then          --	Sonic + Tails
 		characters = {
-			Character:new(charids.sonic, true , portraits.sonic),
-			Character:new(charids.tails, false, portraits.tails)
+			Character:new(charids.sonic   , 0, portraits.sonic),
+			Character:new(charids.tails   , 1, portraits.tails)
 		}
 	elseif selchar == charids.sonic then            --	Sonic solo
 		characters = {
-			Character:new(charids.sonic, true , portraits.sonic)
+			Character:new(charids.sonic   , 0, portraits.sonic)
 		}
 	elseif selchar == charids.tails then            --	Tails
 		characters = {
-			Character:new(charids.tails, true , portraits.tails)
+			Character:new(charids.tails   , 0, portraits.tails)
 		}
 	elseif selchar == charids.knuckles then         --	Knuckles
 		characters = {
-			Character:new(charids.knuckles, true , portraits.knuckles)
+			Character:new(charids.knuckles, 0, portraits.knuckles)
 		}
 	elseif selchar == charids.amy_tails then        --	Amy + Tails
 		characters = {
-			Character:new(charids.amy_rose, true , portraits.amy_rose),
-			Character:new(charids.tails, false, portraits.tails)
+			Character:new(charids.amy_rose, 0, portraits.amy_rose),
+			Character:new(charids.tails   , 1, portraits.tails)
 		}
 	elseif selchar == charids.amy_rose then			--	Amy
 		characters = {
-			Character:new(charids.amy_rose, true , portraits.amy_rose)
+			Character:new(charids.amy_rose, 0, portraits.amy_rose)
 		}
 	--[[
 	elseif selchar == charids.cream then			--	Cream
 		characters = {
-			Character:new(charids.cream   , true , portraits.cream   )
+			Character:new(charids.cream   , 0, portraits.cream   )
 		}
 	--]]
 	elseif selchar == charids.charmy then			--	charmy
 		characters = {
-			Character:new(charids.charmy  , true , portraits.charmy  )
+			Character:new(charids.charmy  , 0, portraits.charmy  )
 		}
 	elseif selchar == charids.bunnie then			--	Bunnie
 		characters = {
-			Character:new(charids.bunnie  , true , portraits.bunnie  )
+			Character:new(charids.bunnie  , 0, portraits.bunnie  )
 		}
 	end
 end

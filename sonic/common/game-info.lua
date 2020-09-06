@@ -146,81 +146,6 @@ function game:scroll_delay_active()
 	return self:scroll_delay() ~= 0
 end
 
--- TODO: Fix for SCH (SST control_counter)
-if curr_data.Tails_control_counter ~= nil then
-	function game:cputime_time_left()
-		return memory.readword(curr_data.Tails_control_counter)
-	end
-else
-	function game:cputime_time_left()
-		return 1
-	end
-end
-
-function game:cputime_active()
-	local cputime = self.cputime_time_left()
-	return cputime ~= 0 and cputime < 599
-end
-
-function game:cputime_timer()
-	return string.format("%5d", self.cputime_time_left())
-end
-
--- TODO: Fix for SCH (SST respawn_counter)
-if curr_data.Tails_respawn_counter ~= nil then
-	function game:despawn_time_left()
-		return memory.readword(curr_data.Tails_respawn_counter)
-	end
-else
-	function game:despawn_time_left()
-		return 1
-	end
-end
-
-function game:despawn_active()
-	return self:despawn_time_left() ~= 0
-end
-
-function game:despawn_timer()
-	return string.format("%5d", 300 - self:despawn_time_left())
-end
-
-function game:respawn_time_left()
-	return (64 - AND(self:get_level_frames(), 0x3f)) % 64
-end
-
--- TODO: Fix for SCH (SST CPU_routine)
-if curr_data.Tails_CPU_routine ~= nil and curr_data.obj_control ~= nil then
-	if rom:is_scheroes() then
-		function game:respawn_active()
-			if memory.readword(0xfff708) == 2 then
-				local leader_ptr = 0xff0000 + memory.readword(curr_data.Leader_ptr)
-				return self:respawn_time_left() ~= 0
-					   and memory.readbyte(leader_ptr + curr_data.obj_control) == 0
-					   and AND(memory.readbyte(leader_ptr + curr_data.status), 0xd2) == 0
-			end
-			return false
-		end
-	else
-		function game:respawn_active()
-			if memory.readword(curr_data.Tails_CPU_routine) == 2 then
-				return self:respawn_time_left() ~= 0
-					   and memory.readbyte(curr_data.Player1 + curr_data.obj_control) == 0
-					   and AND(memory.readbyte(curr_data.Player1 + curr_data.status), 0xd2) == 0
-			end
-			return false
-		end
-		end
-else
-	function game:respawn_active()
-		return false
-	end
-end
-
-function game:respawn_timer()
-	return string.format("%5d", self:respawn_time_left())
-end
-
 if curr_data.Super_Sonic_frame_count ~= nil then
 	function game:super_timer()
 		return string.format("%5d", 61 * game:get_raw_rings() + memory.readword(curr_data.Super_Sonic_frame_count) - 60)
@@ -403,6 +328,10 @@ function game:level_bounds()
 		   memory.readword(curr_data.Camera_Min_Y_pos), memory.readword(curr_data.Camera_Max_Y_pos_now)
 end
 
+function game:min_camera_y()
+	return memory.readword(curr_data.Camera_Min_Y_pos)
+end
+
 if rom:is_scheroes() then
 	function game:extend_screen_bounds()
 		return self:get_zone() == curr_data.sky_chase_zone
@@ -439,7 +368,7 @@ end
 
 function game:init()
 	if rom:is_scheroes() then
-		self.shields = {shieldids.normal_shield, shieldids.flame_shield, shieldids.lightning_shield, shieldids.bubble_shield}
+		self.shields = {shieldids.flame_shield, shieldids.lightning_shield, shieldids.bubble_shield, shieldids.normal_shield}
 	elseif rom:is_sonic3() or rom:is_sonick() then
 		self.shields = {shieldids.flame_shield, shieldids.lightning_shield, shieldids.bubble_shield}
 	else

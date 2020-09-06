@@ -266,14 +266,12 @@ local function s1tails_check(self, val)
 	--	Checksum is no good for this hack.
 	local title = memory.readbyterange(0x120, 0x30)
 	local base  = "MILES \"TAILS\" PROWER IN SONIC THE HEDGEHOG      "
-	local istails = true
 	for i = 1, 0x30, 1 do
 		if base:byte(i) ~= title[i] then
-			istails = false
-			break
+			return false
 		end
 	end
-	return istails
+	return true
 end
 
 --	Special exception check for Tails in Sonic 1.
@@ -284,15 +282,14 @@ local function scheroes_check(self, val)
 	local is_sch = true
 	for i = 1, 0x30, 1 do
 		if base:byte(i) ~= title[i] then
-			is_sch = false
-			break
+			return false
 		end
 	end
 	local revision = memory.readlong(0x1C8)
 	if self.checksum ~= revision then
 		print("Warning: the ROM is at a different revision than the script was written for. Not everything may work correctly.")
 	end
-	return is_sch
+	return true
 end
 
 --	We remap the value read from memory in Amy in S2 to the internal IDs
