@@ -1,4 +1,5 @@
 *~
+.vscode
 img/*.luaimg
 sonic-hud.7z
 sonic/common/boss-tables.lua
