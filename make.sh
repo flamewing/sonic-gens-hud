@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -v MSYSTEM ]]; then
-	BASE="c:/Users/marzo/Documents/gens/ROMS"
+	BASE="c:/Users/$USER/Documents/gens/ROMS"
 else
 	BASE="$HOME/.wine/drive_c/games/gens/ROMS"
 fi
