@@ -37,8 +37,8 @@ local curr_data = rom.data
 prediction_wanted = nil
 if rom:is_sonic_cd() then
 	prediction_wanted = function ()
-				return memory.readbyte(0xff1510) ~= 0
-				       and memory.readbyte(0xfff7cc) == 0
+				return memory.readbyte(rom.data.Update_HUD_timer) ~= 0
+				       and memory.readbyte(rom.data.Control_Locked) == 0
 			end
 elseif rom:is_sonic3() or rom:is_sonick() then
 	prediction_wanted = function ()

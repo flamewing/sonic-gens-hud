@@ -85,10 +85,10 @@ local function save_level(self)
 	fast_forward(function()
 		last = (last + 1) % 2
 		savestate.save(state[last])
-		return memory.readbyte(0xfff600) ~= 0xc
+		return memory.readbyte(rom.data.Game_Mode) ~= rom.data.GameModeID_Level
 	end)
 	savestate.load(state[last])
-	if memory.readbyte(0xfff600) == 0xc then
+	if memory.readbyte(rom.data.Game_Mode) == rom.data.GameModeID_Level then
 		savestate.load(state[(last + 1) % 2])
 	end
 	local iter = 0
@@ -135,10 +135,10 @@ local function paste_level(self)
 	fast_forward(function()
 		last = (last + 1) % 2
 		savestate.save(state[last])
-		return memory.readbyte(0xfff600) ~= 0xc
+		return memory.readbyte(rom.data.Game_Mode) ~= rom.data.GameModeID_Level
 	end)
 	savestate.load(state[last])
-	if memory.readbyte(0xfff600) == 0xc then
+	if memory.readbyte(rom.data.Game_Mode) == rom.data.GameModeID_Level then
 		savestate.load(state[(last + 1) % 2])
 	end
 

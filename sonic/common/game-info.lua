@@ -159,9 +159,9 @@ end
 if rom:is_sonic_cd() then
 	-- This is an ugly hack.
 	local function showing_hud()
-		return AND(memory.readword(0xffd082), 0x7ff) ~= 0x568 or
-		       AND(memory.readword(0xffd0c2), 0x7ff) ~= 0x568 or
-		       AND(memory.readword(0xffd142), 0x7ff) ~= 0x568
+		return AND(memory.readword(curr_data.HUD_ScoreTime + curr_data.art_tile), 0x7ff) ~= 0x568 or
+		       AND(memory.readword(curr_data.HUD_Lives + curr_data.art_tile), 0x7ff) ~= 0x568 or
+		       AND(memory.readword(curr_data.HUD_Rings + curr_data.art_tile), 0x7ff) ~= 0x568
 	end
 	function game:disable_hud()
 		--	RAM byte 0xff1522 indicates if Sonic is actually travelling in time;

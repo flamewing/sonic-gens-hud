@@ -149,7 +149,7 @@ end
 
 if curr_data.Speedshoes_time >= 0xff0000 then
 	-- Raw RAM address
-	function Character:stars_timer()
+	function Character:shoes_timer()
 		return string.format("%5d", 8 * memory.readword(curr_data.Speedshoes_time))
 	end
 elseif rom:is_sonic3() or rom:is_sonick() then

@@ -30,7 +30,7 @@ require("sonic/common/rom-check")
 
 if rom:is_sonic3() or rom:is_sonick() then
 	function toggle_disable_s3k_super_music(enable)
-		local zone, act = 0xffee4e, 0xffee4f
+		local zone, act = rom.data.Apparent_Zone, rom.data.Apparent_Act
 		local sfx, mus  = 0x2c, 0x9f
 		local ad1, ad2, ad3 = 0xa01c0a, 0xa01c0b, 0xa01c22
 

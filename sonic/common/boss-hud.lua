@@ -24,6 +24,8 @@ require("headers/lua-oo")
 require("headers/register")
 require("headers/widgets")
 
+local curr_data = rom.data
+
 --------------------------------------------------------------------------------
 --	This is the HUD of a single boss.
 --------------------------------------------------------------------------------
@@ -34,25 +36,23 @@ Boss_hud = class{
 	flash_timer = function (self) return 0 end,
 }:extends(Container_widget)
 
-if rom:is_sonic3() or rom:is_sonick() then
-	function Boss_hud:get_position()
-		local xpospix   = memory.readword      (self.offset + 0x10)
-		local ypospix   = memory.readwordsigned(self.offset + 0x14)
-		return string.format("%5d, %5d", xpospix, ypospix)
-	end
+function Boss_hud:get_position()
+	local xpospix   = memory.readword      (self.offset + curr_data.x_pos)
+	local ypospix   = memory.readwordsigned(self.offset + curr_data.y_pos)
+	return string.format("%5d, %5d", xpospix, ypospix)
+end
 
+if curr_data.code ~= nil then
 	function Boss_hud:loaded()
-		return memory.readlong(self.offset) ~= 0
+		return memory.readlong(self.offset + curr_data.code) ~= 0
+	end
+elseif curr_data.id ~= nil then
+	function Boss_hud:loaded()
+		return memory.readbyte(self.offset + curr_data.id) ~= 0
 	end
 else
-	function Boss_hud:get_position()
-		local xpospix   = memory.readword      (self.offset + 0x08)
-		local ypospix   = memory.readwordsigned(self.offset + 0x0c)
-		return string.format("%5d, %5d", xpospix, ypospix)
-	end
-
 	function Boss_hud:loaded()
-		return memory.readbyte(self.offset) ~= 0
+		return false
 	end
 end
 
@@ -126,7 +126,9 @@ local eggmanicons = make_boss_icons("eggman-flashing"         , "eggman")
 local mecha_icons = make_boss_icons("mechasonic-blue-flashing", "mechasonic-blue")
 
 local select_icons = function(val) return eggmanicons end
-if rom:is_sonic2() then
+if rom:is_scheroes() then
+	select_icons = function(val) return ((val == 1) and mecha_icons) or eggmanicons end
+elseif rom:is_sonic2() then
 	select_icons = function(val) return ((val == 0xaf) and mecha_icons) or eggmanicons end
 elseif rom:is_sonick() or rom:is_sonic3k() then
 	local knux_icons  = make_boss_icons("knuckles-wounded"    , "knuckles-normal")
@@ -155,37 +157,59 @@ function Boss_widget:construct(x, y, active)
 	return self
 end
 
-function Boss_widget:scan_bosses()
-	self.children = {}
-	if rom:is_keh() then
-	elseif rom:is_sonic3() or rom:is_sonick() then
-		local offset = 0xffb094
-		local last   = 0xffcfcb
-		while offset < last do
-			local code = memory.readlong(offset)
+if curr_data.DynObjs_list_head ~= nil then
+	function Boss_widget:scan_bosses()
+		self.children = {}
+		local offset = 0xff0000 + memory.readword(curr_data.DynObjs_list_head)
+		--local last   = 0xff0000 + memory.readword(curr_data.DynObjs_list_tail)
+		while offset ~= 0xff0000 do
+			local code = memory.readlong(offset + curr_data.code)
 			for ad, fun in pairs(self.boss_addr) do
 				if code == ad then
 					self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
 					break
 				end
 			end
-			offset = offset + 0x4a
+			offset = 0xff0000 + memory.readword(offset + curr_data.next)
 		end
-	else
-		local offset = (rom:is_sonic2() and 0xffb080) or 0xffd040
-		local last   = (rom:is_sonic2() and 0xffd5ff) or 0xffefff
-		while offset < last do
-			local id = memory.readbyte(offset)
-			if id ~= 0 then
-				for ad, fun in pairs(self.boss_addr) do
-					if id == fun[1] then
-						self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
-						break
+	end
+elseif curr_data.Dynamic_Object_RAM_End ~= nil then
+	function Boss_widget:scan_bosses()
+		self.children = {}
+		local offset = curr_data.Dynamic_Object_RAM
+		local last   = curr_data.Dynamic_Object_RAM_End
+		local objsize = curr_data.object_size
+		if curr_data.code ~= nil then
+			while offset < last do
+				local code = memory.readlong(offset + curr_data.code)
+				if code ~= 0 then
+					for ad, fun in pairs(self.boss_addr) do
+						if code == ad then
+							self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+							break
+						end
 					end
 				end
+				offset = offset + objsize
 			end
-			offset = offset + 0x40
+		elseif curr_data.id ~= nil then
+			while offset < last do
+				local id = memory.readbyte(offset + curr_data.id)
+				if id ~= 0 then
+					for _, fun in pairs(self.boss_addr) do
+						if id == fun[1] then
+							self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+							break
+						end
+					end
+				end
+				offset = offset + objsize
+			end
 		end
+	end
+else
+	function Boss_widget:scan_bosses()
+		self.children = {}
 	end
 end
 
@@ -264,4 +288,3 @@ function Boss_widget:draw()
 	end
 	return self.active
 end
-

@@ -69,6 +69,13 @@ local function s3k_dez1_hit_count(self)
 	return ((memory.readlong(self.offset) == 0x7e768) and (memory.readbyte(self.offset + 0x29) - 247)) or 0
 end
 
+--	SCH Final Zone boss flash timer frames.
+local function sch_fz_flash_timer(self)
+    local rout = memory.readbyte(self.offset + sch_rom_data.Obj_BossFinal_routine )
+    local time = memory.readbyte(self.offset + sch_rom_data.boss_invulnerable_time)
+    return ((rout == 2) and time) or 0
+end
+
 --------------------------------------------------------------------------------
 --	Supported ROM data.
 --------------------------------------------------------------------------------
@@ -122,53 +129,93 @@ local eng = {
 --	generated, file contains all the relevant code addresses used by bosses.
 local boss_data = {
 	s1  = {
-		GHZ3 = {0x3d, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		LZ3  = {0x77, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		MZ3  = {0x73, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		SLZ3 = {0x7a, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		SYZ3 = {0x75, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		FZ   = {0x85, make_unsigned_read(0x21,  0), s1_fz_flash_timer           },
+		GHZ3 = {0x3d, make_unsigned_read(sonic1_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          ,  0)},
+		LZ3  = {0x77, make_unsigned_read(sonic1_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          ,  0)},
+		MZ3  = {0x73, make_unsigned_read(sonic1_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          ,  0)},
+		SLZ3 = {0x7a, make_unsigned_read(sonic1_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          ,  0)},
+		SYZ3 = {0x75, make_unsigned_read(sonic1_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          ,  0)},
+		FZ   = {0x85, make_unsigned_read(sonic1_rom_data.collision_property,  0), s1_fz_flash_timer                                                       },
 	},
 	s2 = {
-		CPZ2 = {0x5d, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		EHZ2 = {0x56, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		HTZ2 = {0x52, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		ARZ2 = {0x89, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		MCZ2 = {0x57, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		CNZ2 = {0x51, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		MTZ3 = {0x54, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		OOZ2 = {0x55, make_unsigned_read(0x32,  0), make_unsigned_read(0x14,  0)},
-		DEZ1 = {0xaf, make_unsigned_read(0x21,  0), make_unsigned_read(0x30,  0)},
-		WFZ  = {0xc5, make_signed_read(0x21, 0)   , make_unsigned_read(0x30,  0)},
-		DEZ2 = {0xc7, make_unsigned_read(0x21,  0), make_unsigned_read(0x2a,  0)},
+		CPZ2 = {0x5d, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic2_rom_data.Obj_CPZBoss_invulnerable_time   ,  0)},
+		EHZ2 = {0x56, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic2_rom_data.Obj_EHZBoss_invulnerable_time   ,  0)},
+		HTZ2 = {0x52, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		ARZ2 = {0x89, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		MCZ2 = {0x57, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		CNZ2 = {0x51, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		MTZ3 = {0x54, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		OOZ2 = {0x55, make_unsigned_read(sonic2_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic2_rom_data.boss_invulnerable_time          ,  0)},
+		DEZ1 = {0xaf, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic2_rom_data.Obj_MechaSonic_invulnerable_time,  0)},
+		WFZ  = {0xc5, make_signed_read  (sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic2_rom_data.Obj_WFZBoss_invulnerable_time   ,  0)},
+		DEZ2 = {0xc7, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic2_rom_data.Obj_Eggrobo_invulnerable_time   ,  0)},
 	},
 	s2rob = {
-		GHZ3 = {0xdd, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		MZ3  = {0xdf, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		SYZ3 = {0xe2, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		LZ3  = {0xe4, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		SLZ3 = {0xe7, make_unsigned_read(0x21,  0), make_unsigned_read(0x3e,  0)},
-		FZ   = {0xe9, make_unsigned_read(0x21,  0), s1_fz_flash_timer           },
+		GHZ3 = {0xdd, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          , 0)},
+		MZ3  = {0xdf, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          , 0)},
+		SYZ3 = {0xe2, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          , 0)},
+		LZ3  = {0xe4, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          , 0)},
+		SLZ3 = {0xe7, make_unsigned_read(sonic2_rom_data.collision_property,  0), make_unsigned_read(sonic1_rom_data.boss_invulnerable_time          , 0)},
+		FZ   = {0xe9, make_unsigned_read(sonic2_rom_data.collision_property,  0), s1_fz_flash_timer           },
 	},
 	s2keh = {},
 	s3k = {
-		knux   = {    2, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	HPZ, Knuckles
-		mecha1 = {    1, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	SSZ, Mecha Sonic
-		mecha2 = {    1, make_unsigned_read(0x29,  0), make_unsigned_read(0x1c,  0)},	--	SSZ, "Metropolis" Mecha Sonic
-		CNZ1   = {    0, make_unsigned_read(0x45,  0), make_unsigned_read(0x20,  0)},	--	CNZ1 mini-boss
-		MHZ2   = {    0, make_unsigned_read(0x29, -1), make_unsigned_read(0x20,  0)},	--	MHZ2 boss reports one more hit than he can take
-		DEZ1   = {    0, s3k_dez1_hit_count          , make_unsigned_read(0x20,  0)},	--	This boss is a mess, read the comments in s3k_dez1_hit_count
-		DDZ    = {    0, make_unsigned_read(0x29,  1), make_unsigned_read(0x20,  0)},	--	Both DDZ bosses report one less hit they can take
-		normal = {    0, make_unsigned_read(0x29,  0), make_unsigned_read(0x20,  0)},	--	All other bosses
+		knux   = {    2, make_unsigned_read(sonic3_rom_data.collision_property,  0), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	HPZ, Knuckles
+		mecha1 = {    1, make_unsigned_read(sonic3_rom_data.collision_property,  0), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	SSZ, Mecha Sonic
+		mecha2 = {    1, make_unsigned_read(sonic3_rom_data.collision_property,  0), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time2      ,  0)},	--	SSZ, "Metropolis" Mecha Sonic
+		CNZ1   = {    0, make_unsigned_read(sonic3_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	CNZ1 mini-boss
+		MHZ2   = {    0, make_unsigned_read(sonic3_rom_data.collision_property, -1), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	MHZ2 boss reports one more hit than he can take
+		DEZ1   = {    0, s3k_dez1_hit_count                                        , make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	This boss is a mess, read the comments in s3k_dez1_hit_count
+		DDZ    = {    0, make_unsigned_read(sonic3_rom_data.collision_property,  1), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	Both DDZ bosses report one less hit they can take
+		normal = {    0, make_unsigned_read(sonic3_rom_data.collision_property,  0), make_unsigned_read(sonic3_rom_data.boss_invulnerable_time       ,  0)},	--	All other bosses
 	},
 	s4cyb = {},
-	scheroes = {},
+	scheroes = {
+		GHZ3 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		LZ3  = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		MZ3  = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		SLZ3 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		SYZ3 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		FZ   = {0, make_unsigned_read(sch_rom_data.collision_property,  0), sch_fz_flash_timer                                                   },
+		CPZ2 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.Obj_CPZBoss_invulnerable_time   ,  0)},
+		EHZ2 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.Obj_EHZBoss_invulnerable_time   ,  0)},
+		HTZ2 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		ARZ2 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		MCZ2 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		CNZ2 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		MTZ3 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		OOZ2 = {0, make_unsigned_read(sch_rom_data.boss_hitcount2    ,  0), make_unsigned_read(sch_rom_data.boss_invulnerable_time          ,  0)},
+		DEZ1 = {1, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.Obj_MechaSonic_invulnerable_time,  0)},
+		WFZ  = {0, make_signed_read  (sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.Obj_WFZBoss_invulnerable_time   ,  0)},
+		DEZ2 = {0, make_unsigned_read(sch_rom_data.collision_property,  0), make_unsigned_read(sch_rom_data.Obj_Eggrobo_invulnerable_time   ,  0)},
+	},
 }
 
 --	This maps the above array entries into the relevant code addresses.
 --	The file is generated by an external script.
 require("sonic/common/boss-tables")
 bosses = make_boss_tables(boss_data)
+bosses.scheroes = {
+	[sch_rom_data.Obj_BossGreenHill_ShipMain ] = boss_data.scheroes.GHZ3,	-- 01
+	[sch_rom_data.Obj_BossLabyrinth_ShipMain ] = boss_data.scheroes.LZ3,	-- 02
+	[sch_rom_data.Obj_BossMarble_ShipMain    ] = boss_data.scheroes.MZ3,	-- 03
+	[sch_rom_data.Obj_BossStarLight_ShipMain ] = boss_data.scheroes.SLZ3,	-- 04
+	[sch_rom_data.Obj_BossSpringYard_ShipMain] = boss_data.scheroes.SYZ3,	-- 05
+	[sch_rom_data.Obj_BossFinal_Eggman       ] = boss_data.scheroes.FZ,	-- 06
+	[sch_rom_data.Obj_CPZBoss_Main           ] = boss_data.scheroes.CPZ2,	-- 01
+	[sch_rom_data.Obj_EHZBoss_VehicleMain    ] = boss_data.scheroes.EHZ2,	-- 02
+	[sch_rom_data.Obj_HTZBoss_Mobile         ] = boss_data.scheroes.HTZ2,	-- 03
+	[sch_rom_data.Obj_ARZBoss_Main           ] = boss_data.scheroes.ARZ2,	-- 04
+	[sch_rom_data.Obj_MCZBoss_Main           ] = boss_data.scheroes.MCZ2,	-- 05
+	[sch_rom_data.Obj_CNZBoss_Main           ] = boss_data.scheroes.CNZ2,	-- 06
+	[sch_rom_data.Obj_MTZBoss_Main           ] = boss_data.scheroes.MTZ3,	-- 07
+	[sch_rom_data.Obj_OOZBoss_Main           ] = boss_data.scheroes.OOZ2,	-- 08
+	[sch_rom_data.Obj_MechaSonic_Main6       ] = boss_data.scheroes.DEZ1,	-- 09
+	[sch_rom_data.Obj_MechaSonic_Main8       ] = boss_data.scheroes.DEZ1,	-- 10
+	[sch_rom_data.Obj_MechaSonic_MainA       ] = boss_data.scheroes.DEZ1,	-- 11
+	[sch_rom_data.Obj_WFZBoss_LaserCase      ] = boss_data.scheroes.WFZ,	-- 12
+	[sch_rom_data.Obj_Eggrobo_Body           ] = boss_data.scheroes.DEZ2,	-- 13
+}
+
 -- TODO: Find out the boss code addresses for these two.
 --	s2boom
 --	scd

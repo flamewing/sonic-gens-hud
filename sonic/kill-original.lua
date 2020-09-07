@@ -36,35 +36,36 @@ local exit_restore_fun = function() end
 if rom:is_sonic_cd() then
 	--	In Sonic CD, the HUD is composed of 3 different parts that must be moved
 	--	offscreen. We move each just enough that they are offscreen but still loaded.
-	local addr = {[0xffd080] = 32, [0xffd0c0] = 96, [0xffd140] = 88}
+	local p1addr = rom.data.Player1
+	local addr = {[rom.data.HUD_ScoreTime] = 32, [rom.data.HUD_Lives] = 96, [rom.data.HUD_Rings] = 88}
 	exec_kill_fun    = function()
 			for ad, val in pairs(addr) do
-				memory.registerwrite(ad + 8, 2,
+				memory.registerwrite(ad + rom.data.x_pos, 2,
 					function(address, range)
-						if memory.readbyte(ad) == 28 and
-								memory.readwordsigned(ad + 8) ~= val then
-							memory.writeword(ad + 8, val)
+						if memory.readbyte(ad + rom.data.id) == 28 and
+								memory.readwordsigned(ad + rom.data.x_pos) ~= val then
+							memory.writeword(ad + rom.data.x_pos, val)
 						end
 					end)
 			end
 		end
 	exec_restore_fun = function()
 			for ad, val in pairs(addr) do
-				memory.registerwrite(ad + 8, 2, nil)
+				memory.registerwrite(ad + rom.data.x_pos, 2, nil)
 			end
 		end
 	start_kill_fun   = function()
 			for ad, val in pairs(addr) do
-				if memory.readbyte(ad) == 28 then
-					memory.writeword(ad + 8, val)
+				if memory.readbyte(ad + rom.data.id) == 28 then
+					memory.writeword(ad + rom.data.x_pos, val)
 				end
 			end
 		end
 	exit_restore_fun = function()
 			for ad, val in pairs(addr) do
-				if memory.readbyte(ad) == 28 then
-					memory.registerwrite(ad + 8, 2, nil)
-					memory.writeword(ad + 8, 144)
+				if memory.readbyte(ad + rom.data.id) == 28 then
+					memory.registerwrite(ad + rom.data.x_pos, 2, nil)
+					memory.writeword(ad + rom.data.x_pos, 144)
 				end
 			end
 		end
@@ -80,29 +81,29 @@ if rom:is_sonic_cd() then
 elseif rom:is_sonic1() then
 	--	The HUD in Sonic 1 and hacks is a single object, which we push *just* offscreen so
 	--	that it will still be loaded and drawn.
-	local ad = 0xffd040
+	local ad = rom.data.HUD_Object
 	local val = 32
 	exec_kill_fun    = function()
-			memory.registerwrite(ad + 8, 1,
+			memory.registerwrite(ad + rom.data.x_pos, 1,
 				function(address, range)
-					if memory.readbyte(ad) == 33 and
-							memory.readwordsigned(ad + 8) ~= val then
-						memory.writeword(ad + 8, val)
+					if memory.readbyte(ad + rom.data.id) == 33 and
+							memory.readwordsigned(ad + rom.data.x_pos) ~= val then
+						memory.writeword(ad + rom.data.x_pos, val)
 					end
 				end)
 		end
 	exec_restore_fun = function()
-			memory.registerwrite(ad + 8, 1, nil)
+			memory.registerwrite(ad + rom.data.x_pos, 1, nil)
 		end
 	start_kill_fun   = function()
-			if memory.readbyte(ad) == 33 then
-				memory.writeword(ad + 8, val)
+			if memory.readbyte(ad + rom.data.id) == 33 then
+				memory.writeword(ad + rom.data.x_pos, val)
 			end
 		end
 	exit_restore_fun = function()
-			if memory.readbyte(ad) == 33 then
-				memory.registerwrite(ad + 8, 2, nil)
-				memory.writeword(ad + 8, 144)
+			if memory.readbyte(ad + rom.data.id) == 33 then
+				memory.registerwrite(ad + rom.data.x_pos, 2, nil)
+				memory.writeword(ad + rom.data.x_pos, 144)
 			end
 		end
 elseif rom:is_sonic2() then

@@ -31,9 +31,11 @@ require("headers/register")
 require("headers/widgets")
 require("sonic/common/game-info")
 
-if rom:is_sonic2() then
+local curr_data = rom.data
+
+if curr_data.Two_player_mode ~= nil and curr_data.Two_player_items then
 	local monitor_icon = Icon_widget:new(72 + 4 * 44, 0, function()
-			local frames = AND(memory.readword(0xfffe04), 7)
+			local frames = AND(memory.readword(rom.data.Timer_frames), 7)
 			if frames == 0 then
 				return "sonic-normal"
 			elseif frames == 1 then
@@ -55,7 +57,7 @@ if rom:is_sonic2() then
 			end
 		end)
 	callbacks.gens.registerafter:add(function()
-			if not game:disable_hud() and memory.readword(0xffffffd8) ~= 0 and memory.readword(0xffffff75) == 0 then
+			if not game:disable_hud() and memory.readword(curr_data.Two_player_mode) ~= 0 and memory.readword(curr_data.Two_player_items) == 0 then
 				monitor_icon:draw()
 			end
 		end)

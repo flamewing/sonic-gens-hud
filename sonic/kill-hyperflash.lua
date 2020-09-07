@@ -51,17 +51,23 @@ else
 				--	Point the write destination away from the DMA memory-mapped vport and into
 				--	an unused word-sized RAM address. The theory is that all instructions are
 				--	still executed in each frame, but their effects are nullified.
-				memory.setregister("a6", 0xffcfcc)
+				memory.setregister("a6", rom.data.Unused_address)
 			end or nil
 		--	Fix graphical glitch resulting from above fix.
+		local art_tile_offset = rom.data.art_tile
+		local Player1_art_tile = rom.data.Player1 + art_tile_offset
 		local fix_glitch = enable and function()
 				local reg = memory.getregister("a0")
-				if memory.readbyte(reg + 0xa) == 0 then
-					memory.writeword(reg + 0xa, memory.readword(0xffb00a))
+				if memory.readbyte(reg + art_tile_offset) == 0 then
+					memory.writeword(reg + art_tile_offset, memory.readword(Player1_art_tile))
 				end
 			end or nil
-		memory.registerexec(0x810, kill_fun)
-		memory.registerexec(0x1a516, fix_glitch)
+		if rom.data.kill_hyperdash_address ~= nil then
+			memory.registerexec(rom.data.kill_hyperdash_address, kill_fun)
+		end
+		if rom.data.hyperflash_glitch_fix_address ~= nil then
+			memory.registerexec(rom.data.hyperflash_glitch_fix_address, fix_glitch)
+		end
 	end
 end
 
