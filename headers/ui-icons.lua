@@ -34,6 +34,9 @@ end
 
 ui_icons = {}
 setmetatable(ui_icons, {__index = function (self, image)
+		if image == nil or type(image) ~= "string" then
+			image = "forbidden"
+		end
 		local v = open_image("ui-icon-" .. image .. ".luaimg")
 		self[image] = v
 		return v
