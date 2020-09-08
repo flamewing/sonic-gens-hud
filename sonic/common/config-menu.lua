@@ -119,7 +119,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 		function()
 			return game_hud
 		end, "Show Main HUD", 15, game_hud), 0, 17)
-	for n=1, 2 do
+	for n=1, 3 do
 		--	Pn toggle.
 		cond:add(make_emerald_toggle(
 			function(self)
@@ -136,7 +136,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 		end, nil,
 		function()
 			return stat_hud
-		end, "Show Status HUD", 15, stat_hud), 0, 68)
+		end, "Show Status HUD", 15, stat_hud), 0, 85)
 	--	Boss HUD toggle.
 	cond:add(make_emerald_toggle(
 		function(self)
@@ -144,7 +144,7 @@ function Config_menu:construct(x, y, w, h, draw_fun, active)
 		end, nil,
 		function()
 			return boss_hud_active
-		end, "Show Boss HUD", 15, boss_hud_active), 0, 85)
+		end, "Show Boss HUD", 15, boss_hud_active), 0, 102)
 	fra0:add(cond, 2, 7 + 17)
 	self:add(fra0, 2, 5)
 

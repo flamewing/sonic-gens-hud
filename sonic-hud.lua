@@ -289,7 +289,7 @@ end
 --	Configuration menu.
 --------------------------------------------------------------------------------
 local menubtn = Container_widget:new(273, 0, menu_active)
-local menu = Config_menu:new(40, 30, 240, 143, function ()
+local menu = Config_menu:new(40, 30, 240, 160, function ()
 		apply_options()
 		if not disable_lua_hud and not game:disable_hud() then
 			do_huds()
