@@ -120,6 +120,10 @@ function table_eq(table1, table2)
 		if type(t1) ~= "table" then
 			return t1 == t2
 		end
+		-- Base case: tables of different sizes
+		if #table1 ~= #table2 then
+			return false
+		end
 		-- Now, on to tables.
 		-- First, let's avoid looping forever.
 		if avoid_loops[t1] then
@@ -176,7 +180,7 @@ end
 draw_hud = function ()
 	--	Selected character(s)
 	local selchar   = game:get_char()
-	if characters == nil or (game.curr_char ~= selchar or not table_eq(game.curr_char, selchar)) then
+	if characters == nil or not table_eq(game.curr_char, selchar) then
 		set_chardata(selchar)
 		char_huds = {}
 		levelbounds = {}
