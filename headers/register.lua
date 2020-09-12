@@ -33,7 +33,6 @@ callback = class{
 	callbacks = {},
 	nonrecursive = false,
 	in_call = false,
-	redraw = false,
 }
 
 function callback:call()
@@ -43,9 +42,6 @@ function callback:call()
 	self.in_call = true
 	for _, callfun in pairs(self.callbacks) do
 		callfun()
-	end
-	if redraw then
-		gens.redraw()
 	end
 	self.in_call = false
 end
@@ -66,29 +62,28 @@ function callback:add(fun)
 end
 
 --	Create widget and set position.
-function callback:construct(registerfunc, nonrec, redraw)
+function callback:construct(registerfunc, nonrec)
 	assert_function(registerfunc)
 	self.callbacks = {}
 	self.nonrecursive = nonrec or false
 	self.in_call = false
-	self.redraw = redraw
 	registerfunc(function() self:call() end)
 	return self
 end
 
 callbacks = {
 	gens = {
-		registerbefore = callback:new(gens.registerbefore   , true, false),
-		registerafter  = callback:new(gens.registerafter    , true, false),
-		registerexit   = callback:new(gens.registerexit     , true, false),
-		registerstart  = callback:new(gens.registerstart    , true, false),
+		registerbefore = callback:new(gens.registerbefore   , true),
+		registerafter  = callback:new(gens.registerafter    , true),
+		registerexit   = callback:new(gens.registerexit     , true),
+		registerstart  = callback:new(gens.registerstart    , true),
 	},
 	savestate = {
-		registerload   = callback:new(savestate.registerload, true, false),
-		registersave   = callback:new(savestate.registersave, true, false),
+		registerload   = callback:new(savestate.registerload, true),
+		registersave   = callback:new(savestate.registersave, true),
 	},
 	gui = {
-		register       = callback:new(gui.register          , true, true ),
+		register       = callback:new(gui.register          , true),
 	},
 }
 
