@@ -370,7 +370,7 @@ if rom:is_sonic3() or rom:is_sonick() or rom:is_scheroes() then
 
 	function Character:instashield_time()
 		local shield = self:get_shield_object()
-		return string.format("%5d", 15 - memory.readbyte(shield + curr_data.next_anim) - memory.readbyte(shield + curr_data.anim_frame))
+		return string.format("%5d", 15 - memory.readbyte(shield + curr_data.prev_anim) - memory.readbyte(shield + curr_data.anim_frame))
 	end
 else
 	function Character:doing_instashield()
