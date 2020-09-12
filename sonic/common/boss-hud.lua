@@ -157,59 +157,88 @@ function Boss_widget:construct(x, y, active)
 	return self
 end
 
-if curr_data.DynObjs_list_head ~= nil then
-	function Boss_widget:scan_bosses()
-		self.children = {}
-		local offset = 0xff0000 + memory.readword(curr_data.DynObjs_list_head)
-		--local last   = 0xff0000 + memory.readword(curr_data.DynObjs_list_tail)
-		while offset ~= 0xff0000 do
-			local code = memory.readlong(offset + curr_data.code)
-			for ad, fun in pairs(self.boss_addr) do
-				if code == ad then
-					self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
-					break
-				end
+if curr_data.code ~= nil then
+	function get_obj_identifier(offset)
+		return memory.readlong(offset + curr_data.code)
+	end
+
+	function bossdata_iterator(table)
+		local key, value = nil, nil
+		return function()
+			key, value = next(table, key)
+			if value ~= nil then
+				return key, value
 			end
-			offset = 0xff0000 + memory.readword(offset + curr_data.next)
 		end
 	end
-elseif curr_data.Dynamic_Object_RAM_End ~= nil then
-	function Boss_widget:scan_bosses()
-		self.children = {}
-		local offset = curr_data.Dynamic_Object_RAM
-		local last   = curr_data.Dynamic_Object_RAM_End
-		local objsize = curr_data.object_size
-		if curr_data.code ~= nil then
-			while offset < last do
-				local code = memory.readlong(offset + curr_data.code)
-				if code ~= 0 then
-					for ad, fun in pairs(self.boss_addr) do
-						if code == ad then
-							self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
-							break
-						end
-					end
-				end
-				offset = offset + objsize
-			end
-		elseif curr_data.id ~= nil then
-			while offset < last do
-				local id = memory.readbyte(offset + curr_data.id)
-				if id ~= 0 then
-					for _, fun in pairs(self.boss_addr) do
-						if id == fun[1] then
-							self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
-							break
-						end
-					end
-				end
-				offset = offset + objsize
+elseif curr_data.id ~= nil then
+	function get_obj_identifier(offset)
+		return memory.readbyte(offset + curr_data.id)
+	end
+
+	function bossdata_iterator(table)
+		local key, value = nil, nil
+		return function()
+			key, value = next(table, key)
+			if value ~= nil then
+				return value[1], value
 			end
 		end
 	end
 else
-	function Boss_widget:scan_bosses()
-		self.children = {}
+	function get_obj_identifier(offset)
+		return -1
+	end
+
+	function bossdata_iterator(table)
+		return function()
+		end
+	end
+end
+
+if curr_data.DynObjs_list_head ~= nil then
+	function object_iterator()
+		local offset = curr_data.DynObjs_list_head
+		return function()
+			local base = memory.readword(offset + curr_data.next)
+			offset = base + 0xff0000
+			if base ~= 0 then
+				return offset, get_obj_identifier(offset)
+			end
+		end
+	end
+elseif curr_data.Dynamic_Object_RAM_End ~= nil then
+	function object_iterator()
+		local objsize = curr_data.object_size
+		local offset = curr_data.Dynamic_Object_RAM - objsize
+		local last   = curr_data.Dynamic_Object_RAM_End
+		return function()
+			local data
+			repeat
+				offset = offset + objsize
+				data = get_obj_identifier(offset)
+			until data ~= 0 or offset >= last
+			if offset < last then
+				return offset, data
+			end
+		end
+	end
+else
+	function object_iterator()
+		return function()
+		end
+	end
+end
+
+function Boss_widget:scan_bosses()
+	self.children = {}
+	for offset, objid in object_iterator() do
+		for bossid, fun in bossdata_iterator(self.boss_addr) do
+			if objid == bossid then
+				self:add(Boss_hud:new(0, 0, true, offset, select_icons(fun[1]), fun[2], fun[3]), 0, 0)
+				break
+			end
+		end
 	end
 end
 
@@ -219,7 +248,7 @@ function Boss_widget:register()
 		memory.registerexec(ad, 8,
 			function(address, range)
 				local offset = AND(memory.getregister("a0"), 0xffffff)
-				for id, child in pairs(self.children) do
+				for _, child in pairs(self.children) do
 					if child.offset == offset then
 						-- already have it
 						return
