@@ -176,11 +176,13 @@ function table_eq(table1, table2)
 	return recurse(table1, table2)
 end
 
+local last_mode = nil
 --	Reads mem values, emulates a couple of frames, displays everything
 draw_hud = function ()
 	--	Selected character(s)
 	local selchar   = game:get_char()
-	if characters == nil or not table_eq(game.curr_char, selchar) then
+	local new_mode  = game:get_mode()
+	if characters == nil or new_mode ~= last_mode or not table_eq(game.curr_char, selchar) then
 		set_chardata(selchar)
 		char_huds = {}
 		levelbounds = {}
@@ -191,6 +193,7 @@ draw_hud = function ()
 			table.insert(levelbounds, Level_bounds:new(char, (char.is_p1 and {255, 255, 0, 255}) or {255, 0, 255, 255}))
 		end
 	end
+	last_mode = new_mode
 
 	--	look 2 frames into the future, pretending the B button is held,
 	--	and get what the X and Y velocity of the player will be

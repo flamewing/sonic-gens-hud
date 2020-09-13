@@ -244,6 +244,10 @@ function game:get_char()
 	return rom.get_char()
 end
 
+function game:get_mode()
+	return memory.readbyte(curr_data.Game_Mode)
+end
+
 function game:in_score_tally()
 	return memory.readbyte(curr_data.Game_Mode) == curr_data.GameModeID_Level and memory.readlong(curr_data.Bonus_Countdown_1) ~= 0
 end
