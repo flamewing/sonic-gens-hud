@@ -197,36 +197,67 @@ else
 end
 
 if curr_data.DynObjs_list_head ~= nil then
-	function object_iterator()
-		local offset = curr_data.DynObjs_list_head
-		return function()
-			local base = memory.readword(offset + curr_data.next)
+	local function basic_object_iterator(check_end)
+		return function (direction, offset)
+			local base = memory.readword(offset + direction)
 			offset = base + 0xff0000
-			if base ~= 0 then
+			if not check_end(offset, base) then
 				return offset, get_obj_identifier(offset)
 			end
 		end
 	end
-elseif curr_data.Dynamic_Object_RAM_End ~= nil then
+
 	function object_iterator()
-		local objsize = curr_data.object_size
-		local offset = curr_data.Dynamic_Object_RAM - objsize
-		local last   = curr_data.Dynamic_Object_RAM_End
-		return function()
+		return basic_object_iterator(
+			function (offset, base)
+				return base == 0
+			end), curr_data.next, curr_data.DynObjs_list_head
+	end
+
+	function reverse_object_iterator()
+		return basic_object_iterator(
+			function (offset, base)
+				return offset == curr_data.DynObjs_list_head
+			end), curr_data.prev, curr_data.DynObjs_list_head
+	end
+elseif curr_data.Dynamic_Object_RAM_End ~= nil then
+	local function basic_object_iterator(check_end, objsize)
+		return function(last, offset)
 			local data
 			repeat
 				offset = offset + objsize
 				data = get_obj_identifier(offset)
-			until data ~= 0 or offset >= last
-			if offset < last then
+			until data ~= 0 or check_end(offset, last)
+			if not check_end(offset, last) then
 				return offset, data
 			end
 		end
 	end
+
+	function object_iterator()
+		return basic_object_iterator(
+				function (offset, last)
+					return offset >= last
+				end, curr_data.object_size),
+			curr_data.Dynamic_Object_RAM_End,
+			curr_data.Dynamic_Object_RAM - curr_data.object_size
+	end
+
+	function reverse_object_iterator()
+		return basic_object_iterator(
+				function (offset, last)
+					return offset < last
+				end, -curr_data.object_size),
+			curr_data.Dynamic_Object_RAM,
+			curr_data.Dynamic_Object_RAM_End
+	end
 else
 	function object_iterator()
-		return function()
-		end
+		return function() end
+	end
+
+	function reverse_object_iterator()
+		return function() end
 	end
 end
 

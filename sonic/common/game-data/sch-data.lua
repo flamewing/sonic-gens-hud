@@ -42,6 +42,7 @@ sch_rom_data = {
 	DynObjs_list_head = 0xfffa84,
 	DynObjs_list_tail = 0xfffa86,
 	next = 0x0,
+	prev = 0x2,
 	code = 0x4,
 	x_pos = 0x10,
 	x_sub = 0x12,
