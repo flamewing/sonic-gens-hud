@@ -182,7 +182,7 @@ draw_hud = function ()
 	--	Selected character(s)
 	local selchar   = game:get_char()
 	local new_mode  = game:get_mode()
-	if characters == nil or new_mode ~= last_mode or not table_eq(game.curr_char, selchar) then
+	if (characters == nil) or (new_mode ~= last_mode) or not table_eq(game.curr_char, selchar) then
 		set_chardata(selchar)
 		char_huds = {}
 		levelbounds = {}
@@ -232,6 +232,8 @@ end
 local function do_huds()
 	if not game:disable_hud() then
 		draw_hud()
+	else
+		game.curr_char = nil
 	end
 end
 
