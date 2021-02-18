@@ -404,7 +404,7 @@ if rom:is_sonic_cd() then
 
 	function Character:spindash_charge()
 		-- You can release it a frame earlier than this, but it will be slower.
-		local max = (self:is_rolling() and 45-1) or 30-1
+		local max = (self:is_rolling() and (45-1)) or (30-1)
 		local val = self:spindash_time()
 		local sonicspd = self:get_top_speed()
 		local absinertia = math.abs(self:get_inertia())

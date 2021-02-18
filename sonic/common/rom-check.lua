@@ -37,6 +37,26 @@ require("sonic/common/enums")
 require("headers/lua-oo")
 
 --------------------------------------------------------------------------------
+--	Utility function
+--------------------------------------------------------------------------------
+function bytes_to_string(bytes)
+	local bytearr = {}
+	for _, v in ipairs(bytes) do
+		table.insert(bytearr, string.char(v))
+	end
+	return table.concat(bytearr)
+end
+
+function check_title(base)
+	local title = string.char(unpack(memory.readbyterange(0x120, 0x30)))
+	return title == base
+end
+
+function get_serial(offset)
+	return string.char(unpack(memory.readbyterange(0x180 + (offset or 0), 0x0E)))
+end
+
+--------------------------------------------------------------------------------
 --	Boss data reading metafunctions.
 --------------------------------------------------------------------------------
 local function make_unsigned_read(off, add)
@@ -311,32 +331,20 @@ local function s1tails_check(self, val)
 		return false
 	end
 	--	Checksum is no good for this hack.
-	local title = memory.readbyterange(0x120, 0x30)
-	local base  = "MILES \"TAILS\" PROWER IN SONIC THE HEDGEHOG      "
-	for i = 1, 0x30, 1 do
-		if base:byte(i) ~= title[i] then
-			return false
-		end
-	end
-	return true
+	return check_title("MILES \"TAILS\" PROWER IN SONIC THE HEDGEHOG      ")
 end
 
 --	Special exception check for Tails in Sonic 1.
 local function scheroes_check(self, val)
 	--	Checksum is no good for this hack.
-	local title = memory.readbyterange(0x120, 0x30)
-	local base  = "SONIC THE HEDGEHOG CLASSIC HEROES               "
-	local is_sch = true
-	for i = 1, 0x30, 1 do
-		if base:byte(i) ~= title[i] then
-			return false
+	local sch_title = check_title("SONIC THE HEDGEHOG CLASSIC HEROES               ")
+	if sch_title == true then
+		local revision = memory.readlong(0x1C8)
+		if self.checksum ~= revision then
+			print("Warning: the ROM is at a different revision than the script was written for. Not everything may work correctly.")
 		end
 	end
-	local revision = memory.readlong(0x1C8)
-	if self.checksum ~= revision then
-		print("Warning: the ROM is at a different revision than the script was written for. Not everything may work correctly.")
-	end
-	return true
+	return sch_title
 end
 
 --	We remap the value read from memory in S2/S3/S&K/S3&K to the internal IDs
@@ -409,6 +417,71 @@ local function sklockon_check(v1)
 		end
 end
 
+--	Generic hack fallbacks
+local function generic_s1_hack()
+	local serial = get_serial()
+	if serial == "GM 00001009-00" then
+		print(string.format("Guessing hack based on 'Sonic 1 Rev00'"))
+		return true
+	elseif serial == "GM 00004049-01" then
+		print(string.format("Guessing hack based on 'Sonic 1 Rev01'"))
+		return true
+	else
+		return false
+	end
+end
+
+local function generic_s2_hack()
+	local serial = get_serial()
+	if serial == "GM 00001051-00" then
+		print(string.format("Guessing hack based on 'Sonic 2 Rev00'"))
+		return true
+	elseif serial == "GM 00001051-01" then
+		print(string.format("Guessing hack based on 'Sonic 2 Rev01'"))
+		return true
+	elseif serial == "GM 00001051-02" then
+		print(string.format("Guessing hack based on 'Sonic 2 Rev02'"))
+		return true
+	else
+		return false
+	end
+end
+
+local function generic_s3_hack()
+	local serial = get_serial()
+	if serial == "GM MK-1079 -00" then
+		print(string.format("Guessing hack based on 'Sonic 3'"))
+		return true
+	else
+		return false
+	end
+end
+
+local function generic_sk_hack()
+	local serial1 = get_serial()
+	local serial2 = memory.isvalid(0x200180) and get_serial(0x200000)
+	local sram = string.char(unpack(memory.readbyterange(0x1B0, 0x2)))
+	print(serial1, serial1 == "GM MK-1563 -00")
+	print(sram, sram == "  ")
+	if serial1 == "GM MK-1563 -00" and serial2 ~= "GM MK-1079 -00" and sram == "  " then
+		print(string.format("Guessing hack based on 'Sonic & Knuckles'"))
+		return true
+	else
+		return false
+	end
+end
+
+local function generic_s3k_hack()
+	local serial1 = get_serial()
+	local serial2 = memory.isvalid(0x200180) and get_serial(0x200000)
+	local sram = string.char(unpack(memory.readbyterange(0x1B0, 0x2)))
+	if serial1 == "GM MK-1563 -00" and (serial2 == "GM MK-1079 -00" or sram == "RA") then
+		print(string.format("Guessing hack based on 'Sonic 3 & Knuckles'"))
+		return true
+	else
+		return false
+	end
+end
 --------------------------------------------------------------------------------
 --	Data for all supported ROMS, gathered in an easy-to-use rom_info array.
 --------------------------------------------------------------------------------
@@ -445,6 +518,20 @@ local supported_games = {
 	scheroes = rom_info:new(sums.scheroes , eng.sch, false, true , false, scheroes_char   , bosses.scheroes, sch_rom_data.Ring_count, sch_rom_data.Camera_delay_ptr, nil        , scheroes_check         , sch_rom_data    ),
 }
 
+--------------------------------------------------------------------------------
+--	Data for fallback base games, gathered in an easy-to-use rom_info array.
+--------------------------------------------------------------------------------
+
+local fallbacks = {
+	--  The parameters:                              Air    Tails  Cream  Character ID                       Rings                    Scroll                         S2/S3/SK                              ROM
+	--                       Checksum       Engine   cap    flies  flies  or function       boss code array  offset                   Delay                          HUD code      special rom check       Data
+	s1       = rom_info:new(sums.s1wrev0  , eng.s1 , true , false, false, charids.sonic   , {}             , 0xfffe20               , nil                          , nil        , generic_s1_hack   , sonic1_rom_data ),
+	s2       = rom_info:new(sums.s2       , eng.s2 , true , false, false, s2_char         , {}             , 0xfffe20               , 0xffeed0                     , nil        , generic_s2_hack   , sonic2_rom_data ),
+	s3       = rom_info:new(sums.s3       , eng.s3 , false, true , false, s3k_char        , {}             , 0xfffe20               , 0xffee24                     , nil        , generic_s3_hack   , sonic3_rom_data ),
+	sk       = rom_info:new(sums.sk       , eng.sk , false, true , false, s3k_char        , {}             , 0xfffe20               , 0xffee24                     , nil        , generic_sk_hack   , sonic3_rom_data ),
+	s3k      = rom_info:new(sums.sk       , eng.s3k, false, true , false, s3k_char        , {}             , 0xfffe20               , 0xffee24                     , nil        , generic_s3k_hack  , sonic3_rom_data ),
+}
+
 --	These two variables will hold info on the currently loaded ROM.
 rom = nil
 romid = nil
@@ -460,15 +547,31 @@ for id, game in pairs(supported_games) do
 end
 
 if rom == nil then
-	--	No matching ROM in the supported list. Print error.
-	local s1 = "Error: Unsupported ROM"
+	--	No matching ROM in the supported list.
+	-- Try fallbacks
+	print(string.format("Unsupported ROM with checksum '0x%04x'", checksum))
+	--	Find which ROM we have.
+	local checksum = memory.readword(0x18e)
+	for id, game in pairs(fallbacks) do
+		if game.is_rom(game, checksum) then
+			rom = game
+			romid = tostring(id)
+			print(string.format("Note: fallback functionality will be limited, and maybe even wrong.", checksum))
+			break
+		end
+	end
+	print("")
+end
+
+if rom == nil then
+		-- Print error.
 	if checksum == sums.sk then
-		s2 = "Error details: 'Sonic & Knuckles' ROM is not supported if it is locked on to anything but 'Sonic 2' or 'Sonic 3'."
+		s2 = "Error: 'Sonic & Knuckles' ROM is not supported if it is locked on to anything but 'Sonic 2' or 'Sonic 3'."
 		s2 = string.format("%s\nLock-on checksum '0x%04x' is unsupported.", s2, memory.readword(0x20018e))
 	else
-		s2 = string.format("Error details: ROM with checksum '0x%04x' is unsupported.", checksum)
+		s2 = string.format("Error: ROM with checksum '0x%04x' is unsupported.", checksum)
 	end
-	error(s1.."\n\n"..s2, 0)
+	error(s2, 0)
 else
 	--	Found ROM. Read and print the reported ROM title.
 	local name = ""
