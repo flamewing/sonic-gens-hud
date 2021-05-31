@@ -210,7 +210,7 @@ if curr_data.DynObjs_list_head ~= nil then
 	function object_iterator()
 		return basic_object_iterator(
 			function (offset, base)
-				return base == 0
+				return base == XOR(AND(curr_data.DynObjs_list_tail-2,0xFFFF),0xFFFF)
 			end), curr_data.next, curr_data.DynObjs_list_head
 	end
 
